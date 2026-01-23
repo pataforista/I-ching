@@ -1,0 +1,68 @@
+{
+  "version": "0.1.0",
+  "last_updated_iso": "2026-01-10T00:00:00Z",
+  "app_shell_config": {
+    "min_client_version": "0.1.0",
+    "force_refresh_on_version_change": true
+  },
+  "resources": [
+    {
+      "id": "licenses",
+      "path": "/data/licenses.json",
+      "type": "config",
+      "version": "0.1.0",
+      "required_for_boot": true,
+      "cache_strategy": "network_first"
+    },
+    {
+      "id": "products",
+      "path": "/data/products.json",
+      "type": "config",
+      "version": "0.1.0",
+      "required_for_boot": true,
+      "cache_strategy": "network_first"
+    },
+    {
+      "id": "trigrams",
+      "path": "/data/trigrams.json",
+      "type": "static_data",
+      "version": "0.1.0",
+      "required_for_boot": true,
+      "cache_strategy": "stale_while_revalidate"
+    },
+    {
+      "id": "hexagrams_meta",
+      "path": "/data/hexagrams_meta.json",
+      "type": "static_data",
+      "version": "0.1.0",
+      "required_for_boot": true,
+      "cache_strategy": "stale_while_revalidate"
+    },
+    {
+      "id": "coins_rules",
+      "path": "/data/rules/coins_rules.json",
+      "type": "logic_engine",
+      "version": "0.1.1",
+      "required_for_boot": true,
+      "cache_strategy": "stale_while_revalidate"
+    },
+    {
+      "id": "hexagram_build_rules",
+      "path": "/data/rules/hexagram_build_rules.json",
+      "type": "logic_engine",
+      "version": "0.1.1",
+      "required_for_boot": true,
+      "cache_strategy": "stale_while_revalidate"
+    },
+    {
+      "id": "editorial_content_core",
+      "path": "/data/content/hexagrams_core.json",
+      "type": "content",
+      "version": "0.1.0",
+      "description": "Contiene los textos editoriales de los hexagramas (free + premium) con nota ética.",
+      "required_for_boot": false,
+      "lazy_load": true,
+      "cache_strategy": "cache_first_update_background"
+    }
+  ]
+}

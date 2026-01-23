@@ -1,0 +1,79 @@
+{
+  "version": "0.1.0",
+  "line_order": "bottom_to_top",
+  "line_encoding": { "yang": 1, "yin": 0 },
+  "trigrams": [
+    {
+      "id": "qian",
+      "hanzi": "乾",
+      "symbol_unicode": "☰",
+      "symbol_name_unicode_es": "Trigrama del Cielo",
+      "name_es": "Cielo",
+      "keywords_es": ["iniciativa", "fuerza", "dirección"],
+      "binary_lines_bottom_to_top": [1, 1, 1]
+    },
+    {
+      "id": "kun",
+      "hanzi": "坤",
+      "symbol_unicode": "☷",
+      "symbol_name_unicode_es": "Trigrama de la Tierra",
+      "name_es": "Tierra",
+      "keywords_es": ["receptividad", "sostén", "nutrición"],
+      "binary_lines_bottom_to_top": [0, 0, 0]
+    },
+    {
+      "id": "zhen",
+      "hanzi": "震",
+      "symbol_unicode": "☳",
+      "symbol_name_unicode_es": "Trigrama del Trueno",
+      "name_es": "Trueno",
+      "keywords_es": ["inicio", "impulso", "despertar"],
+      "binary_lines_bottom_to_top": [1, 0, 0]
+    },
+    {
+      "id": "kan",
+      "hanzi": "坎",
+      "symbol_unicode": "☵",
+      "symbol_name_unicode_es": "Trigrama del Agua",
+      "name_es": "Agua",
+      "keywords_es": ["profundidad", "riesgo", "aprendizaje"],
+      "binary_lines_bottom_to_top": [0, 1, 0]
+    },
+    {
+      "id": "gen",
+      "hanzi": "艮",
+      "symbol_unicode": "☶",
+      "symbol_name_unicode_es": "Trigrama de la Montaña",
+      "name_es": "Montaña",
+      "keywords_es": ["detención", "límite", "quietud"],
+      "binary_lines_bottom_to_top": [0, 0, 1]
+    },
+    {
+      "id": "xun",
+      "hanzi": "巽",
+      "symbol_unicode": "☴",
+      "symbol_name_unicode_es": "Trigrama del Viento",
+      "name_es": "Viento",
+      "keywords_es": ["penetración", "influencia", "flexibilidad"],
+      "binary_lines_bottom_to_top": [0, 1, 1]
+    },
+    {
+      "id": "li",
+      "hanzi": "離",
+      "symbol_unicode": "☲",
+      "symbol_name_unicode_es": "Trigrama del Fuego",
+      "name_es": "Fuego",
+      "keywords_es": ["claridad", "adhesión", "discernimiento"],
+      "binary_lines_bottom_to_top": [1, 0, 1]
+    },
+    {
+      "id": "dui",
+      "hanzi": "兌",
+      "symbol_unicode": "☱",
+      "symbol_name_unicode_es": "Trigrama del Lago",
+      "name_es": "Lago",
+      "keywords_es": ["apertura", "gozo", "comunicación"],
+      "binary_lines_bottom_to_top": [1, 1, 0]
+    }
+  ]
+}

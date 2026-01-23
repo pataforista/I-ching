@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es" data-theme="paper">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f3efe4" />
+  <title>I Ching — Reflexión local</title>
+
+  <!-- Fuentes opcionales (puedes borrar esto si no quieres dependencias) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Spectral:wght@400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="brand">
+        <div class="brand__title">I Ching (uso local)</div>
+        <div class="brand__subtitle">Reflexión, no adivinación. Nada se envía a servidores.</div>
+      </div>
+      <div class="toolbar">
+        <button id="btnTheme" class="btn btn--ghost btn--sm" type="button">Tema</button>
+      </div>
+    </header>
+
+    <main id="root"></main>
+
+    <footer class="muted" style="margin-top:14px;font-size:13px;">
+      Elaborado por Dr. César Celada (CACB). Uso personal. No sustituye criterio clínico.
+    </footer>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+  <script>
+    (function(){
+      const html = document.documentElement;
+      const saved = localStorage.getItem("theme");
+      if(saved) html.setAttribute("data-theme", saved);
+
+      const btn = document.getElementById("btnTheme");
+      btn?.addEventListener("click", () => {
+        const next = (html.getAttribute("data-theme") === "sumi") ? "paper" : "sumi";
+        html.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+        // tema-color simple
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if(meta) meta.setAttribute("content", next === "sumi" ? "#1a1a18" : "#f3efe4");
+      });
+    })();
+  </script>
+</body>
+</html>

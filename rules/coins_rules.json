@@ -1,0 +1,38 @@
+{
+  "version": "0.1.1",
+  "method": "three_coins",
+  "coin_values": {
+    "heads": 3,
+    "tails": 2
+  },
+  "sum_outcomes": {
+    "6": {
+      "name_es": "yin_mutante",
+      "line_bit": 0,
+      "is_moving": true,
+      "transforms_to_bit": 1
+    },
+    "7": {
+      "name_es": "yang_estable",
+      "line_bit": 1,
+      "is_moving": false,
+      "transforms_to_bit": 1
+    },
+    "8": {
+      "name_es": "yin_estable",
+      "line_bit": 0,
+      "is_moving": false,
+      "transforms_to_bit": 0
+    },
+    "9": {
+      "name_es": "yang_mutante",
+      "line_bit": 1,
+      "is_moving": true,
+      "transforms_to_bit": 0
+    }
+  },
+  "implementation_notes_es": {
+    "resulting_hexagram_no_conditionals": "El hexagrama resultante puede construirse mapeando transforms_to_bit en las 6 líneas. En 7 y 8 transforms_to_bit == line_bit, por lo que no se requieren condicionales.",
+    "line_order_note": "Se generan 6 líneas de abajo hacia arriba (línea 1 primero)."
+  }
+}

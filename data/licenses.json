@@ -1,0 +1,24 @@
+{
+  "version": "0.1.0",
+  "app_principles_es": {
+    "non_predictive": "Esta app no predice eventos futuros ni ofrece certezas. Presenta marcos de reflexión para decisiones en el presente.",
+    "taoist_orientation": "La interpretación prioriza una lectura taoísta y pragmática: atención al proceso, ajuste al contexto y reducción de fricción.",
+    "no_medical_substitution": "No sustituye criterio clínico, legal o profesional. Si la situación es de riesgo o urgente, busca ayuda profesional y servicios de emergencia."
+  },
+  "privacy_es": {
+    "local_first": "Por defecto, todo se guarda localmente en el dispositivo (IndexedDB/localStorage).",
+    "no_account_required": "No requiere cuenta. No solicita nombre real ni datos sensibles.",
+    "no_cloud_by_default": "No se envía información a servidores externos por defecto.",
+    "export_user_control": "Toda exportación (texto/PDF) es opcional y se realiza bajo control del usuario.",
+    "telemetry_default": "telemetry_off"
+  },
+  "copyright_es": {
+    "editorial_text": "El contenido editorial (español) es texto original del autor del proyecto. No es traducción literal del I Ching.",
+    "public_domain_sources": "La estructura tradicional y referencias se inspiran en el Zhouyi y traducciones históricas de dominio público (p. ej., James Legge).",
+    "third_party_text_policy": "No se incluyen traducciones modernas con copyright como texto visible dentro de la app."
+  },
+  "store_disclosures_es": {
+    "entertainment_wellbeing": "Se presenta como herramienta de reflexión/ bienestar y no como servicio de adivinación.",
+    "pricing_transparency": "Las funciones de pago desbloquean capas de guía (Lectura Profunda, Cuaderno), no promesas de exactitud."
+  }
+}

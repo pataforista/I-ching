@@ -1,0 +1,51 @@
+{
+  "version": "0.1.0",
+  "currency": "MXN",
+  "pricing_model": "one_time_purchase",
+  "products": [
+    {
+      "product_id": "iching_reflection_plus",
+      "store_sku_ios": "iching.reflection.plus",
+      "store_sku_android": "iching_reflection_plus",
+      "title_es": "I Ching · Trabajo Continuo",
+      "short_description_es": "Guarda, revisa y exporta tus lecturas.",
+      "long_description_es": "Desbloquea el diario personal, la exportación en PDF y el seguimiento de tus lecturas para trabajar con continuidad. Pago único. Sin suscripciones. Uso local.",
+      "price": {
+        "amount": 129,
+        "formatted": "$129 MXN"
+      },
+      "entitlements": {
+        "journal_mode": true,
+        "export_tools": true,
+        "premium_sections": true
+      },
+      "non_entitlements": {
+        "prediction": false,
+        "medical_advice": false,
+        "guaranteed_outcomes": false
+      },
+      "purchase_notes_es": [
+        "Pago único, sin renovaciones.",
+        "Las lecturas no se comparten ni se suben a servidores.",
+        "No ofrece predicciones ni consejos médicos o legales."
+      ],
+      "refund_policy_es": "Sujeto a las políticas de reembolso de la tienda.",
+      "visibility": {
+        "show_on_paywall": true,
+        "show_on_onboarding": false
+      }
+    }
+  ],
+  "default_free_entitlements": {
+    "journal_mode": false,
+    "export_tools": false,
+    "premium_sections": false
+  },
+  "paywall_copy_es": {
+    "title": "Trabajar con continuidad",
+    "body": "Guarda tus lecturas, consérvalas como diario y expórtalas en PDF para revisarlas con calma.\n\nPago único. Sin suscripciones.",
+    "cta_primary": "Desbloquear",
+    "cta_secondary": "Continuar sin guardar",
+    "footer_note": "Uso personal. Contenido local."
+  }
+}
