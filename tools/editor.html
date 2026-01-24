@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>I-Ching Content Editor</title>
+    <style>
+        :root {
+            --bg: #f4f4f4;
+            --panel: #fff;
+            --text: #333;
+            --border: #ccc;
+        }
+
+        body {
+            font-family: sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .toolbar {
+            background: var(--panel);
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .sidebar {
+            background: var(--panel);
+            height: 80vh;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .editor {
+            background: var(--panel);
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .hex-item {
+            padding: 8px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .hex-item:hover,
+        .hex-item.active {
+            background: #e0e0e0;
+            font-weight: bold;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background: #555;
+        }
+
+        button.secondary {
+            background: #ddd;
+            color: #333;
+        }
+
+        .status {
+            margin-left: auto;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="toolbar">
+        <button onclick="loadContent()">Recargar JSON</button>
+        <button onclick="downloadContent()" class="secondary">Descargar JSON</button>
+        <div id="status" class="status">Listo.</div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar" id="hexList"></div>
+        <div class="editor" id="editArea">
+            <h2 id="currentHexTitle">Selecciona un hexagrama</h2>
+            <div id="formFields"></div>
+        </div>
+    </div>
+
+    <script>
+        let contentData = null;
+        let currentHexId = null;
+
+        async function loadContent() {
+            setStatus("Cargando...", "");
+            try {
+                const res = await fetch("../data/content/hexagrams_core.json");
+                if (!res.ok) throw new Error("Error cargando archivo");
+                const json = await res.json();
+                contentData = json;
+                renderList();
+                setStatus("Cargado correctamente.", "success");
+            } catch (e) {
+                setStatus("Error: " + e.message, "error");
+            }
+        }
+
+        function setStatus(msg, type) {
+            const el = document.getElementById("status");
+            el.textContent = msg;
+            el.className = "status " + type;
+        }
+
+        function renderList() {
+            const list = document.getElementById("hexList");
+            list.innerHTML = "";
+            if (!contentData || !contentData.hexagrams) return;
+
+            Object.keys(contentData.hexagrams).sort((a, b) => Number(a) - Number(b)).forEach(id => {
+                const div = document.createElement("div");
+                div.className = "hex-item";
+                div.textContent = `${id}. Hexagrama`;
+                div.onclick = () => selectHex(id, div);
+                list.appendChild(div);
+            });
+        }
+
+        function selectHex(id, el) {
+            currentHexId = id;
+            document.querySelectorAll(".hex-item").forEach(d => d.classList.remove("active"));
+            if (el) el.classList.add("active");
+
+            const hex = contentData.hexagrams[id];
+            document.getElementById("currentHexTitle").textContent = `Hexagrama ${id}`;
+
+            const form = document.getElementById("formFields");
+            form.innerHTML = "";
+
+            const fields = [
+                "dynamic_core_es", "image_es", "general_reading_es",
+                "taoist_reading_es", "micro_action_es", "ethics_note_es"
+            ];
+
+            fields.forEach(key => {
+                const label = document.createElement("label");
+                label.textContent = key;
+                const input = document.createElement("textarea");
+                input.value = hex[key] || "";
+                input.oninput = (e) => updateField(id, key, e.target.value);
+                form.appendChild(label);
+                form.appendChild(input);
+            });
+
+            // Special handling for lines? For now just simple text fields.
+            // Guiding questions (array)
+            const labelQ = document.createElement("label");
+            labelQ.textContent = "guiding_questions_es (uno por línea)";
+            const areaQ = document.createElement("textarea");
+            areaQ.value = (hex.guiding_questions_es || []).join("\n");
+            areaQ.oninput = (e) => {
+                contentData.hexagrams[id].guiding_questions_es = e.target.value.split("\n").filter(x => x.trim());
+            };
+            form.appendChild(labelQ);
+            form.appendChild(areaQ);
+        }
+
+        function updateField(id, key, val) {
+            if (contentData && contentData.hexagrams[id]) {
+                contentData.hexagrams[id][key] = val;
+            }
+        }
+
+        function downloadContent() {
+            if (!contentData) return;
+            const blob = new Blob([JSON.stringify(contentData, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "hexagrams_core.json";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setStatus("Archivo descargado. Reemplaza manualmente en /data/content/", "success");
+        }
+
+        // Auto load
+        loadContent();
+    </script>
+
+</body>
+
+</html>

@@ -1,12 +1,12 @@
-import { initEngine, tossLine, buildReading, isContentLoaded } from "./engine.js";
+// app.js
+import { initEngine, tossLine, buildReading, isContentLoaded, getProducts, getLicenses, getEntitlements, purchaseLocal, revokeLocal, trackEvent, getTelemetry } from "./engine.js";
 
 const LS_KEY = "iching_tao_v0";
 const LS_THEME = "iching_theme_v0";
-const LS_ENT = "iching_entitlements_v0";
 
 const state = {
   nav: "home", // home | toss | reading | history | paywall
-  boot: { ok: false, error: null },
+  boot: { ok: false, error: null, missing: null },
   draft: {
     question: { text_es: "", mode: "reflexion" }, // reflexion | decision | relacion | trabajo | salud | otro
     tosses: []
@@ -28,17 +28,38 @@ async function boot() {
   const savedTheme = localStorage.getItem(LS_THEME) || "ink";
   applyTheme(savedTheme);
 
-  // UI hooks (topbar)
-  document.getElementById("btnTheme").addEventListener("click", onToggleTheme);
-  document.getElementById("btnAbout").addEventListener("click", openAbout);
+  // UI hooks
+  const btnTheme = document.getElementById("btnTheme");
+  if (btnTheme) btnTheme.addEventListener("click", onToggleTheme);
+
+  const btnAbout = document.getElementById("btnAbout");
+  if (btnAbout) btnAbout.addEventListener("click", openAbout);
 
   // Engine init
   try {
     await initEngine();
     state.boot.ok = true;
+
+    // Sync Entitlements
+    state.entitlements = getEntitlements();
+
+    // Telemetry
+    trackEvent("session_start");
+
   } catch (e) {
     state.boot.ok = false;
     state.boot.error = String(e?.message || e);
+
+    if (e.missing && Array.isArray(e.missing)) {
+      state.boot.missing = e.missing;
+    }
+  }
+
+  // Set footer text dynamically if possible
+  const licenses = getLicenses();
+  if (licenses?.app_principles_es?.no_medical_substitution) {
+    const footerText = document.getElementById("footerText");
+    if (footerText) footerText.textContent = licenses.app_principles_es.no_medical_substitution;
   }
 
   // SW register
@@ -55,17 +76,11 @@ function loadLocal() {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed.history)) state.history = parsed.history;
     }
-  } catch {}
-
-  try {
-    const ent = localStorage.getItem(LS_ENT);
-    if (ent) state.entitlements = { ...state.entitlements, ...JSON.parse(ent) };
-  } catch {}
+  } catch { }
 }
 
 function saveLocal() {
   localStorage.setItem(LS_KEY, JSON.stringify({ history: state.history }));
-  localStorage.setItem(LS_ENT, JSON.stringify(state.entitlements));
 }
 
 // ---------- Theme ----------
@@ -79,6 +94,9 @@ function applyTheme(name) {
   if (name === "paper") document.documentElement.setAttribute("data-theme", "paper");
   else document.documentElement.removeAttribute("data-theme");
   localStorage.setItem(LS_THEME, name);
+
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", name === "ink" ? "#1a1a18" : "#f3efe4");
 }
 
 // ---------- SW ----------
@@ -86,9 +104,7 @@ async function registerSW() {
   if (!("serviceWorker" in navigator)) return;
   try {
     await navigator.serviceWorker.register("./sw.js");
-  } catch {
-    // silencioso: la app sigue funcionando sin SW
-  }
+  } catch { /* silent */ }
 }
 
 // ---------- Navigation ----------
@@ -121,8 +137,7 @@ function onTossNextLine() {
 
     if (state.draft.tosses.length === 6) {
       if (!isContentLoaded()) {
-        // contenido aún no listo: esperar un render más y permitir reintento
-        // pero construimos igual (el engine lanza si no está cargado)
+        // content pending check could happen here
       }
       const readingData = buildReading(state.draft.tosses);
       state.session = {
@@ -132,6 +147,7 @@ function onTossNextLine() {
         tosses: structuredClone(state.draft.tosses),
         hexagrams: readingData
       };
+      trackEvent("reading_view");
       nav("reading");
     } else {
       render();
@@ -140,7 +156,6 @@ function onTossNextLine() {
     openModal("Error", `
       <p>No pude completar la tirada.</p>
       <p class="mono muted">${escapeHtml(String(e?.message || e))}</p>
-      <p class="muted">Verifica que <span class="mono">/data</span> exista y que <span class="mono">hexagrams_core.json</span> esté accesible.</p>
     `);
   }
 }
@@ -148,7 +163,6 @@ function onTossNextLine() {
 function saveSession() {
   if (!state.session) return;
   state.history.unshift(state.session);
-  // límite simple
   state.history = state.history.slice(0, 200);
   saveLocal();
   openModal("Guardado", `<p>Sesión guardada en este dispositivo.</p>`);
@@ -165,27 +179,34 @@ function deleteHistory() {
 }
 
 function exportPDF() {
-  // Minimal: usa print del navegador (sirve en Android/Chrome como “Guardar PDF”)
   window.print();
 }
 
 function openPaywall(feature) {
   nav("paywall");
-  // store feature requested if needed in the future
   state._paywallFeature = feature;
 }
 
 function unlockPremiumLocal() {
-  // Simulación local (sin tienda): útil para pruebas.
-  state.entitlements.premium_sections = true;
-  saveLocal();
-  openModal("Desbloqueado (local)", `<p>Se activó <span class="mono">premium_sections</span> en este dispositivo.</p>`);
+  // Use Engine logic now
+  // Assuming first product is the one we want
+  const prods = getProducts();
+  if (prods?.products?.length > 0) {
+    const pid = prods.products[0].product_id;
+    state.entitlements = purchaseLocal(pid);
+    render(); // re-render paywall
+    openModal("Desbloqueado", `<p>Producto habilitado en Engine (local).</p>`);
+  }
 }
 
 function lockPremiumLocal() {
-  state.entitlements.premium_sections = false;
-  saveLocal();
-  openModal("Bloqueado", `<p>Se desactivó <span class="mono">premium_sections</span>.</p>`);
+  const prods = getProducts();
+  if (prods?.products?.length > 0) {
+    const pid = prods.products[0].product_id;
+    state.entitlements = revokeLocal(pid);
+    render();
+    openModal("Bloqueado", `<p>Producto revocado.</p>`);
+  }
 }
 
 // ---------- Render ----------
@@ -209,6 +230,17 @@ function render() {
 }
 
 function BootErrorView() {
+  let details = "";
+  if (state.boot.missing) {
+    const listInfo = state.boot.missing.map(m => `<li>${escapeHtml(m)}</li>`).join("");
+    details = `
+      <div class="callout" style="margin-top:12px; border-left-color: var(--color-error);">
+        <div class="callout__title">Archivos faltantes:</div>
+        <ul>${listInfo}</ul>
+      </div>
+    `;
+  }
+
   return `
     <section class="card">
       <div class="vstack">
@@ -216,15 +248,12 @@ function BootErrorView() {
           <div class="seal" aria-hidden="true">!</div>
           <div>
             <div class="hexTitle">No se pudo iniciar</div>
-            <div class="muted">Faltan archivos o rutas en <span class="mono">/data</span>.</div>
+            <div class="muted">Faltan archivos o rutas.</div>
           </div>
         </div>
         <div class="divider"></div>
         <div class="mono muted">${escapeHtml(state.boot.error || "Error desconocido")}</div>
-        <div class="divider"></div>
-        <div class="muted">
-          Revisa que exista: <span class="mono">data/dataset_manifest.json</span> y que sus paths coincidan con tu tree.
-        </div>
+        ${details}
       </div>
     </section>
   `;
@@ -236,44 +265,37 @@ function HomeView() {
       <div class="vstack">
         <div class="hstack" style="justify-content:space-between; align-items:flex-start;">
           <div class="vstack" style="gap:6px;">
-            <div class="hexTitle">Plantea una pregunta útil</div>
-            <div class="muted">Guía reflexiva. No predice. No promete. No sustituye criterio clínico ni decisiones profesionales.</div>
+            <div class="hexTitle">Nueva consulta</div>
+            <div class="muted">Plantea una pregunta abierta para iniciar.</div>
           </div>
-          <span class="badge">${state.entitlements.premium_sections ? "profundidad: activa" : "profundidad: bloqueada"}</span>
+          <span class="badge">${state.entitlements.premium_sections ? "Plus activo" : "Versión estándar"}</span>
         </div>
 
         <div class="divider"></div>
 
         <div class="vstack">
           <div>
-            <div class="label">Modo</div>
+            <div class="label">Foco / Ámbito</div>
             <select id="qMode">
-              ${opt("reflexion","Reflexión")}
-              ${opt("decision","Decisión")}
-              ${opt("relacion","Relación")}
-              ${opt("trabajo","Trabajo")}
-              ${opt("salud","Salud")}
-              ${opt("otro","Otro")}
+              ${opt("reflexion", "Reflexión general")}
+              ${opt("decision", "Toma de decisión")}
+              ${opt("relacion", "Vínculos y relaciones")}
+              ${opt("trabajo", "Trabajo y proyectos")}
+              ${opt("salud", "Bienestar y salud")}
+              ${opt("otro", "Otro")}
             </select>
           </div>
 
           <div>
-            <div class="label">Pregunta (en una frase operativa)</div>
-            <textarea id="qText" placeholder="Ej: ¿Qué actitud reduce fricción en esta situación esta semana?">${escapeHtml(state.draft.question.text_es || "")}</textarea>
-            <div class="muted" style="margin-top:6px;">Tip: evita “¿qué va a pasar?”; usa “¿qué conviene practicar?”</div>
+            <div class="label">Pregunta</div>
+            <textarea id="qText" placeholder="Ej: ¿Qué actitud conviene sostener ante esta situación?">${escapeHtml(state.draft.question.text_es || "")}</textarea>
           </div>
 
           <div class="row">
             <button class="btn btn--primary" id="btnBegin">Tirar monedas</button>
             <button class="btn btn--ghost" id="btnHistory">Historial (${state.history.length})</button>
-            <button class="btn btn--ghost" id="btnPremium">${state.entitlements.premium_sections ? "Gestionar acceso" : "Desbloquear profundidad"}</button>
+            <button class="btn btn--ghost" id="btnPremium">${state.entitlements.premium_sections ? "Tu acceso" : "Desbloquear Plus"}</button>
           </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="muted">
-          Uso local: la app guarda historial solo en <span class="mono">localStorage</span> del navegador.
         </div>
       </div>
     </section>
@@ -282,41 +304,31 @@ function HomeView() {
 
 function TossView() {
   const n = state.draft.tosses.length;
-
   return `
     <section class="card">
       <div class="vstack">
         <div class="hstack" style="justify-content:space-between; align-items:flex-start;">
           <div class="vstack" style="gap:6px;">
-            <div class="hexTitle">Tirada de 3 monedas</div>
-            <div class="muted">Línea ${n + 1} de 6 (de abajo hacia arriba).</div>
+            <div class="hexTitle">Tirada de monedas</div>
+            <div class="muted">Línea ${n + 1} de 6</div>
           </div>
           <span class="badge">${escapeHtml(state.draft.question.mode)}</span>
         </div>
-
         <div class="divider"></div>
-
-        <div class="card" style="background:var(--panel2);">
-          <div class="label">Pregunta</div>
-          <div style="margin-top:6px;">“${escapeHtml(state.draft.question.text_es || "—")}”</div>
-        </div>
-
+        
+        <div class="muted" style="font-style:italic;">“${escapeHtml(state.draft.question.text_es || "—")}”</div>
+        
         <div class="divider"></div>
 
         <div class="vstack">
-          <div class="label">Tiradas</div>
-          ${n === 0 ? `<div class="muted">Aún no has tirado monedas.</div>` : renderTosses(n)}
+          ${n === 0 ? `<div class="muted">Tira las monedas para construir el hexagrama.</div>` : renderTosses(n)}
         </div>
 
         <div class="divider"></div>
 
         <div class="row">
-          <button class="btn btn--primary" id="btnToss">${n < 6 ? "Tirar" : "Listo"}</button>
-          <button class="btn btn--ghost" id="btnBackHome">Volver</button>
-        </div>
-
-        <div class="muted">
-          Nota: la aleatoriedad usa <span class="mono">Math.random()</span>. Si luego quieres auditable/criptográfico, se cambia a <span class="mono">crypto.getRandomValues</span>.
+          <button class="btn btn--primary" id="btnToss">${n < 6 ? "Tirar" : "Finalizar"}</button>
+          <button class="btn btn--ghost" id="btnBackHome">Cancelar</button>
         </div>
       </div>
     </section>
@@ -324,63 +336,81 @@ function TossView() {
 }
 
 function renderTosses(n) {
-  const blocks = state.draft.tosses.map((t, idx) => {
+  return state.draft.tosses.map((t, idx) => {
     const lineNo = idx + 1;
     const moving = t.is_moving ? " (mutante)" : "";
-    const bit = t.line_bit === 1 ? "Yang" : "Yin";
+    const bitText = t.line_bit === 1 ? "Yang" : "Yin";
     const coins = t.coins.map(c => {
-      const yang = (c === "heads");
-      return `<div class="coin ${yang ? "coin--yang" : "coin--yin"}" title="${yang ? "heads" : "tails"}">${yang ? "●" : "○"}</div>`;
+      const isHeads = c === "heads";
+      return `<div class="coin ${isHeads ? "coin--yang" : "coin--yin"}">${isHeads ? "●" : "○"}</div>`;
     }).join("");
 
     return `
-      <div class="card" style="background:transparent;">
+      <div class="card" style="background:transparent; padding:10px;">
         <div class="row" style="justify-content:space-between;">
-          <div class="muted">Línea ${lineNo}${moving}</div>
-          <div class="mono muted">suma=${t.sum} · ${bit} · bit=${t.line_bit} → ${t.transforms_to_bit}</div>
+          <div class="muted">Línea ${lineNo}${moving} · ${bitText}</div>
+          <div class="coins">${coins}</div>
         </div>
-        <div class="coins" style="margin-top:8px;">${coins}</div>
       </div>
     `;
-  }).join("");
-
-  return `<div class="vstack">${blocks}</div>`;
+  }).reverse().join(""); // mostramos la más reciente arriba si preferred, o normal. Let's keep normal but maybe styling? No, let's keep array order (bottom to top visually? usually hexagram builds up. Let's list naturally 1 to n).
 }
 
 function ReadingView() {
-  if (!state.session) {
-    return `<section class="card"><div class="muted">No hay sesión actual.</div></section>`;
-  }
+  if (!state.session) return `<div class="card"><div class="muted">Error de sesión.</div></div>`;
 
   const { primary, resulting, is_mutating } = state.session.hexagrams;
+  const title = primary ? `${primary.id}. ${primary.hanzi} · ${primary.slug}` : "Unknown";
 
-  const title = primary
-    ? `${primary.id}. ${primary.hanzi} · ${primary.slug}`
-    : "Hexagrama no identificado (revisa hexagrams_meta.json)";
+  // Flow: Core -> Image -> General -> Lines -> Resulting -> Premium
 
-  const activeLinesHTML = (primary?.active_lines_content?.length || 0) > 0
+  const coreSection = `
+    <div class="vstack">
+      <div class="label">Núcleo Dinámico</div>
+      <div style="font-size:1.1em; font-weight:500;">${escapeHtml(primary?.dynamic_core_es || "—")}</div>
+    </div>
+  `;
+
+  const imageSection = `
+    <div class="vstack">
+      <div class="label">La Imagen</div>
+      <div>${escapeHtml(primary?.image_es || "—")}</div>
+    </div>
+  `;
+
+  const generalSection = `
+    <div class="vstack">
+      <div class="label">Lectura General</div>
+      <div style="line-height:1.6;">${escapeHtml(primary?.general_reading_es || "—")}</div>
+    </div>
+  `;
+
+  const linesSection = (primary?.active_lines_content?.length > 0)
     ? `
       <div class="divider"></div>
       <div class="vstack">
-        <div class="label">Líneas activas</div>
-        ${primary.active_lines_content.map(l =>
-          `<div class="card" style="background:transparent;">
-            <div class="muted">Línea ${l.position}</div>
-            <div style="margin-top:6px;">${escapeHtml(l.text)}</div>
-          </div>`
-        ).join("")}
+        <div class="label">Líneas Mutantes</div>
+        ${primary.active_lines_content.map(l => `
+          <div class="card" style="background:transparent;">
+            <div class="muted" style="margin-bottom:4px;">Línea ${l.position}</div>
+            <div>${escapeHtml(l.text)}</div>
+          </div>
+        `).join("")}
       </div>
     `
-    : `<div class="divider"></div><div class="muted">Sin líneas mutantes (lectura estable).</div>`;
+    : `<div class="divider"></div><div class="muted">Sin mutaciones. El hexagrama es estable.</div>`;
 
-  const resultingHTML = is_mutating && resulting
+  const resultingSection = (is_mutating && resulting)
     ? `
       <div class="divider"></div>
-      <div class="card" style="background:transparent;">
-        <div class="label">Hexagrama resultante</div>
-        <div style="margin-top:6px;">
-          ${resulting.symbol_unicode ? `<div class="hexBig">${escapeHtml(resulting.symbol_unicode)}</div>` : ""}
-          <div>${escapeHtml(String(resulting.id))}. ${escapeHtml(resulting.hanzi)} · ${escapeHtml(resulting.slug)}</div>
+      <div class="card" style="background:var(--panel2);">
+        <div class="label">Tendencia Futura (Resultante)</div>
+        <div class="row" style="margin-top:8px;">
+          ${resulting.symbol_unicode ? `<div class="hexBig" style="font-size:32px;">${escapeHtml(resulting.symbol_unicode)}</div>` : ""}
+          <div class="vstack" style="gap:2px;">
+            <div style="font-weight:600;">${escapeHtml(resulting.id)}. ${escapeHtml(resulting.hanzi)}</div>
+            <div class="muted">${escapeHtml(resulting.slug)}</div>
+          </div>
         </div>
       </div>
     `
@@ -389,45 +419,30 @@ function ReadingView() {
   return `
     <section class="card">
       <div class="vstack">
+        <!-- Header Lecture -->
         <div class="hstack" style="justify-content:space-between; align-items:flex-start;">
-          <div class="vstack" style="gap:6px;">
+          <div class="row">
             ${primary?.symbol_unicode ? `<div class="hexBig">${escapeHtml(primary.symbol_unicode)}</div>` : ""}
-            <h1 class="hexTitle" style="margin:0;">${escapeHtml(title)}</h1>
-            <div class="muted">${escapeHtml(state.session.created_at_iso)}</div>
+            <div class="vstack" style="gap:2px;">
+              <h1 class="hexTitle">${escapeHtml(title)}</h1>
+              <div class="muted">${escapeHtml(state.session.created_at_iso.split("T")[0])}</div>
+            </div>
           </div>
           <span class="badge">${escapeHtml(state.session.question.mode)}</span>
         </div>
 
         <div class="divider"></div>
-
-        <div class="card" style="background:transparent;">
-          <div class="label">Pregunta</div>
-          <div style="margin-top:6px;">“${escapeHtml(state.session.question.text_es || "—")}”</div>
-        </div>
-
+        <div class="muted" style="font-style:italic;">“${escapeHtml(state.session.question.text_es)}”</div>
         <div class="divider"></div>
 
-        <div class="vstack">
-          <div class="label">Núcleo</div>
-          <div>${escapeHtml(primary?.dynamic_core_es || "—")}</div>
-        </div>
-
+        ${coreSection}
         <div class="divider"></div>
-
-        <div class="vstack">
-          <div class="label">Imagen</div>
-          <div>${escapeHtml(primary?.image_es || "—")}</div>
-        </div>
-
+        ${imageSection}
         <div class="divider"></div>
+        ${generalSection}
 
-        <div class="vstack">
-          <div class="label">Lectura general</div>
-          <div>${escapeHtml(primary?.general_reading_es || "—")}</div>
-        </div>
-
-        ${activeLinesHTML}
-        ${resultingHTML}
+        ${linesSection}
+        ${resultingSection}
 
         <div class="divider"></div>
         ${renderPremiumSection(primary)}
@@ -439,9 +454,9 @@ function ReadingView() {
           <button class="btn btn--ghost" id="btnSave">Guardar</button>
           <button class="btn btn--ghost" id="btnPDF">PDF</button>
         </div>
-
-        <div class="muted">
-          Nota ética: ${escapeHtml(primary?.ethics_note_es || "—")}
+        
+        <div class="muted" style="font-size:11px; margin-top:10px;">
+          ${escapeHtml(primary?.ethics_note_es || "")}
         </div>
       </div>
     </section>
@@ -449,54 +464,56 @@ function ReadingView() {
 }
 
 function renderPremiumSection(hex) {
-  if (!hex) return `<div class="muted">Sin datos premium.</div>`;
+  if (!hex) return "";
 
   if (state.entitlements.premium_sections) {
     const qs = Array.isArray(hex.guiding_questions_es) ? hex.guiding_questions_es : [];
     return `
       <div class="callout">
-        <div class="callout__title">Lectura taoísta (Wu wei)</div>
-        <div>${escapeHtml(hex.taoist_reading_es || "—")}</div>
-
+        <div class="callout__title">Lectura Profunda (Wu wei)</div>
+        <div style="margin-bottom:10px;">${escapeHtml(hex.taoist_reading_es || "—")}</div>
+        
         <div class="divider"></div>
-
-        <div class="callout__title">Preguntas guía</div>
-        ${qs.length ? `<ul>${qs.map(q => `<li>${escapeHtml(q)}</li>`).join("")}</ul>` : `<div class="muted">—</div>`}
-
+        <div class="callout__title">Preguntas Guía</div>
+        <ul style="padding-left:20px; margin:0;">
+          ${qs.map(q => `<li>${escapeHtml(q)}</li>`).join("")}
+        </ul>
+        
         <div class="divider"></div>
-
         <div class="callout__title">Micro-acción</div>
         <div>${escapeHtml(hex.micro_action_es || "—")}</div>
       </div>
     `;
-  }
-
-  return `
-    <div class="callout" style="cursor:pointer;" id="premiumLocked">
-      <div class="callout__title">Lectura taoísta + guía práctica</div>
-      <div class="blur">En clave taoísta, este hexagrama sugiere una forma concreta de reducir fricción y sostener el proceso…</div>
-      <div class="row" style="margin-top:10px;">
-        <button class="btn btn--primary btn--sm" type="button">Desbloquear</button>
+  } else {
+    return `
+      <div class="callout" style="cursor:pointer;" id="premiumLocked">
+        <div class="callout__title">Lectura Profunda</div>
+        <div class="blur">
+          La perspectiva taoísta ofrece una estrategia de mínima resistencia para esta situación, enfocada en el Wu Wei...
+        </div>
+        <div class="row row--end" style="margin-top:10px;">
+          <button class="btn btn--primary btn--sm">Desbloquear Plus</button>
+        </div>
       </div>
-    </div>
-  `;
+    `;
+  }
 }
 
 function HistoryView() {
   const rows = state.history.map((s) => {
     const p = s.hexagrams?.primary;
-    const title = p ? `${p.id}. ${p.hanzi} · ${p.slug}` : "Sesión";
+    const title = p ? `${p.id}. ${p.slug}` : "Sesión";
     return `
-      <div class="card" style="background:transparent;">
+      <div class="card" style="background:transparent; padding:10px;">
         <div class="row" style="justify-content:space-between;">
-          <div>
-            <div class="mono muted">${escapeHtml(s.created_at_iso)}</div>
-            <div style="margin-top:6px;">${escapeHtml(title)}</div>
-            <div class="muted" style="margin-top:6px;">“${escapeHtml(s.question?.text_es || "—")}”</div>
+          <div style="flex:1;">
+            <div class="mono muted" style="font-size:11px;">${escapeHtml(s.created_at_iso.split("T")[0])}</div>
+            <div style="font-weight:600;">${escapeHtml(title)}</div>
+            <div class="muted" style="font-size:13px; font-style:italic; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; max-width:200px;">
+              ${escapeHtml(s.question?.text_es || "—")}
+            </div>
           </div>
-          <div class="row">
-            <button class="btn btn--ghost btn--sm" data-open="${escapeHtml(s.id)}">Abrir</button>
-          </div>
+          <button class="btn btn--ghost btn--sm" data-open="${escapeHtml(s.id)}">Ver</button>
         </div>
       </div>
     `;
@@ -506,22 +523,15 @@ function HistoryView() {
     <section class="card">
       <div class="vstack">
         <div class="hstack" style="justify-content:space-between;">
-          <div>
-            <div class="hexTitle">Historial</div>
-            <div class="muted">${state.history.length} sesiones (local)</div>
-          </div>
-          <span class="badge">localStorage</span>
+          <div class="hexTitle">Historial</div>
+          <span class="badge">Local</span>
         </div>
-
         <div class="divider"></div>
-
-        ${state.history.length ? `<div class="vstack">${rows}</div>` : `<div class="muted">Aún no hay sesiones guardadas.</div>`}
-
+        ${state.history.length ? `<div class="vstack">${rows}</div>` : `<div class="muted">No hay sesiones guardadas.</div>`}
         <div class="divider"></div>
-
         <div class="row">
           <button class="btn btn--ghost" id="btnBackHome2">Volver</button>
-          <button class="btn btn--ghost" id="btnClearHistory">Borrar historial</button>
+          <button class="btn btn--ghost" id="btnClearHistory">Borrar todo</button>
         </div>
       </div>
     </section>
@@ -529,31 +539,45 @@ function HistoryView() {
 }
 
 function PaywallView() {
+  const products = getProducts();
+  const prod = products?.products?.[0]; // asumimos el primero
+  const copy = products?.paywall_copy_es;
+
+  // Fallbacks
+  const title = copy?.title || "Premium";
+  const body = copy?.body || "Desbloquea funciones.";
+  const price = prod?.price?.formatted || "Consultar";
+
+  const benefits = prod?.purchase_notes_es?.map(n => `<li>${escapeHtml(n)}</li>`).join("") || "";
+
   return `
     <section class="card">
       <div class="vstack">
-        <div class="hexTitle">Acceso a “Lectura Profunda”</div>
-        <div class="muted">Aquí va tu integración real (Play Billing / App Store / Stripe). Por ahora hay “unlock local” para pruebas.</div>
-
+        <div class="hexTitle">${escapeHtml(title)}</div>
+        <div style="white-space:pre-wrap; line-height:1.5;">${escapeHtml(body)}</div>
+        
         <div class="divider"></div>
-
-        <div class="card" style="background:transparent;">
-          <div class="label">Estado</div>
-          <div style="margin-top:6px;">
-            ${state.entitlements.premium_sections ? "✅ premium_sections activo" : "⛔ premium_sections inactivo"}
+        
+        <div class="card" style="background:var(--panel2);">
+          <div class="hstack" style="justify-content:space-between;">
+            <div style="font-weight:bold;">${escapeHtml(prod?.title_es || "Acceso Total")}</div>
+            <div class="badge" style="background:var(--accent); color:var(--bg); border:none;">${escapeHtml(price)}</div>
           </div>
+          <ul style="margin:10px 0 0; padding-left:20px; font-size:13px; color:var(--muted);">
+            ${benefits}
+          </ul>
         </div>
 
         <div class="divider"></div>
 
         <div class="row">
-          <button class="btn btn--primary" id="btnUnlockLocal">Unlock local (testing)</button>
-          <button class="btn btn--ghost" id="btnLockLocal">Bloquear</button>
+          <button class="btn btn--primary" id="btnUnlockLocal">Simular Compra</button>
+          <button class="btn btn--ghost" id="btnLockLocal">Restaurar / Bloquear</button>
           <button class="btn btn--ghost" id="btnBackHome3">Volver</button>
         </div>
-
-        <div class="muted">
-          En producción: esta pantalla debería leer <span class="mono">products.json</span> + <span class="mono">licenses.json</span>, y verificar entitlements firmados.
+        
+        <div class="muted" style="font-size:11px; text-align:center;">
+          ${escapeHtml(copy?.footer_note || "Uso local.")}
         </div>
       </div>
     </section>
@@ -563,61 +587,46 @@ function PaywallView() {
 // ---------- Bind events ----------
 function bindCommon(root) {
   // Home
-  const qMode = root.querySelector("#qMode");
-  const qText = root.querySelector("#qText");
   const btnBegin = root.querySelector("#btnBegin");
-  const btnHistory = root.querySelector("#btnHistory");
-  const btnPremium = root.querySelector("#btnPremium");
-
-  if (qMode) {
-    qMode.value = state.draft.question.mode;
-    qMode.addEventListener("change", () => {
-      state.draft.question.mode = qMode.value;
-    });
-  }
-  if (qText) {
-    qText.addEventListener("input", () => {
-      state.draft.question.text_es = qText.value.slice(0, 800);
-    });
-  }
   if (btnBegin) {
+    const qText = root.querySelector("#qText");
+    qText?.addEventListener("input", (e) => state.draft.question.text_es = e.target.value);
+
+    const qMode = root.querySelector("#qMode");
+    qMode?.addEventListener("change", (e) => state.draft.question.mode = e.target.value);
+
+    // restore values
+    if (qText) qText.value = state.draft.question.text_es;
+    if (qMode) qMode.value = state.draft.question.mode;
+
     btnBegin.addEventListener("click", () => {
       if (!state.draft.question.text_es.trim()) {
-        openModal("Falta la pregunta", `<p>Escribe una pregunta breve (operativa) antes de tirar monedas.</p>`);
+        openModal("Falta pregunta", "<p>Por favor escribe algo para reflexionar.</p>");
         return;
       }
       beginToss();
     });
+
+    root.querySelector("#btnHistory")?.addEventListener("click", openHistory);
+    root.querySelector("#btnPremium")?.addEventListener("click", () => openPaywall("home"));
   }
-  if (btnHistory) btnHistory.addEventListener("click", openHistory);
-  if (btnPremium) btnPremium.addEventListener("click", () => nav("paywall"));
 
   // Toss
-  const btnToss = root.querySelector("#btnToss");
-  const btnBackHome = root.querySelector("#btnBackHome");
-  if (btnToss) btnToss.addEventListener("click", onTossNextLine);
-  if (btnBackHome) btnBackHome.addEventListener("click", () => nav("home"));
+  root.querySelector("#btnToss")?.addEventListener("click", onTossNextLine);
+  root.querySelector("#btnBackHome")?.addEventListener("click", startNew); // Cancelar = startNew
 
   // Reading
-  const btnClose = root.querySelector("#btnClose");
-  const btnSave = root.querySelector("#btnSave");
-  const btnPDF = root.querySelector("#btnPDF");
-  const premiumLocked = root.querySelector("#premiumLocked");
-
-  if (btnClose) btnClose.addEventListener("click", () => nav("home"));
-  if (btnSave) btnSave.addEventListener("click", saveSession);
-  if (btnPDF) btnPDF.addEventListener("click", exportPDF);
-  if (premiumLocked) premiumLocked.addEventListener("click", () => openPaywall("premium_sections"));
+  root.querySelector("#btnClose")?.addEventListener("click", startNew);
+  root.querySelector("#btnSave")?.addEventListener("click", saveSession);
+  root.querySelector("#btnPDF")?.addEventListener("click", exportPDF);
+  root.querySelector("#premiumLocked")?.addEventListener("click", () => openPaywall("reading"));
 
   // History
-  const btnBackHome2 = root.querySelector("#btnBackHome2");
-  const btnClearHistory = root.querySelector("#btnClearHistory");
-  if (btnBackHome2) btnBackHome2.addEventListener("click", () => nav("home"));
-  if (btnClearHistory) btnClearHistory.addEventListener("click", deleteHistory);
-
-  root.querySelectorAll("[data-open]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-open");
+  root.querySelector("#btnBackHome2")?.addEventListener("click", () => nav("home"));
+  root.querySelector("#btnClearHistory")?.addEventListener("click", deleteHistory);
+  root.querySelectorAll("[data-open]").forEach(b => {
+    b.addEventListener("click", () => {
+      const id = b.getAttribute("data-open");
       const found = state.history.find(x => x.id === id);
       if (found) {
         state.session = found;
@@ -627,56 +636,55 @@ function bindCommon(root) {
   });
 
   // Paywall
-  const btnUnlockLocal = root.querySelector("#btnUnlockLocal");
-  const btnLockLocal = root.querySelector("#btnLockLocal");
-  const btnBackHome3 = root.querySelector("#btnBackHome3");
-  if (btnUnlockLocal) btnUnlockLocal.addEventListener("click", unlockPremiumLocal);
-  if (btnLockLocal) btnLockLocal.addEventListener("click", lockPremiumLocal);
-  if (btnBackHome3) btnBackHome3.addEventListener("click", () => nav("home"));
+  root.querySelector("#btnUnlockLocal")?.addEventListener("click", unlockPremiumLocal);
+  root.querySelector("#btnLockLocal")?.addEventListener("click", lockPremiumLocal);
+  root.querySelector("#btnBackHome3")?.addEventListener("click", () => nav("home"));
 }
 
-// ---------- Modal ----------
-function openModal(title, bodyHtml) {
-  const modal = document.getElementById("modal");
+function openModal(title, body) {
+  const m = document.getElementById("modal");
   document.getElementById("modalTitle").textContent = title;
-  document.getElementById("modalBody").innerHTML = bodyHtml;
-  modal.showModal();
+  document.getElementById("modalBody").innerHTML = body;
+  m.showModal();
 }
 
 function openAbout() {
-  openModal("Acerca de", `
-    <p>Esta app implementa una lectura del I Ching como guía reflexiva, sin promesas de adivinación.</p>
-    <ul>
-      <li>Funciona local en el dispositivo.</li>
-      <li>Historial opcional: se guarda en <span class="mono">localStorage</span>.</li>
-      <li>No reemplaza criterio clínico, legal o profesional.</li>
-    </ul>
-    <p class="muted">Si quieres “cierre monetización real”: integramos tienda y entitlements firmados.</p>
-  `);
+  const lic = getLicenses();
+  const principles = lic?.app_principles_es || {};
+  const stats = getTelemetry();
+
+  const content = `
+    <div class="vstack" style="gap:12px;">
+      <p><strong>Reflexión, no predicción.</strong> ${escapeHtml(principles.non_predictive || "")}</p>
+      <p><strong>Enfoque.</strong> ${escapeHtml(principles.taoist_orientation || "")}</p>
+      <div class="callout">
+        ${escapeHtml(principles.no_medical_substitution || "No sustituye ayuda profesional.")}
+      </div>
+      <div class="divider"></div>
+      <div class="label">Tus estadísticas (Local)</div>
+      <div class="hstack" style="justify-content:space-between; font-size:13px;">
+          <div>Sesiones: <b>${stats.sessions || 0}</b></div>
+          <div>Lecturas: <b>${stats.readings || 0}</b></div>
+      </div>
+      <div class="divider"></div>
+      <p class="muted" style="font-size:12px;">Versión 0.1.1 · Local Storage</p>
+    </div>
+  `;
+  openModal("Acerca de", content);
 }
 
-// ---------- Utils ----------
-function opt(value, label) {
-  return `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`;
-}
-
-function escapeHtml(s) {
-  return String(s)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
+// Utils
+function opt(val, lbl) { return `<option value="${val}">${lbl}</option>`; }
 function htmlToNode(html) {
   const t = document.createElement("template");
   t.innerHTML = html.trim();
   return t.content.firstElementChild;
 }
-
+function escapeHtml(s) {
+  if (!s) return "";
+  return String(s).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+}
 function cryptoRandomId() {
-  // sin deps, suficientemente único para historial local
   const a = new Uint8Array(12);
   crypto.getRandomValues(a);
   return Array.from(a).map(b => b.toString(16).padStart(2, "0")).join("");

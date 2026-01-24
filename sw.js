@@ -1,6 +1,5 @@
-/* sw.js - cache simple (app shell) + data (stale-while-revalidate) */
-const CACHE_NAME = "iching-tao-shell-v0.1.0";
-const DATA_CACHE = "iching-tao-data-v0.1.0";
+const CACHE_NAME = "iching-tao-shell-v0.1.1";
+const DATA_CACHE = "iching-tao-data-v0.1.1";
 
 const SHELL = [
   "./",

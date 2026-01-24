@@ -9,37 +9,122 @@ const store = {
   rules: { coins: null, build: null },
   meta: null,
   trigrams: null,
-  content: null, // hexagrams_core.json (esperado como objeto con "hexagrams" o directo)
+  products: null,
+  licenses: null,
+  content: null,
   ready: false,
+  purchases: new Set(),
+  telemetry: { sessions: 0, readings: 0, last_active: null }
 };
 
 export async function initEngine() {
-  // Cargar manifest
-  const manifestRes = await fetch(`${DATA_ROOT}/dataset_manifest.json`, { cache: "no-cache" });
-  if (!manifestRes.ok) throw new Error("No se pudo cargar dataset_manifest.json");
+  let manifestRes;
+  try {
+    manifestRes = await fetch(`${DATA_ROOT}/dataset_manifest.json`, { cache: "no-cache" });
+  } catch (e) {
+    throw new Error("Error de red cargando dataset_manifest.json");
+  }
+
+  if (!manifestRes.ok) throw new Error("No se pudo cargar dataset_manifest.json (404)");
   store.manifest = await manifestRes.json();
 
-  // Cargar recursos required_for_boot
   const bootResources = store.manifest.resources.filter(r => r.required_for_boot);
 
-  const results = await Promise.all(bootResources.map(async (r) => {
+  const promises = bootResources.map(async (r) => {
     const path = r.path.startsWith("http") ? r.path : `.${r.path}`;
-    const res = await fetch(path, { cache: "no-cache" });
-    if (!res.ok) throw new Error(`No se pudo cargar: ${path}`);
-    return { id: r.id, data: await res.json() };
-  }));
+    try {
+      const res = await fetch(path, { cache: "no-cache" });
+      if (!res.ok) return { id: r.id, path, error: `Status ${res.status}` };
+      return { id: r.id, data: await res.json() };
+    } catch (e) {
+      return { id: r.id, path, error: String(e.message) };
+    }
+  });
+
+  const results = await Promise.all(promises);
+
+  const failures = results.filter(r => r.error);
+  if (failures.length > 0) {
+    const err = new Error("Faltan recursos esenciales");
+    err.missing = failures.map(f => `${f.id} (${f.path})`);
+    throw err;
+  }
 
   results.forEach(({ id, data }) => {
     if (id === "coins_rules") store.rules.coins = data;
     if (id === "hexagram_build_rules") store.rules.build = data;
     if (id === "hexagrams_meta") store.meta = data;
     if (id === "trigrams") store.trigrams = data;
+    if (id === "products") store.products = data;
+    if (id === "licenses") store.licenses = data;
   });
 
-  // cargar contenido editorial en background (no bloquea)
-  loadContent().catch(() => {});
+  // Restore persistence
+  try {
+    const saved = localStorage.getItem("iching_engine_v0");
+    if (saved) {
+      const p = JSON.parse(saved);
+      if (Array.isArray(p.purchases)) store.purchases = new Set(p.purchases);
+      if (p.telemetry) store.telemetry = p.telemetry;
+    }
+  } catch { }
+
+  loadContent().catch(() => { });
   store.ready = true;
+  trackEvent("engine_init", "ok");
   return true;
+}
+
+export function getProducts() { return store.products; }
+export function getLicenses() { return store.licenses; }
+
+// --- Entitlements ---
+export function getEntitlements() {
+  const ent = structuredClone(store.products?.default_free_entitlements || {});
+
+  if (store.products?.products) {
+    store.products.products.forEach(prod => {
+      if (store.purchases.has(prod.product_id)) {
+        for (const [key, val] of Object.entries(prod.entitlements || {})) {
+          if (val === true) ent[key] = true;
+        }
+      }
+    });
+  }
+  return ent;
+}
+
+export function purchaseLocal(productId) {
+  store.purchases.add(productId);
+  saveEngineState();
+  trackEvent("purchase_simulated", productId);
+  return getEntitlements();
+}
+
+export function revokeLocal(productId) {
+  store.purchases.delete(productId);
+  saveEngineState();
+  trackEvent("purchase_revoked", productId);
+  return getEntitlements();
+}
+
+function saveEngineState() {
+  localStorage.setItem("iching_engine_v0", JSON.stringify({
+    purchases: Array.from(store.purchases),
+    telemetry: store.telemetry
+  }));
+}
+
+// --- Telemetry ---
+export function trackEvent(name, data) {
+  if (name === "session_start") store.telemetry.sessions++;
+  if (name === "reading_view") store.telemetry.readings++;
+  store.telemetry.last_active = new Date().toISOString();
+  saveEngineState();
+}
+
+export function getTelemetry() {
+  return store.telemetry;
 }
 
 async function loadContent() {
@@ -79,7 +164,8 @@ function randCoin() {
 
 export function buildReading(tosses) {
   if (!store.meta) throw new Error("Meta no cargado");
-  if (!store.content) throw new Error("Contenido editorial no cargado (aún)");
+  // Graceful degradation: ya no lanzamos error si falta content
+  // if (!store.content) throw new Error("Contenido editorial no cargado (aún)");
 
   if (!Array.isArray(tosses) || tosses.length !== 6) {
     throw new Error("Se requieren 6 líneas");
@@ -87,7 +173,7 @@ export function buildReading(tosses) {
 
   // bottom_to_top: tosses[0] = línea 1 (abajo)
   const primaryBits = tosses.map(t => t.line_bit);
-  const resultBits  = tosses.map(t => t.transforms_to_bit);
+  const resultBits = tosses.map(t => t.transforms_to_bit);
 
   const primaryHex = findHexagram(primaryBits);
   const hasMoving = tosses.some(t => t.is_moving);
@@ -106,7 +192,7 @@ function findHexagram(bits) {
 
   const trigramMap = {
     "1,1,1": "qian", "0,0,0": "kun", "1,0,0": "zhen", "0,1,0": "kan",
-    "0,0,1": "gen",  "0,1,1": "xun",  "1,0,1": "li",   "1,1,0": "dui"
+    "0,0,1": "gen", "0,1,1": "xun", "1,0,1": "li", "1,1,0": "dui"
   };
 
   const lowerId = trigramMap[lowerBits.join(",")];
@@ -120,17 +206,19 @@ function findHexagram(bits) {
 function hydrateHexagram(metaHex, tosses = null) {
   if (!metaHex) return null;
 
-  const content = store.content.hexagrams[String(metaHex.id)];
-  // Permite dataset parcial, pero avisa en UI.
+  // Acceso seguro: store.content puede ser null
+  const content = store.content ? store.content.hexagrams[String(metaHex.id)] : null;
+
+  // Permite dataset parcial o nulo
   const safe = content || {
-    dynamic_core_es: "Contenido no disponible aún para este hexagrama.",
+    dynamic_core_es: "Cargando contenido...",
     image_es: "—",
-    general_reading_es: "—",
+    general_reading_es: "Texto no disponible. Revise su conexión o la carpeta /data.",
     lines_es: {},
     taoist_reading_es: "—",
     guiding_questions_es: [],
     micro_action_es: "—",
-    ethics_note_es: "—"
+    ethics_note_es: "Sin datos editoriales."
   };
 
   let activeLines = [];
