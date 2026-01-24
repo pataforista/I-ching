@@ -14,10 +14,21 @@ const store = {
   content: null,
   ready: false,
   purchases: new Set(),
-  telemetry: { sessions: 0, readings: 0, last_active: null }
+  telemetry: {
+    sessions: 0,
+    readings: 0,
+    last_active: null,
+    // New metrics
+    feature_locks: {}, // { "history_limit": 5, "pdf": 2 ... }
+    paywall_views: 0,
+    conversions: 0,
+    overwrite_decisions: { overwrite: 0, upgrade: 0 }
+  },
+  locales: {}
 };
 
 export async function initEngine() {
+  // Cargar manifest
   let manifestRes;
   try {
     manifestRes = await fetch(`${DATA_ROOT}/dataset_manifest.json`, { cache: "no-cache" });
@@ -28,6 +39,11 @@ export async function initEngine() {
   if (!manifestRes.ok) throw new Error("No se pudo cargar dataset_manifest.json (404)");
   store.manifest = await manifestRes.json();
 
+  // Load Locales (Parallel to boot resources)
+  const LOCALE = "es"; // Fixed for now, can be dynamic later
+  const localePromise = fetch(`${DATA_ROOT}/locales/${LOCALE}.json`).then(r => r.json()).catch(() => ({}));
+
+  // Cargar recursos required_for_boot
   const bootResources = store.manifest.resources.filter(r => r.required_for_boot);
 
   const promises = bootResources.map(async (r) => {
@@ -41,7 +57,8 @@ export async function initEngine() {
     }
   });
 
-  const results = await Promise.all(promises);
+  const [results, locales] = await Promise.all([Promise.all(promises), localePromise]);
+  store.locales = locales;
 
   const failures = results.filter(r => r.error);
   if (failures.length > 0) {
@@ -108,6 +125,8 @@ export function revokeLocal(productId) {
   return getEntitlements();
 }
 
+
+
 function saveEngineState() {
   localStorage.setItem("iching_engine_v0", JSON.stringify({
     purchases: Array.from(store.purchases),
@@ -116,15 +135,52 @@ function saveEngineState() {
 }
 
 // --- Telemetry ---
-export function trackEvent(name, data) {
-  if (name === "session_start") store.telemetry.sessions++;
-  if (name === "reading_view") store.telemetry.readings++;
-  store.telemetry.last_active = new Date().toISOString();
+export function trackEvent(name, data = {}) {
+  const t = store.telemetry;
+  t.last_active = new Date().toISOString();
+
+  switch (name) {
+    case "session_start":
+      t.sessions++;
+      break;
+    case "reading_view": // mapped to reading_completed in schema
+      t.readings++;
+      break;
+    case "feature_locked":
+      const fid = data.feature_id || "unknown";
+      t.feature_locks[fid] = (t.feature_locks[fid] || 0) + 1;
+      break;
+    case "paywall_viewed":
+      t.paywall_views++;
+      break;
+    case "purchase_completed":
+      t.conversions++;
+      break;
+    case "overwrite_decision":
+      const choice = data.choice; // "overwrite" | "upgrade"
+      if (choice) t.overwrite_decisions[choice] = (t.overwrite_decisions[choice] || 0) + 1;
+      break;
+  }
+
+  // Debug log for verification
+  console.log(`[Telemetry] ${name}`, data);
   saveEngineState();
 }
 
 export function getTelemetry() {
   return store.telemetry;
+}
+
+export function t(key, params = {}) {
+  const parts = key.split(".");
+  let val = store.locales;
+  for (const p of parts) {
+    val = val?.[p];
+  }
+  if (!val) return key; // fallback
+
+  // Replace params {{name}}
+  return val.replace(/{{(\w+)}}/g, (_, k) => params[k] !== undefined ? params[k] : `{{${k}}}`);
 }
 
 async function loadContent() {

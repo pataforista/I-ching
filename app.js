@@ -1,5 +1,5 @@
 // app.js
-import { initEngine, tossLine, buildReading, isContentLoaded, getProducts, getLicenses, getEntitlements, purchaseLocal, revokeLocal, trackEvent, getTelemetry } from "./engine.js";
+import { initEngine, tossLine, buildReading, isContentLoaded, getProducts, getLicenses, getEntitlements, purchaseLocal, revokeLocal, trackEvent, getTelemetry, t } from "./engine.js";
 
 const LS_KEY = "iching_tao_v0";
 const LS_THEME = "iching_theme_v0";
@@ -59,7 +59,8 @@ async function boot() {
   const licenses = getLicenses();
   if (licenses?.app_principles_es?.no_medical_substitution) {
     const footerText = document.getElementById("footerText");
-    if (footerText) footerText.textContent = licenses.app_principles_es.no_medical_substitution;
+    if (footerText) footerText.textContent = t("app.footer_default"); // Fallback or key? actually principles are static in licenses.json potentially, but let's use i18n for footer.
+    // Better: let's use t("app.footer_default") if principle not found.
   }
 
   // SW register
@@ -153,7 +154,7 @@ function onTossNextLine() {
       render();
     }
   } catch (e) {
-    openModal("Error", `
+    openModal(t("app.unknown_error"), `
       <p>No pude completar la tirada.</p>
       <p class="mono muted">${escapeHtml(String(e?.message || e))}</p>
     `);
@@ -162,10 +163,56 @@ function onTossNextLine() {
 
 function saveSession() {
   if (!state.session) return;
-  state.history.unshift(state.session);
-  state.history = state.history.slice(0, 200);
+
+  // Limite de historial (Freemium logic)
+  if (!state.entitlements.unlimited_history && state.history.length > 0) {
+    // Show Overwrite Decision Modal
+    const modalContent = `
+      <p>${t("history.limit_modal_body")}</p>
+      <div class="callout" style="border-left-color:var(--accent);">
+        <div style="font-weight:bold;">${t("history.limit_modal_question")}</div>
+        <div class="muted" style="font-size:0.9em;">${t("history.limit_modal_warning", { date: state.history[0].created_at_iso.split("T")[0] })}</div>
+      </div>
+      <div class="vstack" style="gap:10px; margin-top:20px;">
+        <button class="btn btn--primary" id="btnUpgradeSave">${t("history.btn_upgrade_save")}</button>
+        <button class="btn btn--danger" id="btnOverwriteSave">${t("history.btn_overwrite_save")}</button>
+      </div>
+    `;
+    openModal(t("history.limit_modal_title"), modalContent);
+    trackEvent("feature_locked", { feature_id: "history_limit" });
+
+    // Bind modal buttons immediately
+    setTimeout(() => {
+      document.getElementById("btnUpgradeSave")?.addEventListener("click", () => {
+        trackEvent("overwrite_decision", { choice: "upgrade" });
+        document.getElementById("modal").close();
+        openPaywall("history_limit_save");
+      });
+      document.getElementById("btnOverwriteSave")?.addEventListener("click", () => {
+        trackEvent("overwrite_decision", { choice: "overwrite" });
+        document.getElementById("modal").close();
+        performSave(true); // overwrite = true
+      });
+    }, 50); // slight delay to ensure DOM is ready inside modal
+    return;
+  }
+
+  // Normal save
+  performSave(false);
+}
+
+function performSave(overwrite) {
+  trackEvent("session_saved", { overwrite: overwrite });
+  if (overwrite) {
+    state.history = [state.session];
+    openModal(t("history.modal_saved_title"), `<p>${t("history.alert_replaced")}</p>`);
+  } else {
+    state.history.unshift(state.session);
+    state.history = state.history.slice(0, 200);
+    openModal(t("history.modal_saved_title"), `<p>${t("history.modal_saved_body")}</p>`);
+  }
   saveLocal();
-  openModal("Guardado", `<p>Sesión guardada en este dispositivo.</p>`);
+  render(); // update history count in buttons if visible
 }
 
 function openHistory() {
@@ -175,14 +222,20 @@ function openHistory() {
 function deleteHistory() {
   state.history = [];
   saveLocal();
-  openModal("Historial borrado", `<p>Listo. No queda nada guardado en este navegador para esta app.</p>`);
+  openModal(t("history.modal_cleared_title"), `<p>${t("history.modal_cleared_body")}</p>`);
 }
 
 function exportPDF() {
+  if (!state.entitlements.pdf_export) {
+    trackEvent("feature_locked", { feature_id: "pdf_export" });
+    openPaywall("pdf_export");
+    return;
+  }
   window.print();
 }
 
 function openPaywall(feature) {
+  trackEvent("paywall_viewed", { source: feature });
   nav("paywall");
   state._paywallFeature = feature;
 }
@@ -194,8 +247,9 @@ function unlockPremiumLocal() {
   if (prods?.products?.length > 0) {
     const pid = prods.products[0].product_id;
     state.entitlements = purchaseLocal(pid);
+    trackEvent("purchase_completed", { product_id: pid });
     render(); // re-render paywall
-    openModal("Desbloqueado", `<p>Producto habilitado en Engine (local).</p>`);
+    openModal(t("paywall.modal_unlocked"), `<p>${t("paywall.modal_unlocked_body")}</p>`);
   }
 }
 
@@ -205,7 +259,7 @@ function lockPremiumLocal() {
     const pid = prods.products[0].product_id;
     state.entitlements = revokeLocal(pid);
     render();
-    openModal("Bloqueado", `<p>Producto revocado.</p>`);
+    openModal(t("paywall.modal_locked"), `<p>${t("paywall.modal_locked_body")}</p>`);
   }
 }
 
@@ -235,7 +289,7 @@ function BootErrorView() {
     const listInfo = state.boot.missing.map(m => `<li>${escapeHtml(m)}</li>`).join("");
     details = `
       <div class="callout" style="margin-top:12px; border-left-color: var(--color-error);">
-        <div class="callout__title">Archivos faltantes:</div>
+        <div class="callout__title">${t("app.missing_files")}</div>
         <ul>${listInfo}</ul>
       </div>
     `;
@@ -247,12 +301,12 @@ function BootErrorView() {
         <div class="hstack">
           <div class="seal" aria-hidden="true">!</div>
           <div>
-            <div class="hexTitle">No se pudo iniciar</div>
-            <div class="muted">Faltan archivos o rutas.</div>
+            <div class="hexTitle">${t("app.boot_error_title")}</div>
+            <div class="muted">${t("app.boot_error_desc")}</div>
           </div>
         </div>
         <div class="divider"></div>
-        <div class="mono muted">${escapeHtml(state.boot.error || "Error desconocido")}</div>
+        <div class="mono muted">${escapeHtml(state.boot.error || t("app.unknown_error"))}</div>
         ${details}
       </div>
     </section>
@@ -265,36 +319,36 @@ function HomeView() {
       <div class="vstack">
         <div class="hstack" style="justify-content:space-between; align-items:flex-start;">
           <div class="vstack" style="gap:6px;">
-            <div class="hexTitle">Nueva consulta</div>
-            <div class="muted">Plantea una pregunta abierta para iniciar.</div>
+            <div class="hexTitle">${t("home.title")}</div>
+            <div class="muted">${t("home.subtitle")}</div>
           </div>
-          <span class="badge">${state.entitlements.premium_sections ? "Plus activo" : "Versión estándar"}</span>
+          <span class="badge">${state.entitlements.premium_sections ? t("home.badge_premium") : t("home.badge_free")}</span>
         </div>
 
         <div class="divider"></div>
 
         <div class="vstack">
           <div>
-            <div class="label">Foco / Ámbito</div>
+            <div class="label">${t("home.label_focus")}</div>
             <select id="qMode">
-              ${opt("reflexion", "Reflexión general")}
-              ${opt("decision", "Toma de decisión")}
-              ${opt("relacion", "Vínculos y relaciones")}
-              ${opt("trabajo", "Trabajo y proyectos")}
-              ${opt("salud", "Bienestar y salud")}
-              ${opt("otro", "Otro")}
+              ${opt("reflexion", t("home.focus_options.reflexion"))}
+              ${opt("decision", t("home.focus_options.decision"))}
+              ${opt("relacion", t("home.focus_options.relacion"))}
+              ${opt("trabajo", t("home.focus_options.trabajo"))}
+              ${opt("salud", t("home.focus_options.salud"))}
+              ${opt("otro", t("home.focus_options.otro"))}
             </select>
           </div>
 
           <div>
-            <div class="label">Pregunta</div>
-            <textarea id="qText" placeholder="Ej: ¿Qué actitud conviene sostener ante esta situación?">${escapeHtml(state.draft.question.text_es || "")}</textarea>
+            <div class="label">${t("home.label_question")}</div>
+            <textarea id="qText" placeholder="${t("home.placeholder_question")}">${escapeHtml(state.draft.question.text_es || "")}</textarea>
           </div>
 
           <div class="row">
-            <button class="btn btn--primary" id="btnBegin">Tirar monedas</button>
-            <button class="btn btn--ghost" id="btnHistory">Historial (${state.history.length})</button>
-            <button class="btn btn--ghost" id="btnPremium">${state.entitlements.premium_sections ? "Tu acceso" : "Desbloquear Plus"}</button>
+            <button class="btn btn--primary" id="btnBegin">${t("home.btn_toss")}</button>
+            <button class="btn btn--ghost" id="btnHistory">${t("home.btn_history")} (${state.history.length})</button>
+            <button class="btn btn--ghost" id="btnPremium">${state.entitlements.premium_sections ? t("home.btn_your_access") : t("home.btn_unlock")}</button>
           </div>
         </div>
       </div>
@@ -309,8 +363,8 @@ function TossView() {
       <div class="vstack">
         <div class="hstack" style="justify-content:space-between; align-items:flex-start;">
           <div class="vstack" style="gap:6px;">
-            <div class="hexTitle">Tirada de monedas</div>
-            <div class="muted">Línea ${n + 1} de 6</div>
+            <div class="hexTitle">${t("toss.title")}</div>
+            <div class="muted">${t("toss.line_counter", { n: n + 1 })}</div>
           </div>
           <span class="badge">${escapeHtml(state.draft.question.mode)}</span>
         </div>
@@ -321,14 +375,14 @@ function TossView() {
         <div class="divider"></div>
 
         <div class="vstack">
-          ${n === 0 ? `<div class="muted">Tira las monedas para construir el hexagrama.</div>` : renderTosses(n)}
+          ${n === 0 ? `<div class="muted">${t("toss.instruction_initial")}</div>` : renderTosses(n)}
         </div>
 
         <div class="divider"></div>
 
         <div class="row">
-          <button class="btn btn--primary" id="btnToss">${n < 6 ? "Tirar" : "Finalizar"}</button>
-          <button class="btn btn--ghost" id="btnBackHome">Cancelar</button>
+          <button class="btn btn--primary" id="btnToss">${n < 6 ? t("toss.btn_toss") : t("toss.btn_finish")}</button>
+          <button class="btn btn--ghost" id="btnBackHome">${t("toss.btn_cancel")}</button>
         </div>
       </div>
     </section>
@@ -336,11 +390,11 @@ function TossView() {
 }
 
 function renderTosses(n) {
-  return state.draft.tosses.map((t, idx) => {
+  return state.draft.tosses.map((toss, idx) => {
     const lineNo = idx + 1;
-    const moving = t.is_moving ? " (mutante)" : "";
-    const bitText = t.line_bit === 1 ? "Yang" : "Yin";
-    const coins = t.coins.map(c => {
+    const moving = toss.is_moving ? t("toss.moving") : "";
+    const bitText = toss.line_bit === 1 ? t("toss.yang") : t("toss.yin");
+    const coins = toss.coins.map(c => {
       const isHeads = c === "heads";
       return `<div class="coin ${isHeads ? "coin--yang" : "coin--yin"}">${isHeads ? "●" : "○"}</div>`;
     }).join("");
@@ -348,7 +402,7 @@ function renderTosses(n) {
     return `
       <div class="card" style="background:transparent; padding:10px;">
         <div class="row" style="justify-content:space-between;">
-          <div class="muted">Línea ${lineNo}${moving} · ${bitText}</div>
+          <div class="muted">${t("toss.line")} ${lineNo}${moving} · ${bitText}</div>
           <div class="coins">${coins}</div>
         </div>
       </div>
@@ -366,21 +420,21 @@ function ReadingView() {
 
   const coreSection = `
     <div class="vstack">
-      <div class="label">Núcleo Dinámico</div>
+      <div class="label">${t("reading.label_core")}</div>
       <div style="font-size:1.1em; font-weight:500;">${escapeHtml(primary?.dynamic_core_es || "—")}</div>
     </div>
   `;
 
   const imageSection = `
     <div class="vstack">
-      <div class="label">La Imagen</div>
+      <div class="label">${t("reading.label_image")}</div>
       <div>${escapeHtml(primary?.image_es || "—")}</div>
     </div>
   `;
 
   const generalSection = `
     <div class="vstack">
-      <div class="label">Lectura General</div>
+      <div class="label">${t("reading.label_general")}</div>
       <div style="line-height:1.6;">${escapeHtml(primary?.general_reading_es || "—")}</div>
     </div>
   `;
@@ -389,22 +443,22 @@ function ReadingView() {
     ? `
       <div class="divider"></div>
       <div class="vstack">
-        <div class="label">Líneas Mutantes</div>
+        <div class="label">${t("reading.label_lines")}</div>
         ${primary.active_lines_content.map(l => `
           <div class="card" style="background:transparent;">
-            <div class="muted" style="margin-bottom:4px;">Línea ${l.position}</div>
+            <div class="muted" style="margin-bottom:4px;">${t("toss.line")} ${l.position}</div>
             <div>${escapeHtml(l.text)}</div>
           </div>
         `).join("")}
       </div>
     `
-    : `<div class="divider"></div><div class="muted">Sin mutaciones. El hexagrama es estable.</div>`;
+    : `<div class="divider"></div><div class="muted">${t("reading.no_mutations")}</div>`;
 
   const resultingSection = (is_mutating && resulting)
     ? `
       <div class="divider"></div>
       <div class="card" style="background:var(--panel2);">
-        <div class="label">Tendencia Futura (Resultante)</div>
+        <div class="label">${t("reading.label_resulting")}</div>
         <div class="row" style="margin-top:8px;">
           ${resulting.symbol_unicode ? `<div class="hexBig" style="font-size:32px;">${escapeHtml(resulting.symbol_unicode)}</div>` : ""}
           <div class="vstack" style="gap:2px;">
@@ -450,9 +504,9 @@ function ReadingView() {
         <div class="divider"></div>
 
         <div class="row">
-          <button class="btn btn--ghost" id="btnClose">Cerrar</button>
-          <button class="btn btn--ghost" id="btnSave">Guardar</button>
-          <button class="btn btn--ghost" id="btnPDF">PDF</button>
+          <button class="btn btn--ghost" id="btnClose">${t("reading.btn_close")}</button>
+          <button class="btn btn--ghost" id="btnSave">${t("reading.btn_save")}</button>
+          <button class="btn btn--ghost" id="btnPDF">${t("reading.btn_pdf")}</button>
         </div>
         
         <div class="muted" style="font-size:11px; margin-top:10px;">
@@ -470,37 +524,60 @@ function renderPremiumSection(hex) {
     const qs = Array.isArray(hex.guiding_questions_es) ? hex.guiding_questions_es : [];
     return `
       <div class="callout">
-        <div class="callout__title">Lectura Profunda (Wu wei)</div>
+        <div class="callout__title">${t("reading.premium_title")}</div>
         <div style="margin-bottom:10px;">${escapeHtml(hex.taoist_reading_es || "—")}</div>
         
         <div class="divider"></div>
-        <div class="callout__title">Preguntas Guía</div>
+        <div class="callout__title">${t("reading.premium_questions")}</div>
         <ul style="padding-left:20px; margin:0;">
           ${qs.map(q => `<li>${escapeHtml(q)}</li>`).join("")}
         </ul>
         
         <div class="divider"></div>
-        <div class="callout__title">Micro-acción</div>
+        <div class="callout__title">${t("reading.premium_action")}</div>
         <div>${escapeHtml(hex.micro_action_es || "—")}</div>
       </div>
     `;
   } else {
+    // Teaser / Soft Gate
+    // We grab the first few words if possible, or generic text, and blur the rest.
+    const teaser = (hex.taoist_reading_es || "").split(" ").slice(0, 4).join(" ") + "...";
+
     return `
       <div class="callout" style="cursor:pointer;" id="premiumLocked">
-        <div class="callout__title">Lectura Profunda</div>
-        <div class="blur">
-          La perspectiva taoísta ofrece una estrategia de mínima resistencia para esta situación, enfocada en el Wu Wei...
-        </div>
-        <div class="row row--end" style="margin-top:10px;">
-          <button class="btn btn--primary btn--sm">Desbloquear Plus</button>
+        <div class="callout__title">${t("reading.premium_title")}</div>
+        <div style="position:relative;">
+            <div style="filter:blur(4px); user-select:none; opacity:0.6;">
+                ${t("reading.teaser_blur_text")}
+            </div>
+            <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center;">
+                <span style="background:var(--panel); padding:4px 8px; border-radius:4px; box-shadow:0 2px 4px rgba(0,0,0,0.1); font-weight:bold; font-size:0.9em;">
+                    ${escapeHtml(teaser)}
+                </span>
+                <button class="btn btn--primary btn--sm" style="margin-top:8px;" id="btnUnlockTeaser">${t("reading.teaser_overlay")}</button>
+            </div>
         </div>
       </div>
     `;
+    // Note: We can't easily bind the ID here because this is a template string returning HTML.
+    // The binding happens in bindCommon or we use an inline onclick if we were lax, but better to use the container ID `premiumLocked`.
   }
 }
 
 function HistoryView() {
-  const rows = state.history.map((s) => {
+  // Freemium Logic for History
+  const isUnlimited = state.entitlements.unlimited_history;
+
+  let visibleHistory = state.history;
+  let lockedCount = 0;
+
+  if (!isUnlimited && state.history.length > 1) {
+    // Si tienes más de 1 y eres free, solo mostramos la primera real, y simulamos locked
+    visibleHistory = [state.history[0]];
+    lockedCount = state.history.length - 1;
+  }
+
+  const rows = visibleHistory.map((s) => {
     const p = s.hexagrams?.primary;
     const title = p ? `${p.id}. ${p.slug}` : "Sesión";
     return `
@@ -513,25 +590,39 @@ function HistoryView() {
               ${escapeHtml(s.question?.text_es || "—")}
             </div>
           </div>
-          <button class="btn btn--ghost btn--sm" data-open="${escapeHtml(s.id)}">Ver</button>
+          <button class="btn btn--ghost btn--sm" data-open="${escapeHtml(s.id)}">${t("history.btn_view")}</button>
         </div>
       </div>
     `;
   }).join("");
 
+  let upsell = "";
+  if (!isUnlimited) {
+    upsell = `
+       <div class="card" style="background:#f0f0f0; border:1px dashed #ccc; cursor:pointer;" id="historyLocked">
+         <div class="row" style="justify-content:center; padding:10px; color:#555;">
+            <div>${t("history.locked_banner", { count: lockedCount })}</div>
+         </div>
+       </div>
+     `;
+  }
+
   return `
     <section class="card">
       <div class="vstack">
         <div class="hstack" style="justify-content:space-between;">
-          <div class="hexTitle">Historial</div>
-          <span class="badge">Local</span>
+          <div class="hexTitle">${t("history.title")}</div>
+          <span class="badge">${isUnlimited ? t("history.badge_full") : t("history.badge_limited")}</span>
         </div>
         <div class="divider"></div>
-        ${state.history.length ? `<div class="vstack">${rows}</div>` : `<div class="muted">No hay sesiones guardadas.</div>`}
+        ${state.history.length ? `<div class="vstack">${rows}</div>` : `<div class="muted">${t("history.empty")}</div>`}
+        
+        ${upsell}
+
         <div class="divider"></div>
         <div class="row">
-          <button class="btn btn--ghost" id="btnBackHome2">Volver</button>
-          <button class="btn btn--ghost" id="btnClearHistory">Borrar todo</button>
+          <button class="btn btn--ghost" id="btnBackHome2">${t("history.btn_back")}</button>
+          <button class="btn btn--ghost" id="btnClearHistory">${t("history.btn_clear")}</button>
         </div>
       </div>
     </section>
@@ -571,9 +662,9 @@ function PaywallView() {
         <div class="divider"></div>
 
         <div class="row">
-          <button class="btn btn--primary" id="btnUnlockLocal">Simular Compra</button>
-          <button class="btn btn--ghost" id="btnLockLocal">Restaurar / Bloquear</button>
-          <button class="btn btn--ghost" id="btnBackHome3">Volver</button>
+          <button class="btn btn--primary" id="btnUnlockLocal">${t("paywall.btn_simulate")}</button>
+          <button class="btn btn--ghost" id="btnLockLocal">${t("paywall.btn_revoke")}</button>
+          <button class="btn btn--ghost" id="btnBackHome3">${t("paywall.btn_back")}</button>
         </div>
         
         <div class="muted" style="font-size:11px; text-align:center;">
@@ -601,7 +692,7 @@ function bindCommon(root) {
 
     btnBegin.addEventListener("click", () => {
       if (!state.draft.question.text_es.trim()) {
-        openModal("Falta pregunta", "<p>Por favor escribe algo para reflexionar.</p>");
+        openModal(t("home.error_empty_question"), `<p>${t("home.error_empty_question_body")}</p>`);
         return;
       }
       beginToss();
@@ -619,11 +710,18 @@ function bindCommon(root) {
   root.querySelector("#btnClose")?.addEventListener("click", startNew);
   root.querySelector("#btnSave")?.addEventListener("click", saveSession);
   root.querySelector("#btnPDF")?.addEventListener("click", exportPDF);
-  root.querySelector("#premiumLocked")?.addEventListener("click", () => openPaywall("reading"));
+  root.querySelector("#premiumLocked")?.addEventListener("click", () => {
+    trackEvent("feature_locked", { feature_id: "deep_reading" });
+    openPaywall("reading");
+  });
 
   // History
   root.querySelector("#btnBackHome2")?.addEventListener("click", () => nav("home"));
   root.querySelector("#btnClearHistory")?.addEventListener("click", deleteHistory);
+  root.querySelector("#historyLocked")?.addEventListener("click", () => {
+    trackEvent("feature_locked", { feature_id: "history_limit_list" });
+    openPaywall("history_limit");
+  });
   root.querySelectorAll("[data-open]").forEach(b => {
     b.addEventListener("click", () => {
       const id = b.getAttribute("data-open");
@@ -653,24 +751,30 @@ function openAbout() {
   const principles = lic?.app_principles_es || {};
   const stats = getTelemetry();
 
+  // Format stats for display
+  const locks = Object.entries(stats.feature_locks || {}).map(([k, v]) => `${k}: ${v}`).join(", ") || "0";
+
   const content = `
     <div class="vstack" style="gap:12px;">
-      <p><strong>Reflexión, no predicción.</strong> ${escapeHtml(principles.non_predictive || "")}</p>
-      <p><strong>Enfoque.</strong> ${escapeHtml(principles.taoist_orientation || "")}</p>
+      <p><strong>${t("about.reflection_not_prediction")}</strong> ${escapeHtml(principles.non_predictive || "")}</p>
       <div class="callout">
-        ${escapeHtml(principles.no_medical_substitution || "No sustituye ayuda profesional.")}
+        ${escapeHtml(principles.no_medical_substitution || t("about.no_medical_substitution"))}
       </div>
       <div class="divider"></div>
-      <div class="label">Tus estadísticas (Local)</div>
-      <div class="hstack" style="justify-content:space-between; font-size:13px;">
-          <div>Sesiones: <b>${stats.sessions || 0}</b></div>
-          <div>Lecturas: <b>${stats.readings || 0}</b></div>
+      <div class="label">${t("about.stats_title")}</div>
+      <div class="vstack" style="gap:4px; font-size:13px; font-family:monospace;">
+          <div class="row" style="justify-content:space-between"><span>${t("about.stats_sessions")}:</span> <b>${stats.sessions || 0}</b></div>
+          <div class="row" style="justify-content:space-between"><span>${t("about.stats_readings")}:</span> <b>${stats.readings || 0}</b></div>
+          <div class="divider"></div>
+          <div class="row" style="justify-content:space-between"><span>${t("about.stats_paywall")}:</span> <b>${stats.paywall_views || 0}</b></div>
+          <div class="row" style="justify-content:space-between"><span>${t("about.stats_conversions")}:</span> <b>${stats.conversions || 0}</b></div>
+          <div class="row" style="justify-content:space-between"><span>${t("about.stats_locks")}:</span> <span style="font-size:0.9em">${locks}</span></div>
       </div>
       <div class="divider"></div>
-      <p class="muted" style="font-size:12px;">Versión 0.1.1 · Local Storage</p>
+      <p class="muted" style="font-size:12px;">${t("about.footer")}</p>
     </div>
   `;
-  openModal("Acerca de", content);
+  openModal(t("about.title"), content);
 }
 
 // Utils

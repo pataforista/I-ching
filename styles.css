@@ -153,6 +153,11 @@ input:focus, textarea:focus, select:focus{
   background:transparent;
   border:2px solid var(--line);
 }
+.btn--danger{
+  background:transparent;
+  border:2px solid var(--accent);
+  color:var(--accent);
+}
 .btn--sm{padding:8px 10px; font-size:13px}
 
 .hexBig{

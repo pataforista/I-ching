@@ -17,7 +17,9 @@
       "entitlements": {
         "journal_mode": true,
         "export_tools": true,
-        "premium_sections": true
+        "premium_sections": true,
+        "unlimited_history": true,
+        "pdf_export": true
       },
       "non_entitlements": {
         "prediction": false,
@@ -25,9 +27,10 @@
         "guaranteed_outcomes": false
       },
       "purchase_notes_es": [
-        "Pago único, sin renovaciones.",
-        "Las lecturas no se comparten ni se suben a servidores.",
-        "No ofrece predicciones ni consejos médicos o legales."
+        "Historial ilimitado: Tu memoria de cambios.",
+        "Estrategia Wu Wei: Profundidad para la acción.",
+        "Exportación PDF: Material de estudio.",
+        "Privacidad Local: Solo tú ves tus datos."
       ],
       "refund_policy_es": "Sujeto a las políticas de reembolso de la tienda.",
       "visibility": {
@@ -39,13 +42,15 @@
   "default_free_entitlements": {
     "journal_mode": false,
     "export_tools": false,
-    "premium_sections": false
+    "premium_sections": false,
+    "unlimited_history": false,
+    "pdf_export": false
   },
   "paywall_copy_es": {
-    "title": "Trabajar con continuidad",
-    "body": "Guarda tus lecturas, consérvalas como diario y expórtalas en PDF para revisarlas con calma.\n\nPago único. Sin suscripciones.",
-    "cta_primary": "Desbloquear",
-    "cta_secondary": "Continuar sin guardar",
-    "footer_note": "Uso personal. Contenido local."
+    "title": "Cultiva tu claridad",
+    "body": "El I Ching es un compañero para tiempos de cambio. Para comprender verdaderamente tu camino, es útil mirar atrás y ver los pasos que has dado.\n\nEsta versión completa transforma la aplicación en un diario de evolución personal, permitiéndote conservar tu historial, acceder a estrategias de acción profundas y exportar tus reflexiones.",
+    "cta_primary": "Habilitar herramienta completa",
+    "cta_secondary": "Volver a la versión simple",
+    "footer_note": "Pago único de por vida. Sin suscripciones. Tus datos permanecen en tu dispositivo."
   }
 }
