@@ -358,57 +358,195 @@ function HomeView() {
 
 function TossView() {
   const n = state.draft.tosses.length;
+  // Si estamos "tirando" (animación en curso), el estado UI debe reflejarlo.
+  // Pero aquí usamos 'render' reactivo. Manejaremos la animación manipulando el DOM directamente o con estado transitorio.
+  // Para simplificar, TossView renderiza el estado. 
+
   return `
     <section class="card">
       <div class="vstack">
-        <div class="hstack" style="justify-content:space-between; align-items:flex-start;">
-          <div class="vstack" style="gap:6px;">
-            <div class="hexTitle">${t("toss.title")}</div>
-            <div class="muted">${t("toss.line_counter", { n: n + 1 })}</div>
-          </div>
-          <span class="badge">${escapeHtml(state.draft.question.mode)}</span>
+        <!-- Zen Master Header -->
+        <div class="hstack" style="justify-content:space-between;">
+           <div class="hexTitle">${t("toss.title")}</div>
+           <div class="badge">${n}/6</div>
         </div>
-        <div class="divider"></div>
-        
-        <div class="muted" style="font-style:italic;">“${escapeHtml(state.draft.question.text_es || "—")}”</div>
-        
+
+        <!-- Zen Box -->
+        <div id="zenBox" class="zen-container">
+           <span id="zenText"></span><span class="zen-cursor"></span>
+        </div>
+
         <div class="divider"></div>
 
-        <div class="vstack">
-          ${n === 0 ? `<div class="muted">${t("toss.instruction_initial")}</div>` : renderTosses(n)}
+        <!-- Stage Area (Active Toss) -->
+        <div class="coin-stage" id="coinStage">
+           <!-- Coins placeholders o resultado final de la ultima tirada si animation done? -->
+           ${renderStageCoins()}
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- History of Lines -->
+        <div class="vstack" id="linesList">
+          ${renderTosses(n)}
         </div>
 
         <div class="divider"></div>
 
         <div class="row">
-          <button class="btn btn--primary" id="btnToss">${n < 6 ? t("toss.btn_toss") : t("toss.btn_finish")}</button>
-          <button class="btn btn--ghost" id="btnBackHome">${t("toss.btn_cancel")}</button>
+          <button class="btn btn--primary" id="btnToss" ${state._tossing ? "disabled" : ""}>
+            ${n < 6 ? t("toss.btn_toss") : t("toss.btn_finish")}
+          </button>
+          <button class="btn btn--ghost" id="btnBackHome" ${state._tossing ? "disabled" : ""}>${t("toss.btn_cancel")}</button>
         </div>
       </div>
     </section>
   `;
 }
 
+function renderStageCoins() {
+  // Renderiza 3 monedas estáticas por defecto.
+  // Durante la animación, JS las manipulará.
+  const base = `
+    <div class="coin-3d"><div class="coin-face coin-front"></div><div class="coin-face coin-back"></div></div>
+  `;
+  return base + base + base;
+}
+
 function renderTosses(n) {
+  // Mostramos el historial de líneas ya generadas (abajo -> arriba)
+  // state.draft.tosses[0] es la línea 1
   return state.draft.tosses.map((toss, idx) => {
     const lineNo = idx + 1;
-    const moving = toss.is_moving ? t("toss.moving") : "";
-    const bitText = toss.line_bit === 1 ? t("toss.yang") : t("toss.yin");
-    const coins = toss.coins.map(c => {
+    const moving = toss.is_moving ? " · " + t("toss.moving") : "";
+    const bitText = toss.line_bit === 1 ? "Yang" : "Yin";
+
+    // Mini visual de monedas (2D legacy style para el historial)
+    const coinsMini = toss.coins.map(c => {
       const isHeads = c === "heads";
-      return `<div class="coin ${isHeads ? "coin--yang" : "coin--yin"}">${isHeads ? "●" : "○"}</div>`;
+      return `<div class="coin ${isHeads ? "coin--yang" : "coin--yin"}" style="width:20px; height:20px; font-size:10px;">${isHeads ? "●" : "○"}</div>`;
     }).join("");
 
     return `
-      <div class="card" style="background:transparent; padding:10px;">
+      <div class="card fade-in" style="background:transparent; padding:8px; border:1px solid var(--line);">
         <div class="row" style="justify-content:space-between;">
-          <div class="muted">${t("toss.line")} ${lineNo}${moving} · ${bitText}</div>
-          <div class="coins">${coins}</div>
+          <div class="hstack">
+            <div class="seal" style="width:24px; height:24px; font-size:12px;">${lineNo}</div>
+            <div class="muted">${bitText}${moving}</div>
+          </div>
+          <div class="coins">${coinsMini}</div>
         </div>
       </div>
     `;
-  }).reverse().join(""); // mostramos la más reciente arriba si preferred, o normal. Let's keep normal but maybe styling? No, let's keep array order (bottom to top visually? usually hexagram builds up. Let's list naturally 1 to n).
+  }).reverse().join(""); // Lo más nuevo arriba
 }
+
+// --- Animación y Lógica ---
+
+async function onTossNextLine() {
+  if (!state.boot.ok) return;
+  if (state.draft.tosses.length >= 6) {
+    finishToss();
+    return;
+  }
+
+  if (state._tossing) return; // Prevención doble click
+  state._tossing = true;
+
+  // 1. Update UI to Disabled State (manual o re-render)
+  render();
+
+  // 2. Zen Master Speaks: "Concentrate..."
+  const zenTexts = [
+    "El azar no existe, solo relaciones ocultas...",
+    "Respira. La respuesta ya está en ti...",
+    "Deja que las monedas caigan como hojas...",
+    "Observa el movimiento del Tao...",
+    "Sin intención, no hay revelación..."
+  ];
+  const msg = zenTexts[Math.floor(Math.random() * zenTexts.length)];
+  await typeWriter("zenText", msg, 40);
+
+  // 3. Animate Coins
+  const stage = document.getElementById("coinStage");
+  if (stage) {
+    const coins = stage.querySelectorAll(".coin-3d");
+    coins.forEach(c => {
+      c.classList.remove("outcome-heads", "outcome-tails");
+      c.classList.add("spinning");
+    });
+
+    // Sonido opcional aquí
+    await delay(1200); // Spin duration
+
+    // 4. Calculate Result Logic
+    let tossResult;
+    try {
+      tossResult = tossLine(); // Engine logic
+    } catch (e) {
+      state._tossing = false;
+      openModal("Error", String(e));
+      render();
+      return;
+    }
+
+    // 5. Stop Animation & Show Result
+    coins.forEach((c, i) => {
+      c.classList.remove("spinning");
+      // Force reflow
+      void c.offsetWidth;
+      const face = tossResult.coins[i]; // "heads" or "tails"
+      const rotation = face === "heads" ? "outcome-heads" : "outcome-tails";
+
+      // Randomize slight rotation for realism? CSS handle transitions.
+      // JS sets class.
+      c.classList.add(rotation);
+    });
+
+    await delay(800); // Wait for landing settle
+
+    // 6. Record State
+    state.draft.tosses.push(tossResult);
+
+    // 7. Cleanup & Re-render
+    state._tossing = false;
+    render();
+
+    // Post-toss Zen Comment
+    const postMsg = tossResult.is_moving
+      ? "El cambio se manifiesta. Una línea mutante."
+      : "La energía se asienta.";
+    typeWriter("zenText", postMsg, 30);
+  }
+}
+
+function finishToss() {
+  if (!isContentLoaded()) { /* check */ }
+  const readingData = buildReading(state.draft.tosses);
+  state.session = {
+    id: cryptoRandomId(),
+    created_at_iso: new Date().toISOString(),
+    question: structuredClone(state.draft.question),
+    tosses: structuredClone(state.draft.tosses),
+    hexagrams: readingData
+  };
+  trackEvent("reading_view");
+  nav("reading");
+}
+
+/* --- Zen Master Utilities --- */
+async function typeWriter(elementId, text, speed = 40) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  el.textContent = "";
+  for (let i = 0; i < text.length; i++) {
+    el.textContent += text.charAt(i);
+    await delay(speed + (Math.random() * 20)); // Organic typing
+  }
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
 
 function ReadingView() {
   if (!state.session) return `<div class="card"><div class="muted">Error de sesión.</div></div>`;

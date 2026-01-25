@@ -58,7 +58,7 @@
       "id": "editorial_content_core",
       "path": "/data/content/hexagrams_core.json",
       "type": "content",
-      "version": "0.1.0",
+      "version": "0.1.3",
       "description": "Contiene los textos editoriales de los hexagramas (free + premium) con nota ética.",
       "required_for_boot": false,
       "lazy_load": true,
