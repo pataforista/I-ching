@@ -1,47 +1,71 @@
-// app.js
-import { initEngine, tossLine, buildReading, isContentLoaded, getProducts, getLicenses, getEntitlements, purchaseLocal, revokeLocal, trackEvent, getTelemetry, t } from "./engine.js";
+import { BubbleMenu, Typewriter, InkGalaxy, Stepper, TiltCard } from "./ui-lib.js";
+import {
+  initEngine,
+  trackEvent,
+  tossLine,
+  buildReading,
+  getProducts,
+  purchaseLocal,
+  revokeLocal,
+  isContentLoaded,
+  getLicenses
+} from "./engine.js";
 
-const LS_KEY = "iching_tao_v0";
-const LS_THEME = "iching_theme_v0";
+// Global UI Instances
+let sageTyper = null;
+let bubbleMenu = null;
+let galaxy = null;
 
-const state = {
-  nav: "home", // home | toss | reading | history | paywall
-  boot: { ok: false, error: null, missing: null },
+var state = {
+  // Boot status
+  boot: { ok: true, missing: [], error: null },
+
+  // Navigation: 'home' | 'toss' | 'reading' | 'history' | 'paywall'
+  nav: "home",
+
+  // Data
+  history: [], // Array of sessions
+
+  // Current Session Draft
   draft: {
-    question: { text_es: "", mode: "reflexion" }, // reflexion | decision | relacion | trabajo | salud | otro
-    tosses: []
+    question: { text_es: "", mode: "reflexion" }, // modos: reflexion, decision, relacion, trabajo, salud
+    tosses: [] // Array of { coins: ['heads','tails','heads'], value: 7/8/6/9, ... }
   },
+
+  // Active Session (Displaying Reading)
   session: null,
-  history: [],
+
+  // UI State
+  _tossing: false, // animation lock
+  _paywallFeature: null, // "history_limit" | "pdf_export"
+
+  // Mock Entitlements (Local Logic)
   entitlements: {
-    premium_sections: false
-  }
+    unlimited_history: false,
+    premium_sections: false,
+    pdf_export: false
+  },
+  _bookOpen: false
 };
 
-// ---------- Boot ----------
-boot();
-
-async function boot() {
+// ---------- Init ----------
+// Se ejecuta al cargar el script (module)
+(async function init() {
   loadLocal();
 
-  // Theme init
-  const savedTheme = localStorage.getItem(LS_THEME) || "ink";
-  applyTheme(savedTheme);
+  // Handle URL params or redirects if needed
+  if (!state.history) state.history = [];
 
-  // UI hooks
-  const btnTheme = document.getElementById("btnTheme");
-  if (btnTheme) btnTheme.addEventListener("click", onToggleTheme);
+  // Init Menu
+  initBubbleMenu();
 
-  const btnAbout = document.getElementById("btnAbout");
-  if (btnAbout) btnAbout.addEventListener("click", openAbout);
+  // Init Ink Galaxy Background
+  galaxy = new InkGalaxy({ count: 180 });
 
-  // Engine init
   try {
+    // Attempt boot checks
     await initEngine();
     state.boot.ok = true;
-
-    // Sync Entitlements
-    state.entitlements = getEntitlements();
 
     // Telemetry
     trackEvent("session_start");
@@ -49,24 +73,28 @@ async function boot() {
   } catch (e) {
     state.boot.ok = false;
     state.boot.error = String(e?.message || e);
-
     if (e.missing && Array.isArray(e.missing)) {
       state.boot.missing = e.missing;
     }
-  }
-
-  // Set footer text dynamically if possible
-  const licenses = getLicenses();
-  if (licenses?.app_principles_es?.no_medical_substitution) {
-    const footerText = document.getElementById("footerText");
-    if (footerText) footerText.textContent = t("app.footer_default"); // Fallback or key? actually principles are static in licenses.json potentially, but let's use i18n for footer.
-    // Better: let's use t("app.footer_default") if principle not found.
   }
 
   // SW register
   registerSW();
 
   render();
+})();
+
+function initBubbleMenu() {
+  bubbleMenu = new BubbleMenu([
+    { label: "Inicio", onClick: () => startNew() },
+    { label: "Historial", onClick: () => openHistory() },
+    { label: "Tema", onClick: () => onToggleTheme() },
+    {
+      label: "Acerca de", onClick: () => {
+        openModal("Acerca de", "<p>I Ching - Reflexión Local</p><div class='muted'>Versión Premium Ukiyo-e</div>");
+      }
+    }
+  ]);
 }
 
 // ---------- Storage ----------
@@ -93,7 +121,7 @@ function onToggleTheme() {
 
 function applyTheme(name) {
   if (name === "paper") document.documentElement.setAttribute("data-theme", "paper");
-  else document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", "ink");
   localStorage.setItem(LS_THEME, name);
 
   const meta = document.querySelector('meta[name="theme-color"]');
@@ -127,46 +155,11 @@ function beginToss() {
   nav("toss");
 }
 
-function onTossNextLine() {
-  if (!state.boot.ok) return;
-
-  if (state.draft.tosses.length >= 6) return;
-
-  try {
-    const t = tossLine();
-    state.draft.tosses.push(t);
-
-    if (state.draft.tosses.length === 6) {
-      if (!isContentLoaded()) {
-        // content pending check could happen here
-      }
-      const readingData = buildReading(state.draft.tosses);
-      state.session = {
-        id: cryptoRandomId(),
-        created_at_iso: new Date().toISOString(),
-        question: structuredClone(state.draft.question),
-        tosses: structuredClone(state.draft.tosses),
-        hexagrams: readingData
-      };
-      trackEvent("reading_view");
-      nav("reading");
-    } else {
-      render();
-    }
-  } catch (e) {
-    openModal(t("app.unknown_error"), `
-      <p>No pude completar la tirada.</p>
-      <p class="mono muted">${escapeHtml(String(e?.message || e))}</p>
-    `);
-  }
-}
-
 function saveSession() {
   if (!state.session) return;
 
   // Limite de historial (Freemium logic)
   if (!state.entitlements.unlimited_history && state.history.length > 0) {
-    // Show Overwrite Decision Modal
     const modalContent = `
       <p>${t("history.limit_modal_body")}</p>
       <div class="callout" style="border-left-color:var(--accent);">
@@ -193,7 +186,7 @@ function saveSession() {
         document.getElementById("modal").close();
         performSave(true); // overwrite = true
       });
-    }, 50); // slight delay to ensure DOM is ready inside modal
+    }, 50);
     return;
   }
 
@@ -212,7 +205,7 @@ function performSave(overwrite) {
     openModal(t("history.modal_saved_title"), `<p>${t("history.modal_saved_body")}</p>`);
   }
   saveLocal();
-  render(); // update history count in buttons if visible
+  render();
 }
 
 function openHistory() {
@@ -241,14 +234,12 @@ function openPaywall(feature) {
 }
 
 function unlockPremiumLocal() {
-  // Use Engine logic now
-  // Assuming first product is the one we want
   const prods = getProducts();
   if (prods?.products?.length > 0) {
     const pid = prods.products[0].product_id;
     state.entitlements = purchaseLocal(pid);
     trackEvent("purchase_completed", { product_id: pid });
-    render(); // re-render paywall
+    render();
     openModal(t("paywall.modal_unlocked"), `<p>${t("paywall.modal_unlocked_body")}</p>`);
   }
 }
@@ -266,147 +257,214 @@ function lockPremiumLocal() {
 // ---------- Render ----------
 function render() {
   const root = document.getElementById("app");
-  root.innerHTML = "";
+  if (!root) return;
 
+  // 1. Ensure Shell (Book structure) exists
+  if (!document.getElementById("theBook")) {
+    root.innerHTML = BookShellHTML();
+    bindShellEvents();
+  }
+
+  // 2. Update Shell State (Open/Closed)
+  const book = document.getElementById("theBook");
+  if (state._bookOpen) book.classList.add("open");
+  else book.classList.remove("open");
+
+  // 3. Render Page Content inside the Book
+  const pageContainer = document.getElementById("bookPageContent");
+  if (!pageContainer) return; // Should exist if shell exists
+
+  // If boot error, override
   if (!state.boot.ok) {
-    root.appendChild(htmlToNode(BootErrorView()));
-    bindCommon(root);
+    pageContainer.innerHTML = BootErrorView(); // Returns string now for simplicity? No, let's keep consistent.
+    // Actually our previous views returned strings (HTML).
     return;
   }
 
-  if (state.nav === "home") root.appendChild(htmlToNode(HomeView()));
-  if (state.nav === "toss") root.appendChild(htmlToNode(TossView()));
-  if (state.nav === "reading") root.appendChild(htmlToNode(ReadingView()));
-  if (state.nav === "history") root.appendChild(htmlToNode(HistoryView()));
-  if (state.nav === "paywall") root.appendChild(htmlToNode(PaywallView()));
-
-  bindCommon(root);
-}
-
-function BootErrorView() {
-  let details = "";
-  if (state.boot.missing) {
-    const listInfo = state.boot.missing.map(m => `<li>${escapeHtml(m)}</li>`).join("");
-    details = `
-      <div class="callout" style="margin-top:12px; border-left-color: var(--color-error);">
-        <div class="callout__title">${t("app.missing_files")}</div>
-        <ul>${listInfo}</ul>
-      </div>
-    `;
+  let contentHTML = "";
+  switch (state.nav) {
+    case "home": contentHTML = HomeFormView(); break;
+    case "toss": contentHTML = TossView(); break;
+    case "reading": contentHTML = ReadingView(); break;
+    case "history": contentHTML = HistoryView(); break;
+    case "paywall": contentHTML = PaywallView(); break;
+    default: contentHTML = HomeFormView();
   }
 
+  // Simple diff to avoid destructive re-renders if not needed?
+  // For now, simpler to just replace innerHTML. 
+  // IMPORTANT: Re-binding events is needed after innerHTML replacement.
+  pageContainer.innerHTML = contentHTML;
+
+  // 4. Post-Render logic (Events, Typewriters)
+  bindPageEvents(pageContainer);
+  initPageEffects(); // e.g. Typewriter
+}
+
+function BookShellHTML() {
   return `
-    <section class="card">
-      <div class="vstack">
-        <div class="hstack">
-          <div class="seal" aria-hidden="true">!</div>
-          <div>
-            <div class="hexTitle">${t("app.boot_error_title")}</div>
-            <div class="muted">${t("app.boot_error_desc")}</div>
+    <section class="max-w" style="display:grid; place-items:center; min-height:85vh;">
+       <div class="book-scene">
+          <div class="book" id="theBook">
+             <!-- Cover -->
+             <div class="book-face book-front">
+                <div class="book-cover-title-box">
+                   <div class="seal" style="width:60px; height:60px; font-size:32px; margin:0 auto 10px; background:var(--vermilion);">IC</div>
+                   <h1 class="hexTitle gold-foil" style="font-size:36px; margin:0; opacity:0.9;">I CHING</h1>
+                   <div class="muted" style="margin-top:10px; font-family:var(--font-serif); font-style:italic;">Libro de las Mutaciones</div>
+                </div>
+                <button class="book-btn" id="btnOpenBook">Consultar</button>
+             </div>
+
+             <!-- Inside (Pages) -->
+             <div class="book-face book-inside">
+                <!-- Dynamic Content Here -->
+                <div id="bookPageContent" class="vstack" style="flex:1;"></div>
+                
+                <!-- Footer inside book -->
+                <div style="margin-top:20px; text-align:center; opacity:0.4; font-size:10px; font-family:var(--font-serif);">
+                   Reflexión Local · v1.0
+                </div>
+             </div>
           </div>
-        </div>
-        <div class="divider"></div>
-        <div class="mono muted">${escapeHtml(state.boot.error || t("app.unknown_error"))}</div>
-        ${details}
-      </div>
+       </div>
     </section>
   `;
 }
 
-function HomeView() {
+function bindShellEvents() {
+  document.getElementById("btnOpenBook")?.addEventListener("click", () => {
+    state._bookOpen = true;
+    render();
+  });
+}
+
+function initPageEffects() {
+  // Toss View Effects
+  if (state.nav === "toss") {
+    // Sage Typer
+    const msgEl = document.getElementById("zenText");
+    if (msgEl) {
+      // Always recreate to bind to new DOM element
+      sageTyper = new Typewriter(msgEl, { typingSpeed: 30, cursor: true });
+
+      // Initial text only if start of session
+      if (!state._tossing && state.draft.tosses.length === 0) {
+        sageTyper.type("La respuesta que buscas ya reside en tu interior. Lanza las monedas...");
+      }
+    }
+
+    // Stepper
+    const stepEl = document.getElementById("tossStepper");
+    if (stepEl) {
+      // Calculate current step (1-indexed input for user, 0-indexed info in array)
+      // tosses.length is 0 -> Step 1
+      // tosses.length is 1 -> Step 2
+      const currentLine = state.draft.tosses.length + 1;
+
+      new Stepper(stepEl, {
+        initialStep: currentLine,
+        totalSteps: 6,
+        disableStepIndicators: true, // Non-interactive
+        stepContainerClassName: 'stepper-mini', // Custom override if needed
+        renderStepIndicator: (step, isActive, isCompleted) => {
+          // Custom Ink Dot rendering if needed, or default
+          // Let's use default styles but maybe smaller?
+          // For now default is fine.
+          let classes = "step-dot";
+          if (isActive) classes += " active";
+          if (isCompleted) classes += " completed";
+          // Using chinese numbers or just Roman/Arabic? Arabic is clearer.
+          // Or maybe Yi Jing lines style? Let's stick to numbers for clarity.
+          return `<div class="${classes}" style="width:24px; height:24px; font-size:12px;">${step}</div>`;
+        }
+      });
+    }
+
+  } else if (state.nav === "history") {
+    document.querySelectorAll(".history-card").forEach(el => {
+      new TiltCard(el, { maxTilt: 10, scale: 1.02 });
+    });
+    sageTyper = null;
+
+  } else {
+    sageTyper = null;
+  }
+}
+
+
+
+// Renamed HomeView to HomeFormView for clarity as it's just the form now
+function HomeFormView() {
   return `
-    <section class="card">
-      <div class="vstack">
-        <div class="hstack" style="justify-content:space-between; align-items:flex-start;">
-          <div class="vstack" style="gap:6px;">
-            <div class="hexTitle">${t("home.title")}</div>
-            <div class="muted">${t("home.subtitle")}</div>
-          </div>
-          <span class="badge">${state.entitlements.premium_sections ? t("home.badge_premium") : t("home.badge_free")}</span>
-        </div>
+    <div style="text-align:center; opacity:0.7;">
+       <div class="seal" style="width:40px; height:40px; margin:0 auto;">IC</div>
+    </div>
+    
+    <div class="label" style="text-align:center; margin-top:20px;">${t("home.label_focus")}</div>
+    <select id="qMode" class="input-field" style="text-align:center;">
+        ${opt("reflexion", t("home.focus_options.reflexion"))}
+        ${opt("decision", t("home.focus_options.decision"))}
+        ${opt("relacion", t("home.focus_options.relacion"))}
+        ${opt("trabajo", t("home.focus_options.trabajo"))}
+        ${opt("salud", t("home.focus_options.salud"))}
+        ${opt("otro", t("home.focus_options.otro"))}
+    </select>
 
-        <div class="divider"></div>
+    <div class="label" style="text-align:center; margin-top:20px;">${t("home.label_question")}</div>
+    <textarea id="qText" class="input-field" style="min-height:100px; text-align:center; font-style:italic;" placeholder="${t("home.placeholder_question")}">${escapeHtml(state.draft.question.text_es || "")}</textarea>
 
-        <div class="vstack">
-          <div>
-            <div class="label">${t("home.label_focus")}</div>
-            <select id="qMode">
-              ${opt("reflexion", t("home.focus_options.reflexion"))}
-              ${opt("decision", t("home.focus_options.decision"))}
-              ${opt("relacion", t("home.focus_options.relacion"))}
-              ${opt("trabajo", t("home.focus_options.trabajo"))}
-              ${opt("salud", t("home.focus_options.salud"))}
-              ${opt("otro", t("home.focus_options.otro"))}
-            </select>
-          </div>
+    <div class="divider"></div>
 
-          <div>
-            <div class="label">${t("home.label_question")}</div>
-            <textarea id="qText" placeholder="${t("home.placeholder_question")}">${escapeHtml(state.draft.question.text_es || "")}</textarea>
-          </div>
-
-          <div class="row">
-            <button class="btn btn--primary" id="btnBegin">${t("home.btn_toss")}</button>
-            <button class="btn btn--ghost" id="btnHistory">${t("home.btn_history")} (${state.history.length})</button>
-            <button class="btn btn--ghost" id="btnPremium">${state.entitlements.premium_sections ? t("home.btn_your_access") : t("home.btn_unlock")}</button>
-          </div>
-        </div>
-      </div>
-    </section>
+    <div class="row" style="justify-content:center; margin-top:20px;">
+      <button class="btn btn--primary" id="btnBegin">${t("home.btn_toss")}</button>
+    </div>
   `;
 }
 
 function TossView() {
   const n = state.draft.tosses.length;
-  // Si estamos "tirando" (animación en curso), el estado UI debe reflejarlo.
-  // Pero aquí usamos 'render' reactivo. Manejaremos la animación manipulando el DOM directamente o con estado transitorio.
-  // Para simplificar, TossView renderiza el estado. 
-
+  // Note: inside book, no section wrapper needed, just vstack
   return `
-    <section class="card">
       <div class="vstack">
-        <!-- Zen Master Header -->
-        <div class="hstack" style="justify-content:space-between;">
-           <div class="hexTitle">${t("toss.title")}</div>
-           <div class="badge">${n}/6</div>
+        
+        <div class="sage-container">
+           <div class="sage-aura"></div>
+           <div class="sage-avatar"></div>
+           <div class="sage-bubble">
+              <span id="zenText"></span>
+           </div>
         </div>
 
-        <!-- Zen Box -->
-        <div id="zenBox" class="zen-container">
-           <span id="zenText"></span><span class="zen-cursor"></span>
+        <div class="card">
+          <div class="hstack" style="justify-content:space-between;">
+             <div class="hexTitle">${t("toss.title")}</div>
+             <!-- Stepper Container -->
+             <div id="tossStepper" style="flex:1; display:flex; justify-content:flex-end;"></div>
+          </div>
+  
+          <div class="coin-stage" id="coinStage">
+             ${renderStageCoins()}
+          </div>
+  
+          <div class="divider"></div>
+
+          <div class="row" style="justify-content:center;">
+            <button class="btn btn--primary" id="btnToss" ${state._tossing ? "disabled" : ""}>
+              ${n < 6 ? t("toss.btn_toss") : t("toss.btn_finish")}
+            </button>
+            <button class="btn btn--ghost" id="btnBackHome" ${state._tossing ? "disabled" : ""}>${t("toss.btn_cancel")}</button>
+          </div>
         </div>
 
-        <div class="divider"></div>
-
-        <!-- Stage Area (Active Toss) -->
-        <div class="coin-stage" id="coinStage">
-           <!-- Coins placeholders o resultado final de la ultima tirada si animation done? -->
-           ${renderStageCoins()}
-        </div>
-
-        <div class="divider"></div>
-
-        <!-- History of Lines -->
-        <div class="vstack" id="linesList">
+        <div class="vstack" style="margin-top:20px;">
           ${renderTosses(n)}
         </div>
-
-        <div class="divider"></div>
-
-        <div class="row">
-          <button class="btn btn--primary" id="btnToss" ${state._tossing ? "disabled" : ""}>
-            ${n < 6 ? t("toss.btn_toss") : t("toss.btn_finish")}
-          </button>
-          <button class="btn btn--ghost" id="btnBackHome" ${state._tossing ? "disabled" : ""}>${t("toss.btn_cancel")}</button>
-        </div>
       </div>
-    </section>
   `;
 }
 
 function renderStageCoins() {
-  // Renderiza 3 monedas estáticas por defecto.
-  // Durante la animación, JS las manipulará.
   const base = `
     <div class="coin-3d"><div class="coin-face coin-front"></div><div class="coin-face coin-back"></div></div>
   `;
@@ -414,34 +472,28 @@ function renderStageCoins() {
 }
 
 function renderTosses(n) {
-  // Mostramos el historial de líneas ya generadas (abajo -> arriba)
-  // state.draft.tosses[0] es la línea 1
+  if (n === 0) return "";
   return state.draft.tosses.map((toss, idx) => {
     const lineNo = idx + 1;
-    const moving = toss.is_moving ? " · " + t("toss.moving") : "";
-    const bitText = toss.line_bit === 1 ? "Yang" : "Yin";
+    const isYang = toss.line_bit === 1;
 
-    // Mini visual de monedas (2D legacy style para el historial)
-    const coinsMini = toss.coins.map(c => {
-      const isHeads = c === "heads";
-      return `<div class="coin ${isHeads ? "coin--yang" : "coin--yin"}" style="width:20px; height:20px; font-size:10px;">${isHeads ? "●" : "○"}</div>`;
-    }).join("");
-
+    // Brush style rendering for history lines
     return `
-      <div class="card fade-in" style="background:transparent; padding:8px; border:1px solid var(--line);">
-        <div class="row" style="justify-content:space-between;">
-          <div class="hstack">
-            <div class="seal" style="width:24px; height:24px; font-size:12px;">${lineNo}</div>
-            <div class="muted">${bitText}${moving}</div>
-          </div>
-          <div class="coins">${coinsMini}</div>
-        </div>
+      <div class="brush-border" style="padding:10px; opacity:0.8; background:var(--panel); border-radius:var(--radius); margin-bottom:8px;">
+         <div class="hstack">
+            <span class="muted" style="width:20px;">${lineNo}</span>
+            <div style="flex:1; height:12px; display:flex; gap:16px;">
+               ${isYang
+        ? `<div style="flex:1; background:var(--text); border-radius:2px; opacity:0.85;"></div>`
+        : `<div style="flex:1; background:var(--text); border-radius:2px; opacity:0.85;"></div><div style="flex:1; background:var(--text); border-radius:2px; opacity:0.85;"></div>`
+      }
+            </div>
+            ${toss.is_moving ? `<span class="badge" style="border-color:var(--accent); color:var(--accent);">Mutation</span>` : ""}
+         </div>
       </div>
     `;
-  }).reverse().join(""); // Lo más nuevo arriba
+  }).reverse().join("");
 }
-
-// --- Animación y Lógica ---
 
 async function onTossNextLine() {
   if (!state.boot.ok) return;
@@ -450,39 +502,40 @@ async function onTossNextLine() {
     return;
   }
 
-  if (state._tossing) return; // Prevención doble click
+  if (state._tossing) return;
   state._tossing = true;
-
-  // 1. Update UI to Disabled State (manual o re-render)
   render();
 
-  // 2. Zen Master Speaks: "Concentrate..."
   const zenTexts = [
-    "El azar no existe, solo relaciones ocultas...",
-    "Respira. La respuesta ya está en ti...",
-    "Deja que las monedas caigan como hojas...",
-    "Observa el movimiento del Tao...",
-    "Sin intención, no hay revelación..."
+    "El universo te escucha...",
+    "Concéntrate en tu pregunta...",
+    "El cambio es la única constante...",
+    "Siente el peso de las monedas...",
+    "Deja fluir tu intención..."
   ];
   const msg = zenTexts[Math.floor(Math.random() * zenTexts.length)];
-  await typeWriter("zenText", msg, 40);
+  if (sageTyper) sageTyper.type(msg);
 
-  // 3. Animate Coins
   const stage = document.getElementById("coinStage");
   if (stage) {
     const coins = stage.querySelectorAll(".coin-3d");
     coins.forEach(c => {
       c.classList.remove("outcome-heads", "outcome-tails");
-      c.classList.add("spinning");
+      // Reset animation
+      c.style.animation = 'none';
+      c.offsetHeight; /* trigger reflow */
+
+      // Randomize speed and delay for natural feel
+      const duration = 0.6 + Math.random() * 0.4; // 0.6s - 1.0s
+      const delay = Math.random() * 0.1; // 0 - 0.1s offset
+      c.style.animation = `spin ${duration}s infinite linear ${delay}s`;
     });
 
-    // Sonido opcional aquí
-    await delay(1200); // Spin duration
+    await delay(1200);
 
-    // 4. Calculate Result Logic
     let tossResult;
     try {
-      tossResult = tossLine(); // Engine logic
+      tossResult = tossLine();
     } catch (e) {
       state._tossing = false;
       openModal("Error", String(e));
@@ -490,38 +543,28 @@ async function onTossNextLine() {
       return;
     }
 
-    // 5. Stop Animation & Show Result
     coins.forEach((c, i) => {
-      c.classList.remove("spinning");
-      // Force reflow
+      c.style.animation = 'none'; // Stop spin
       void c.offsetWidth;
-      const face = tossResult.coins[i]; // "heads" or "tails"
+      const face = tossResult.coins[i];
       const rotation = face === "heads" ? "outcome-heads" : "outcome-tails";
-
-      // Randomize slight rotation for realism? CSS handle transitions.
-      // JS sets class.
       c.classList.add(rotation);
     });
 
-    await delay(800); // Wait for landing settle
+    await delay(800);
 
-    // 6. Record State
     state.draft.tosses.push(tossResult);
-
-    // 7. Cleanup & Re-render
     state._tossing = false;
     render();
 
-    // Post-toss Zen Comment
     const postMsg = tossResult.is_moving
-      ? "El cambio se manifiesta. Una línea mutante."
-      : "La energía se asienta.";
-    typeWriter("zenText", postMsg, 30);
+      ? "¡Una línea mutante se revela!"
+      : "La línea se ha fijado.";
+    if (sageTyper) sageTyper.type(postMsg);
   }
 }
 
 function finishToss() {
-  if (!isContentLoaded()) { /* check */ }
   const readingData = buildReading(state.draft.tosses);
   state.session = {
     id: cryptoRandomId(),
@@ -535,16 +578,6 @@ function finishToss() {
 }
 
 /* --- Zen Master Utilities --- */
-async function typeWriter(elementId, text, speed = 40) {
-  const el = document.getElementById(elementId);
-  if (!el) return;
-  el.textContent = "";
-  for (let i = 0; i < text.length; i++) {
-    el.textContent += text.charAt(i);
-    await delay(speed + (Math.random() * 20)); // Organic typing
-  }
-}
-
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 
@@ -553,8 +586,6 @@ function ReadingView() {
 
   const { primary, resulting, is_mutating } = state.session.hexagrams;
   const title = primary ? `${primary.id}. ${primary.hanzi} · ${primary.slug}` : "Unknown";
-
-  // Flow: Core -> Image -> General -> Lines -> Resulting -> Premium
 
   const coreSection = `
     <div class="vstack">
@@ -583,7 +614,7 @@ function ReadingView() {
       <div class="vstack">
         <div class="label">${t("reading.label_lines")}</div>
         ${primary.active_lines_content.map(l => `
-          <div class="card" style="background:transparent;">
+          <div class="card" style="background:transparent; border:none; padding:10px;">
             <div class="muted" style="margin-bottom:4px;">${t("toss.line")} ${l.position}</div>
             <div>${escapeHtml(l.text)}</div>
           </div>
@@ -595,7 +626,7 @@ function ReadingView() {
   const resultingSection = (is_mutating && resulting)
     ? `
       <div class="divider"></div>
-      <div class="card" style="background:var(--panel2);">
+      <div class="card" style="background:var(--panel);">
         <div class="label">${t("reading.label_resulting")}</div>
         <div class="row" style="margin-top:8px;">
           ${resulting.symbol_unicode ? `<div class="hexBig" style="font-size:32px;">${escapeHtml(resulting.symbol_unicode)}</div>` : ""}
@@ -609,49 +640,44 @@ function ReadingView() {
     : "";
 
   return `
-    <section class="card">
       <div class="vstack">
-        <!-- Header Lecture -->
-        <div class="hstack" style="justify-content:space-between; align-items:flex-start;">
-          <div class="row">
-            ${primary?.symbol_unicode ? `<div class="hexBig">${escapeHtml(primary.symbol_unicode)}</div>` : ""}
-            <div class="vstack" style="gap:2px;">
-              <h1 class="hexTitle">${escapeHtml(title)}</h1>
-              <div class="muted">${escapeHtml(state.session.created_at_iso.split("T")[0])}</div>
+        <div class="card">
+          <div class="hstack" style="justify-content:space-between; align-items:flex-start;">
+            <div class="row">
+              ${primary?.symbol_unicode ? `<div class="hexBig">${escapeHtml(primary.symbol_unicode)}</div>` : ""}
+              <div class="vstack" style="gap:2px;">
+                <h1 class="hexTitle">${escapeHtml(title)}</h1>
+                <div class="muted">${escapeHtml(state.session.created_at_iso.split("T")[0])}</div>
+              </div>
             </div>
+            <span class="badge">${escapeHtml(state.session.question.mode)}</span>
           </div>
-          <span class="badge">${escapeHtml(state.session.question.mode)}</span>
-        </div>
 
-        <div class="divider"></div>
-        <div class="muted" style="font-style:italic;">“${escapeHtml(state.session.question.text_es)}”</div>
-        <div class="divider"></div>
+          <div class="divider"></div>
+          <div class="muted" style="font-style:italic;">“${escapeHtml(state.session.question.text_es)}”</div>
+          <div class="divider"></div>
 
-        ${coreSection}
-        <div class="divider"></div>
-        ${imageSection}
-        <div class="divider"></div>
-        ${generalSection}
+          ${coreSection}
+          <div class="divider"></div>
+          ${imageSection}
+          <div class="divider"></div>
+          ${generalSection}
 
-        ${linesSection}
-        ${resultingSection}
+          ${linesSection}
+          ${resultingSection}
 
-        <div class="divider"></div>
-        ${renderPremiumSection(primary)}
+          <div class="divider"></div>
+          ${renderPremiumSection(primary)}
 
-        <div class="divider"></div>
+          <div class="divider"></div>
 
-        <div class="row">
-          <button class="btn btn--ghost" id="btnClose">${t("reading.btn_close")}</button>
-          <button class="btn btn--ghost" id="btnSave">${t("reading.btn_save")}</button>
-          <button class="btn btn--ghost" id="btnPDF">${t("reading.btn_pdf")}</button>
-        </div>
-        
-        <div class="muted" style="font-size:11px; margin-top:10px;">
-          ${escapeHtml(primary?.ethics_note_es || "")}
+          <div class="row">
+            <button class="btn btn--ghost" id="btnClose">${t("reading.btn_close")}</button>
+            <button class="btn btn--ghost" id="btnSave">${t("reading.btn_save")}</button>
+            <button class="btn btn--ghost" id="btnPDF">${t("reading.btn_pdf")}</button>
+          </div>
         </div>
       </div>
-    </section>
   `;
 }
 
@@ -677,12 +703,9 @@ function renderPremiumSection(hex) {
       </div>
     `;
   } else {
-    // Teaser / Soft Gate
-    // We grab the first few words if possible, or generic text, and blur the rest.
     const teaser = (hex.taoist_reading_es || "").split(" ").slice(0, 4).join(" ") + "...";
-
     return `
-      <div class="callout" style="cursor:pointer;" id="premiumLocked">
+      <div class="callout" style="cursor:pointer; position:relative;" id="premiumLocked">
         <div class="callout__title">${t("reading.premium_title")}</div>
         <div style="position:relative;">
             <div style="filter:blur(4px); user-select:none; opacity:0.6;">
@@ -697,39 +720,29 @@ function renderPremiumSection(hex) {
         </div>
       </div>
     `;
-    // Note: We can't easily bind the ID here because this is a template string returning HTML.
-    // The binding happens in bindCommon or we use an inline onclick if we were lax, but better to use the container ID `premiumLocked`.
   }
 }
 
 function HistoryView() {
-  // Freemium Logic for History
   const isUnlimited = state.entitlements.unlimited_history;
 
   let visibleHistory = state.history;
   let lockedCount = 0;
 
   if (!isUnlimited && state.history.length > 1) {
-    // Si tienes más de 1 y eres free, solo mostramos la primera real, y simulamos locked
     visibleHistory = [state.history[0]];
     lockedCount = state.history.length - 1;
   }
 
   const rows = visibleHistory.map((s) => {
     const p = s.hexagrams?.primary;
-    const title = p ? `${p.id}. ${p.slug}` : "Sesión";
+    // Use card style
     return `
-      <div class="card" style="background:transparent; padding:10px;">
-        <div class="row" style="justify-content:space-between;">
-          <div style="flex:1;">
-            <div class="mono muted" style="font-size:11px;">${escapeHtml(s.created_at_iso.split("T")[0])}</div>
-            <div style="font-weight:600;">${escapeHtml(title)}</div>
-            <div class="muted" style="font-size:13px; font-style:italic; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; max-width:200px;">
-              ${escapeHtml(s.question?.text_es || "—")}
-            </div>
-          </div>
-          <button class="btn btn--ghost btn--sm" data-open="${escapeHtml(s.id)}">${t("history.btn_view")}</button>
-        </div>
+      <div class="history-card" data-open="${escapeHtml(s.id)}">
+        <div class="hex-char">${escapeHtml(p?.symbol_unicode || "??")}</div>
+        <div class="card-title">${escapeHtml(p?.dynamic_core_es || "Sesión")}</div>
+        <div class="card-date">${escapeHtml(s.created_at_iso.split("T")[0])}</div>
+        <div class="card-q">"${escapeHtml(s.question?.text_es || "—")}"</div>
       </div>
     `;
   }).join("");
@@ -737,42 +750,39 @@ function HistoryView() {
   let upsell = "";
   if (!isUnlimited) {
     upsell = `
-       <div class="card" style="background:#f0f0f0; border:1px dashed #ccc; cursor:pointer;" id="historyLocked">
-         <div class="row" style="justify-content:center; padding:10px; color:#555;">
-            <div>${t("history.locked_banner", { count: lockedCount })}</div>
-         </div>
+       <div class="history-card" style="justify-content:center; border:1px dashed var(--muted); background:transparent; opacity:0.7;" id="historyLocked">
+          <div class="seal" style="width:40px; height:40px; font-size:20px;">+${lockedCount}</div>
+          <div style="margin-top:10px; font-size:0.9em;">${t("history.locked_banner", { count: lockedCount })}</div>
        </div>
      `;
   }
 
   return `
-    <section class="card">
       <div class="vstack">
-        <div class="hstack" style="justify-content:space-between;">
-          <div class="hexTitle">${t("history.title")}</div>
-          <span class="badge">${isUnlimited ? t("history.badge_full") : t("history.badge_limited")}</span>
-        </div>
-        <div class="divider"></div>
-        ${state.history.length ? `<div class="vstack">${rows}</div>` : `<div class="muted">${t("history.empty")}</div>`}
-        
-        ${upsell}
+        <div class="card" style="overflow:visible;"> <!-- Overflow visible for tilt perspective interaction -->
+          <div class="hstack" style="justify-content:space-between;">
+            <div class="hexTitle">${t("history.title")}</div>
+            <span class="badge">${isUnlimited ? t("history.badge_full") : t("history.badge_limited")}</span>
+          </div>
+          <div class="divider"></div>
+          
+          ${state.history.length ? `<div class="history-grid">${rows}${upsell}</div>` : `<div class="muted">${t("history.empty")}</div>`}
 
-        <div class="divider"></div>
-        <div class="row">
-          <button class="btn btn--ghost" id="btnBackHome2">${t("history.btn_back")}</button>
-          <button class="btn btn--ghost" id="btnClearHistory">${t("history.btn_clear")}</button>
+          <div class="divider"></div>
+          <div class="row">
+            <button class="btn btn--ghost" id="btnBackHome2">${t("history.btn_back")}</button>
+            <button class="btn btn--ghost" id="btnClearHistory">${t("history.btn_clear")}</button>
+          </div>
         </div>
       </div>
-    </section>
   `;
 }
 
 function PaywallView() {
   const products = getProducts();
-  const prod = products?.products?.[0]; // asumimos el primero
+  const prod = products?.products?.[0];
   const copy = products?.paywall_copy_es;
 
-  // Fallbacks
   const title = copy?.title || "Premium";
   const body = copy?.body || "Desbloquea funciones.";
   const price = prod?.price?.formatted || "Consultar";
@@ -780,42 +790,44 @@ function PaywallView() {
   const benefits = prod?.purchase_notes_es?.map(n => `<li>${escapeHtml(n)}</li>`).join("") || "";
 
   return `
-    <section class="card">
       <div class="vstack">
-        <div class="hexTitle">${escapeHtml(title)}</div>
-        <div style="white-space:pre-wrap; line-height:1.5;">${escapeHtml(body)}</div>
-        
-        <div class="divider"></div>
-        
-        <div class="card" style="background:var(--panel2);">
-          <div class="hstack" style="justify-content:space-between;">
-            <div style="font-weight:bold;">${escapeHtml(prod?.title_es || "Acceso Total")}</div>
-            <div class="badge" style="background:var(--accent); color:var(--bg); border:none;">${escapeHtml(price)}</div>
+        <div class="card">
+          <div class="hexTitle">${escapeHtml(title)}</div>
+          <div style="white-space:pre-wrap; line-height:1.5;">${escapeHtml(body)}</div>
+          
+          <div class="divider"></div>
+          
+          <div class="card" style="background:var(--panel2);">
+            <div class="hstack" style="justify-content:space-between;">
+              <div style="font-weight:bold;">${escapeHtml(prod?.title_es || "Acceso Total")}</div>
+              <div class="badge" style="background:var(--accent); color:var(--bg); border:none;">${escapeHtml(price)}</div>
+            </div>
+            <ul style="margin:10px 0 0; padding-left:20px; font-size:13px; color:var(--muted);">
+              ${benefits}
+            </ul>
           </div>
-          <ul style="margin:10px 0 0; padding-left:20px; font-size:13px; color:var(--muted);">
-            ${benefits}
-          </ul>
-        </div>
 
-        <div class="divider"></div>
+          <div class="divider"></div>
 
-        <div class="row">
-          <button class="btn btn--primary" id="btnUnlockLocal">${t("paywall.btn_simulate")}</button>
-          <button class="btn btn--ghost" id="btnLockLocal">${t("paywall.btn_revoke")}</button>
-          <button class="btn btn--ghost" id="btnBackHome3">${t("paywall.btn_back")}</button>
-        </div>
-        
-        <div class="muted" style="font-size:11px; text-align:center;">
-          ${escapeHtml(copy?.footer_note || "Uso local.")}
+          <div class="row">
+            <button class="btn btn--primary" id="btnUnlockLocal">${t("paywall.btn_simulate")}</button>
+            <button class="btn btn--ghost" id="btnLockLocal">${t("paywall.btn_revoke")}</button>
+            <button class="btn btn--ghost" id="btnBackHome3">${t("paywall.btn_back")}</button>
+          </div>
+          
+          <div class="muted" style="font-size:11px; text-align:center;">
+            ${escapeHtml(copy?.footer_note || "Uso local.")}
+          </div>
         </div>
       </div>
-    </section>
   `;
 }
 
 // ---------- Bind events ----------
-function bindCommon(root) {
-  // Home
+function bindPageEvents(root) {
+  if (!root) return;
+
+  // Home Form
   const btnBegin = root.querySelector("#btnBegin");
   if (btnBegin) {
     const qText = root.querySelector("#qText");
@@ -824,7 +836,6 @@ function bindCommon(root) {
     const qMode = root.querySelector("#qMode");
     qMode?.addEventListener("change", (e) => state.draft.question.mode = e.target.value);
 
-    // restore values
     if (qText) qText.value = state.draft.question.text_es;
     if (qMode) qMode.value = state.draft.question.mode;
 
@@ -842,30 +853,30 @@ function bindCommon(root) {
 
   // Toss
   root.querySelector("#btnToss")?.addEventListener("click", onTossNextLine);
-  root.querySelector("#btnBackHome")?.addEventListener("click", startNew); // Cancelar = startNew
+  // Back to Home now stays inside book, just nav change
+  root.querySelector("#btnBackHome")?.addEventListener("click", startNew);
 
   // Reading
   root.querySelector("#btnClose")?.addEventListener("click", startNew);
   root.querySelector("#btnSave")?.addEventListener("click", saveSession);
   root.querySelector("#btnPDF")?.addEventListener("click", exportPDF);
-  root.querySelector("#premiumLocked")?.addEventListener("click", () => {
-    trackEvent("feature_locked", { feature_id: "deep_reading" });
-    openPaywall("reading");
+  root.querySelector("#premiumLocked")?.addEventListener("click", () => openPaywall("reading_teaser"));
+  root.querySelector("#btnUnlockTeaser")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    openPaywall("reading_overlay");
   });
 
   // History
-  root.querySelector("#btnBackHome2")?.addEventListener("click", () => nav("home"));
+  root.querySelector("#btnBackHome2")?.addEventListener("click", startNew);
   root.querySelector("#btnClearHistory")?.addEventListener("click", deleteHistory);
-  root.querySelector("#historyLocked")?.addEventListener("click", () => {
-    trackEvent("feature_locked", { feature_id: "history_limit_list" });
-    openPaywall("history_limit");
-  });
-  root.querySelectorAll("[data-open]").forEach(b => {
-    b.addEventListener("click", () => {
-      const id = b.getAttribute("data-open");
-      const found = state.history.find(x => x.id === id);
-      if (found) {
-        state.session = found;
+  root.querySelector("#historyLocked")?.addEventListener("click", () => openPaywall("history_list"));
+
+  root.querySelectorAll("[data-open]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-open");
+      const sess = state.history.find(s => s.id === id);
+      if (sess) {
+        state.session = sess;
         nav("reading");
       }
     });
@@ -874,60 +885,126 @@ function bindCommon(root) {
   // Paywall
   root.querySelector("#btnUnlockLocal")?.addEventListener("click", unlockPremiumLocal);
   root.querySelector("#btnLockLocal")?.addEventListener("click", lockPremiumLocal);
-  root.querySelector("#btnBackHome3")?.addEventListener("click", () => nav("home"));
+  root.querySelector("#btnBackHome3")?.addEventListener("click", startNew);
 }
 
-function openModal(title, body) {
-  const m = document.getElementById("modal");
-  document.getElementById("modalTitle").textContent = title;
-  document.getElementById("modalBody").innerHTML = body;
-  m.showModal();
-}
-
-function openAbout() {
-  const lic = getLicenses();
-  const principles = lic?.app_principles_es || {};
-  const stats = getTelemetry();
-
-  // Format stats for display
-  const locks = Object.entries(stats.feature_locks || {}).map(([k, v]) => `${k}: ${v}`).join(", ") || "0";
-
-  const content = `
-    <div class="vstack" style="gap:12px;">
-      <p><strong>${t("about.reflection_not_prediction")}</strong> ${escapeHtml(principles.non_predictive || "")}</p>
-      <div class="callout">
-        ${escapeHtml(principles.no_medical_substitution || t("about.no_medical_substitution"))}
-      </div>
-      <div class="divider"></div>
-      <div class="label">${t("about.stats_title")}</div>
-      <div class="vstack" style="gap:4px; font-size:13px; font-family:monospace;">
-          <div class="row" style="justify-content:space-between"><span>${t("about.stats_sessions")}:</span> <b>${stats.sessions || 0}</b></div>
-          <div class="row" style="justify-content:space-between"><span>${t("about.stats_readings")}:</span> <b>${stats.readings || 0}</b></div>
-          <div class="divider"></div>
-          <div class="row" style="justify-content:space-between"><span>${t("about.stats_paywall")}:</span> <b>${stats.paywall_views || 0}</b></div>
-          <div class="row" style="justify-content:space-between"><span>${t("about.stats_conversions")}:</span> <b>${stats.conversions || 0}</b></div>
-          <div class="row" style="justify-content:space-between"><span>${t("about.stats_locks")}:</span> <span style="font-size:0.9em">${locks}</span></div>
-      </div>
-      <div class="divider"></div>
-      <p class="muted" style="font-size:12px;">${t("about.footer")}</p>
-    </div>
-  `;
-  openModal(t("about.title"), content);
-}
-
-// Utils
-function opt(val, lbl) { return `<option value="${val}">${lbl}</option>`; }
-function htmlToNode(html) {
-  const t = document.createElement("template");
-  t.innerHTML = html.trim();
-  return t.content.firstElementChild;
-}
-function escapeHtml(s) {
-  if (!s) return "";
-  return String(s).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
-}
+// ---------- Helpers ----------
 function cryptoRandomId() {
-  const a = new Uint8Array(12);
-  crypto.getRandomValues(a);
-  return Array.from(a).map(b => b.toString(16).padStart(2, "0")).join("");
+  return "sess_" + Math.random().toString(36).substr(2, 9);
 }
+
+function htmlToNode(html) {
+  const tpl = document.createElement("template");
+  tpl.innerHTML = html.trim();
+  return tpl.content; // Returns documentFragment
+}
+
+function escapeHtml(unsafe) {
+  if (typeof unsafe !== "string") return "";
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function t(key, params) {
+  // Simple fallback translation mock
+  const en = {
+    "app.boot_error_title": "Error de carga",
+    "app.boot_error_desc": "No se pudieron cargar archivos esenciales.",
+    "app.unknown_error": "Error desconocido",
+    "app.missing_files": "Archivos faltantes",
+    "app.footer_default": "Uso personal. No sustituye criterio clínico.",
+    "home.title": "I Ching",
+    "home.subtitle": "Reflexión Local",
+    "home.label_focus": "Enfoque",
+    "home.label_question": "Tu Pregunta",
+    "home.placeholder_question": "Escribe aquí tu inquietud...",
+    "home.btn_toss": "Consultar",
+    "home.btn_history": "Historial",
+    "home.btn_unlock": "Desbloquear",
+    "home.btn_your_access": "Tu Acceso",
+    "home.error_empty_question": "Pregunta vacía",
+    "home.error_empty_question_body": "Por favor escribe una pregunta para concentrar tu intención.",
+    "home.focus_options.reflexion": "Reflexión General",
+    "home.focus_options.decision": "Toma de Decisión",
+    "home.focus_options.relacion": "Relaciones",
+    "home.focus_options.trabajo": "Trabajo / Proyectos",
+    "home.focus_options.salud": "Salud / Bienestar",
+    "home.focus_options.otro": "Otro",
+    "toss.title": "Consulta",
+    "toss.btn_toss": "Lanzar Monedas",
+    "toss.btn_finish": "Ver Lectura",
+    "toss.btn_cancel": "Cancelar",
+    "toss.moving": "Mutante",
+    "toss.line": "Línea",
+    "reading.label_core": "Esencia",
+    "reading.label_image": "Imagen",
+    "reading.label_general": "Dictamen",
+    "reading.label_lines": "Líneas Activas",
+    "reading.label_resulting": "Hexagrama Resultante",
+    "reading.no_mutations": "Sin líneas mutantes. La situación es estable.",
+    "reading.btn_close": "Cerrar",
+    "reading.btn_save": "Guardar",
+    "reading.btn_pdf": "PDF",
+    "reading.premium_title": "Lectura Taoísta & Acción",
+    "reading.premium_questions": "Preguntas Guía",
+    "reading.premium_action": "Micro-Acción",
+    "reading.teaser_blur_text": "Contenido Premium Contenido Premium Contenido Premium Contenido Premium",
+    "reading.teaser_overlay": "Desbloquear Lectura Completa",
+    "history.title": "Historial",
+    "history.badge_full": "Ilimitado",
+    "history.badge_limited": "Gratis (Reciente)",
+    "history.btn_view": "Ver",
+    "history.btn_back": "Volver",
+    "history.btn_clear": "Borrar Todo",
+    "history.empty": "No hay consultas guardadas.",
+    "history.locked_banner": "Y {count} sesiones más guardadas...",
+    "history.modal_saved_title": "Sesión Guardada",
+    "history.modal_saved_body": "Tu consulta se ha guardado en el historial.",
+    "history.alert_replaced": "Se ha sobrescrito la sesión anterior (Límite Gratuito).",
+    "history.limit_modal_title": "Límite de Historial",
+    "history.limit_modal_body": "En la versión gratuita, solo se guarda 1 sesión.",
+    "history.limit_modal_question": "¿Deseas desbloquear el historial ilimitado?",
+    "history.limit_modal_warning": "Si no, se sobrescribirá la sesión del {date}.",
+    "history.btn_upgrade_save": "Mejorar y Guardar",
+    "history.btn_overwrite_save": "Sobrescribir",
+    "history.modal_cleared_title": "Historial Borrado",
+    "history.modal_cleared_body": "Se han eliminado todas las sesiones.",
+    "paywall.btn_simulate": "Simular Compra",
+    "paywall.btn_revoke": "Revocar Acceso",
+    "paywall.btn_back": "Volver",
+    "paywall.modal_unlocked": "¡Premium Activado!",
+    "paywall.modal_unlocked_body": "Gracias por tu apoyo. Disfruta de todas las funciones.",
+    "paywall.modal_locked": "Premium Desactivado",
+    "paywall.modal_locked_body": "Has vuelto a la versión gratuita."
+  };
+
+  let val = en[key] || key;
+  if (params) {
+    Object.keys(params).forEach(k => {
+      val = val.replace(`{${k}}`, params[k]);
+    });
+  }
+  return val;
+}
+
+function opt(val, label) {
+  return `<option value="${val}">${label}</option>`;
+}
+
+// Global Modal
+function openModal(title, content) {
+  const m = document.getElementById("modal");
+  const tVal = document.getElementById("modalTitle");
+  const bVal = document.getElementById("modalBody");
+  if (m && tVal && bVal) {
+    tVal.textContent = title;
+    bVal.innerHTML = content;
+    m.showModal();
+  }
+}
+
+// Removed fallback stubs since we are now importing them directly.

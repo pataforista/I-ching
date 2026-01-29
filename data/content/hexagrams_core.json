@@ -1,5 +1,5 @@
 {
-  "version": "0.1.2",
+  "version": "0.1.3",
   "editorial_note_es": "Texto editorial propio inspirado en el Zhouyi y en traducciones históricas de dominio público (James Legge). No es traducción literal ni tiene función predictiva.",
   "hexagrams": {
     "1": {
@@ -37,9 +37,6 @@
       },
       "taoist_reading_es": "Kun encarna el wu wei como disponibilidad radical. No es inercia ni sumisión, sino una forma de acción que responde sin imponer. El riesgo está en perder la propia posición o intentar liderar desde un lugar que no corresponde.",
       "guiding_questions_es": [
-        "¿Qué estoy llamado a sostener más que a dirigir?",
-        "¿Dónde confundo receptividad con renuncia?",
-        "¿Qué forma concreta puede tomar mi apoyo en esta situación? parcial",
         "¿Qué estoy llamado a sostener más que a dirigir?",
         "¿Dónde confundo receptividad con renuncia?",
         "¿Qué forma concreta puede tomar mi apoyo en esta situación?"
@@ -160,7 +157,7 @@
         "1": "Sinceridad y verdad. Llena la vasija de barro. La unión comienza con una actitud interna honesta. Si buscas aliados con segundas intenciones, la relación nacerá muerta. La autenticidad atrae buena fortuna inesperada.",
         "2": "La unión viene desde dentro. No necesitas correr detrás de nadie. Si mantienes tu dignidad y centro, las personas correctas se acercarán a ti. Forzar la pertenencia es degradante e inútil.",
         "3": "Unirse a las personas equivocadas. Estás rodeado de gente que no comparte tus valores o que te arrastra hacia abajo. La intimidad con el grupo incorrecto es peligrosa. Despierta y mira con quién caminas.",
-        "4": "Unión externa. Mostrar lealtad abierta a quien lidera o sostiene el grupo es correcto ahora.",
+        "4": "Unión externa. Mostrar lealtad abierta a tu líder o a tu causa es correcto. No escondas tu apoyo. Al alinearte visiblemente con lo que consideras bueno, fortaleces tu propia posición.",
         "5": "Manifestación de la unión. El rey caza sin cercar tres lados. Deja que quienes quieran irse, se vayan. No retengas a nadie por la fuerza. Solo los que se quedan por voluntad propia construyen una comunidad real.",
         "6": "No hay cabeza para la unión. El momento de conectar ya pasó o nunca hubo un centro real. Si dudas hasta el final, te quedas solo. Sin un propósito compartido, la gente se dispersa llorando."
       },
@@ -445,11 +442,10 @@
       ],
       "micro_action_es": "Define una regla concreta (una frase) que aplique desde hoy. Escríbela y comunícala sin justificarte en exceso.",
       "ethics_note_es": "La firmeza es distinta de la violencia. Si hay abuso, prioriza seguridad y apoyo externo."
-    },
-    "22": {
-      "dynamic_core_es": "La gracia y la forma. Lo estético ordena lo interno, pero la forma no debe reemplazar la sustancia.",
-      "image_es": "Fuego al pie de la montaña. Luz que embellece y revela contornos: claridad que da estilo.",
-      "general_reading_es": "Es un momento para cuidar presentación, lenguaje, diseño y modales. Eso facilita acuerdos y reduce fricción. A la vez, hay advertencia: la belleza no debe tapar la verdad ni convertirse en máscara. Primero sustancia, luego forma.",
+    },"22": {
+      "dynamic_core_es": "La gracia y la forma. La belleza es necesaria para dar orden y dignidad a la vida, pero no debe ocultar la falta de sustancia.",
+      "image_es": "Fuego al pie de la montaña. La luz ilumina la forma de las cosas, haciéndolas agradables.",
+      "general_reading_es": "Es un momento para cuidar las formas, la estética y el protocolo. La apariencia importa porque facilita la conexión. Sin embargo, el hexagrama advierte: el adorno no sustituye a la verdad. Usa la forma para comunicar el fondo, no para esconderlo.",
       "lines_es": {
         "1": "Gracia en los dedos de los pies. Deja el carruaje y camina. Es mejor avanzar con dignidad propia y sencillez que depender de lujos ajenos. La honestidad simple es la mejor estética al inicio.",
         "2": "Gracia en la barba. Te ocupas de la apariencia y el estilo. No es profundo, pero es necesario para la interacción social. Cuidar la forma es parte del respeto, siempre que no sea lo único que hagas.",
@@ -458,19 +454,19 @@
         "5": "Gracia en colinas y jardines. El rollo de seda es pequeño y pobre. Humillación, pero al final buena fortuna. No tienes grandes recursos para regalar o impresionar, pero tu intención es pura. La sinceridad supera la falta de lujo.",
         "6": "Gracia blanca. Sin culpa. Vuelta a la esencia absoluta. Sin color, sin adorno, sin pretensión. La forma perfecta es la que es transparente. Has trascendido la necesidad de aparentar."
       },
-      "taoist_reading_es": "Wu wei aquí es economía: la forma correcta es la que reduce ruido. La belleza taoísta no grita; acomoda.",
+      "taoist_reading_es": "La belleza taoísta es funcional y simple. Wu wei es actuar con elegancia pero sin artificio. Si necesitas decorar demasiado una situación, es porque la estructura base falla.",
       "guiding_questions_es": [
-        "¿Qué parte de mi mensaje se pierde por mala forma (confusión, rudeza, desorden)?",
-        "¿Qué estoy embelleciendo para evitar nombrar lo verdadero?",
-        "¿Qué minimalismo haría esto más claro?"
+        "¿Estoy usando la imagen para comunicar o para ocultar?",
+        "¿Qué adorno sobra en esta situación?",
+        "¿Puedo atreverme a presentar la verdad desnuda?"
       ],
-      "micro_action_es": "Mejora una sola cosa de forma: reescribe un mensaje importante con menos palabras o ordena visualmente tu espacio de trabajo.",
-      "ethics_note_es": "Cuidar la forma no es superficial si sirve a la claridad y al respeto."
+      "micro_action_es": "Simplifica algo hoy: reduce un texto, limpia un espacio o ten una conversación directa sin rodeos educados.",
+      "ethics_note_es": "La estética no es frivolidad, es respeto por el otro. Pero la mentira estética sigue siendo mentira."
     },
     "23": {
-      "dynamic_core_es": "Desintegración y desgaste. Algo se ha debilitado y ya no sostiene: conviene soltar antes de que colapse.",
-      "image_es": "La montaña sobre la tierra que cede. Capas que se desprenden: lo viejo se descascara.",
-      "general_reading_es": "No es tiempo de expandir ni de pelear por mantener una estructura que ya se rompió por dentro. La tarea es proteger lo esencial, reducir exposición y aceptar que una fase termina. Resistirse por orgullo agrava la caída.",
+      "dynamic_core_es": "La desintegración. Lo viejo se cae a pedazos. No es posible sostener la estructura actual; es tiempo de soltar.",
+      "image_es": "La montaña descansa sobre la tierra. La base se erosiona y lo alto cae.",
+      "general_reading_es": "La energía va en contra de la construcción. Intentar sostener lo insostenible ahora solo agota. Es un tiempo de poda radical o de colapso de estructuras obsoletas. La única acción segura es proteger tu núcleo y dejar que lo demás caiga.",
       "lines_es": {
         "1": "La cama se rompe por las patas. Los que perseveran se destruyen. Desgracia. El deterioro empieza por la base. Los fundamentos (económicos, lealtad, salud) están siendo socavados. No ignores la señal. Detente.",
         "2": "La cama se rompe por el borde. Los que perseveran se destruyen. El peligro ya no está oculto, está a la vista. Te sientes indefenso ante el avance de la desintegración. Busca aliados, no te quedes solo.",
@@ -479,19 +475,19 @@
         "5": "Una hilera de peces. Favor a través de las damas de palacio. Todo es propicio. En medio del colapso, surge una solución diplomática o suave. Adaptarse y someterse al cambio trae una ayuda inesperada. No pelees, fluye.",
         "6": "Un gran fruto no es comido. El noble recibe un carruaje; el hombre pequeño pierde su casa. La semilla de la verdad sobrevive a la destrucción. Si eres noble (tienes sustancia), renaces. Si eres vacío, colapsas con la estructura."
       },
-      "taoist_reading_es": "Wu wei es soltar lo que ya no vive. El Tao no conserva la cáscara por nostalgia. Reduce, retírate, protege la semilla.",
+      "taoist_reading_es": "El Tao también es entropía. Wu wei aquí es no luchar contra el invierno. Acepta que algo debe morir para que la energía se recicle. No apuntales ruinas.",
       "guiding_questions_es": [
-        "¿Qué estructura sostengo por miedo a perder identidad?",
-        "¿Qué parte esencial puedo salvar si suelto el resto?",
-        "¿Qué señal clara de desgaste he ignorado?"
+        "¿Qué estoy tratando de salvar que ya está muerto?",
+        "¿Qué es lo único esencial que debo proteger mientras todo cambia?",
+        "¿Puedo ver la pérdida como limpieza?"
       ],
-      "micro_action_es": "Elimina una carga que ya no sostiene valor (un compromiso, un objeto, una expectativa). Una sola, hoy.",
-      "ethics_note_es": "Soltar no es rendirse. Es elegir no invertir vida en lo que ya se está cayendo."
+      "micro_action_es": "Tira, borra o regala algo que ya no sirve. Una sola cosa, hoy. Haz espacio físico para el vacío.",
+      "ethics_note_es": "Aceptar el colapso no es cinismo, es realismo necesario para la futura reconstrucción."
     },
     "24": {
-      "dynamic_core_es": "El retorno. Después de la caída o el extravío, aparece un punto de reorientación: volver a lo simple y correcto.",
-      "image_es": "Trueno dentro de la tierra. La vida despierta bajo la superficie y vuelve en ciclo.",
-      "general_reading_es": "Algo regresa: energía, claridad, motivación, camino. El retorno útil es pequeño al inicio. No lo sobrecargues. La constancia en lo básico restaura dirección. Es un hexagrama de reinicio limpio.",
+      "dynamic_core_es": "El retorno. El punto de giro donde la oscuridad máxima da paso a la primera luz. Renacimiento lento.",
+      "image_es": "Trueno bajo la tierra. La vida se agita en lo profundo, preparándose para volver.",
+      "general_reading_es": "Después de un tiempo de decadencia o error, el ciclo cambia. Es un momento delicado y esperanzador. No intentes correr; la energía es tierna como un brote nuevo. Protege este inicio y sé amable contigo mismo en la recuperación.",
       "lines_es": {
         "1": "Retorno desde corta distancia. No hay necesidad de remordimiento. Gran fortuna. Te das cuenta del error apenas lo cometes y corriges de inmediato. Esta capacidad de auto-corrección rápida es la mejor cualidad posible.",
         "2": "Retorno tranquilo. Buena fortuna. Decides volver al buen camino y lo haces con calma, sin drama. Te apoyas en personas que también hacen lo correcto. La suavidad en el cambio lo hace sostenible.",
@@ -500,19 +496,19 @@
         "5": "Retorno noble. Sin remordimiento. Tu corrección es interna y honesta. No necesitas explicarte ni pedir disculpas públicas teatrales. Simplemente cambias y tu carácter se fortalece. Excelente.",
         "6": "Retorno perdido. Desgracia. Hay calamidad interna y externa. Perdiste la oportunidad de corregir cuando era el momento. Ahora, el error se ha calcificado. Insistir en el camino equivocado lleva al desastre total."
       },
-      "taoist_reading_es": "Wu wei es volver al centro. El Tao no pide épica: pide retorno al paso correcto. La virtud aquí es la repetición humilde.",
+      "taoist_reading_es": "El retorno es el movimiento del Tao. Todo vuelve a su raíz. Wu wei es permitir la recuperación sin forzar el ritmo. Descansa para que la fuerza nazca sola.",
       "guiding_questions_es": [
-        "¿Qué es ‘lo básico’ que me devuelve estabilidad?",
-        "¿Cuál es mi primer desvío típico y cómo lo detecto antes?",
-        "¿Qué pequeño retorno puedo sostener sin heroísmo?"
+        "¿A qué parte de mí necesito volver?",
+        "¿Qué error pequeño puedo corregir hoy sin culpa, solo con acción?",
+        "¿Estoy protegiendo mi nueva rutina o exponiéndola demasiado pronto?"
       ],
-      "micro_action_es": "Define un “ritual de retorno” de 10 minutos (ordenar, caminar, respirar, escribir) y úsalo hoy cuando notes dispersión.",
-      "ethics_note_es": "Retornar no borra consecuencias; restaura dirección para responder mejor a ellas."
+      "micro_action_es": "Dedica 20 minutos a no hacer nada productivo, solo descansar conscientemente para resetear tu energía.",
+      "ethics_note_es": "Corregir el rumbo es más valioso que no haber fallado nunca."
     },
     "25": {
-      "dynamic_core_es": "Inocencia y espontaneidad correcta. Actuar sin artificio ni cálculo manipulatorio.",
-      "image_es": "Trueno bajo el cielo. Impulso natural que emerge sin esquema previo, como movimiento auténtico.",
-      "general_reading_es": "Este hexagrama favorece la acción honesta y directa. La clave es motivación limpia. Si intentas “hacer bien” para controlar resultado, pierdes la inocencia. Si actúas desde integridad, el proceso se ordena.",
+      "dynamic_core_es": "La inocencia y lo inesperado. Actuar sin segundas intenciones, alineado con la naturaleza del momento.",
+      "image_es": "Trueno bajo el cielo. La energía se mueve libremente y sin cálculo.",
+      "general_reading_es": "El éxito viene de ser genuino. Si actúas con cálculo, manipulación o esperando una recompensa específica, fallarás. Si actúas por convicción y 'sin querer', todo fluirá. Prepárate también para sucesos inesperados que no dependen de tu karma.",
       "lines_es": {
         "1": "Comportamiento inocente. Buena fortuna. Actúas según tus instintos naturales y tu conciencia, sin segundas intenciones. Sigue así. La honestidad simple es tu protección y tu camino al éxito.",
         "2": "Si uno no cuenta la cosecha mientras ara, ni el uso de la tierra mientras la prepara, es propicio emprender algo. Concéntrate en el trabajo, no en la recompensa. Disfruta el proceso (el arar) sin obsesionarte con el resultado (la cosecha). Wu Wei en acción.",
@@ -521,19 +517,19 @@
         "5": "Enfermedad sin causa (inocente). No uses medicina. Habrá alegría. El problema no viene de un error tuyo ni es grave. No intervengas agresivamente. Deja que la naturaleza siga su curso y se curará solo. A veces, hacer nada es la cura.",
         "6": "Acción inocente. Trae desgracia. Nada es propicio. El tiempo no está para actuar, ni siquiera con buenas intenciones. Quédate quieto. Cualquier movimiento ahora, por inocente que sea, genera fricción y error."
       },
-      "taoist_reading_es": "Wu wei es acción sin doble intención. El Tao no opera por manipulación. La inocencia no es ingenuidad: es ausencia de teatro interno.",
+      "taoist_reading_es": "Wu wei es la 'acción sin intención'. Haz lo que toca hacer porque es lo natural, no para obtener algo. La inocencia taoísta es espontaneidad sabia, no ignorancia.",
       "guiding_questions_es": [
-        "¿Qué parte de mí está intentando controlar la reacción de otros?",
-        "¿Qué acción sería correcta aunque nadie la aplauda?",
-        "¿Dónde confundo espontaneidad con impulsividad?"
+        "¿Estoy haciendo esto porque quiero o para obtener algo a cambio?",
+        "¿Puedo aceptar un evento inesperado sin buscar culpables?",
+        "¿Dónde estoy forzando una solución a un problema que se arregla solo?"
       ],
-      "micro_action_es": "Haz una acción simple de integridad (pequeña pero real) sin explicarte ni justificarse ante nadie.",
-      "ethics_note_es": "Actuar con inocencia no implica tolerar daño. Implica no contaminar tu respuesta con manipulación."
+      "micro_action_es": "Haz una tarea bien hecha solo por el placer de hacerla bien, olvidando totalmente qué ganarás con ella.",
+      "ethics_note_es": "No todo lo malo que pasa es culpa tuya. Acepta el azar sin cargar con culpas falsas."
     },
     "26": {
-      "dynamic_core_es": "La gran contención. Acumular fuerza, conocimiento y carácter antes de un salto mayor.",
-      "image_es": "La montaña retiene el cielo. Gran potencia sostenida: energía guardada con disciplina.",
-      "general_reading_es": "Hay capacidad, pero aún no es momento de liberarla por completo. La tarea es preparación: estudio, entrenamiento, digestión, estrategia. Contener no es reprimir: es madurar la potencia para que salga con forma y duración.",
+      "dynamic_core_es": "La gran fuerza domesticadora. Acumular poder y recursos mediante la contención y la disciplina diaria.",
+      "image_es": "La montaña sostiene el cielo. La quietud contiene una inmensa energía creativa.",
+      "general_reading_es": "Tienes gran energía y capacidad, pero el éxito radica en no gastarla toda de golpe. Es tiempo de estudiar, entrenar y acumular recursos. La contención diaria crea la presión necesaria para el gran logro futuro. No te desahogues; constrúyete.",
       "lines_es": {
         "1": "Peligro está a la mano. Es propicio detenerse. Sientes el impulso de actuar, pero la situación es riesgosa. La verdadera fuerza ahora está en la capacidad de freno. No avanzar evita el desastre antes de que empiece.",
         "2": "Los radios se quitan del carruaje. Te obligas a detenerte desmantelando tu propio medio de avance. No es un accidente, es una decisión estratégica. Reconoces que no es el tiempo y asumes la espera activa sin quejas.",
@@ -542,19 +538,19 @@
         "5": "El colmillo de un cerdo castrado. Buena fortuna. Frenas la agresión en su origen. No necesitas pelear contra la fuerza bruta; la neutralizas quitándole su motivación o su capacidad de daño de forma indirecta. Inteligencia sobre violencia.",
         "6": "Uno lleva el camino del cielo. Éxito. La contención ha terminado. Toda la energía acumulada y disciplinada ahora se libera en una dirección noble. Es el momento de la gran realización. Avanza sin miedo."
       },
-      "taoist_reading_es": "Wu wei es potencia en reposo: la montaña no compite, sostiene. Cuando el momento llegue, la fuerza saldrá sin violencia porque fue cultivada.",
+      "taoist_reading_es": "Acumular De (virtud/poder) requiere no fugarse en reacciones triviales. Wu wei es retener la reacción inmediata para responder con totalidad más tarde. Domestica tu propio impulso.",
       "guiding_questions_es": [
-        "¿Qué capacidad necesito desarrollar antes del siguiente paso?",
-        "¿Qué prisa actual me hace cometer errores repetidos?",
-        "¿Cuál es mi práctica de contención (sueño, entrenamiento, límites, estudio)?"
+        "¿En qué estoy desperdiciando mi energía diariamente?",
+        "¿Qué hábito necesito frenar antes de que se vuelva destructivo?",
+        "¿Para qué gran objetivo me estoy preparando?"
       ],
-      "micro_action_es": "Define una práctica de 20 minutos (estudio, ejercicio, orden, escritura) y hazla hoy sin negociar con tu estado de ánimo.",
-      "ethics_note_es": "Contener no es negar deseos; es darles forma para que no destruyan lo que buscas construir."
+      "micro_action_es": "Identifica una reacción habitual (queja, crítica, comer por ansiedad) y frénala una sola vez hoy. Siente la energía que ahorras.",
+      "ethics_note_es": "El poder acumulado conlleva la responsabilidad de usarlo para 'alimentar a la gente', no para dominarla."
     },
     "27": {
-      "dynamic_core_es": "Nutrición y discurso. Lo que entra por la boca (comida y palabras) construye o deteriora tu vida.",
-      "image_es": "Montaña y trueno. Una boca firme: lo que sostienes y lo que dices debe tener estructura.",
-      "general_reading_es": "Este hexagrama pide revisar cómo te nutres y cómo nutres a otros. No solo dieta: también información, hábitos, conversaciones. La pregunta central es: ¿esto alimenta o intoxica? La forma de hablar importa tanto como el contenido.",
+      "dynamic_core_es": "La nutrición. Las comisuras de la boca. Lo que entra (alimento/ideas) y lo que sale (palabras/acciones) define tu realidad.",
+      "image_es": "Trueno bajo la montaña. La energía se mueve abajo, la quietud arriba: una boca masticando.",
+      "general_reading_es": "Eres lo que comes y lo que dices. Este hexagrama te pide examinar tus fuentes de nutrición (física, mental, emocional). ¿Te estás llenando de basura o de sustancia? También vigila tus palabras: hablar de más debilita. Cuida tu ecosistema personal.",
       "lines_es": {
         "1": "Dejas caer tu tortuga mágica y me miras con la boca abierta. Desgracia. Tienes recursos internos y sabiduría propia (la tortuga), pero los ignoras para envidiar lo que tienen otros. La dependencia emocional y la envidia te debilitan.",
         "2": "Buscar nutrición en la colina. Continuar haciendo esto trae desgracia. Intentas nutrirte de formas antinaturales o buscas apoyo donde no corresponde (en lo inferior). Quieres atajos. Retornar al camino normal es vital.",
@@ -563,19 +559,19 @@
         "5": "Desviarse del camino. Permanecer perseverante trae buena fortuna. Sabes que no puedes resolver esto solo. Aceptas tu limitación y buscas un mentor o guía. Mantenerte en el camino, aunque sea difícil, es la salida correcta.",
         "6": "La fuente de la nutrición. Peligro, pero buena fortuna. Tienes la responsabilidad de nutrir a todos. Es una carga pesada y peligrosa, pero eres capaz. Si eres consciente del riesgo y actúas con responsabilidad, cruzarás el gran río."
       },
-      "taoist_reading_es": "Wu wei aquí es sobriedad: consumir lo necesario, decir lo necesario. El Tao no requiere exceso. La boca es una puerta; cuida qué dejas entrar y qué dejas salir.",
+      "taoist_reading_es": "El cultivo de la vida (Yang Sheng) empieza por la boca. Wu wei es no interferir con tu cuerpo dándole tóxicos. Nútrete de silencio y de alimentos reales. Evita el chisme que drena el espíritu.",
       "guiding_questions_es": [
-        "¿Qué consumo (comida, redes, ideas) me deja más claro y qué me deja más turbio?",
-        "¿Mis palabras alimentan comprensión o alimentan conflicto?",
-        "¿Qué hábito de nutrición simple podría sostener 30 días?"
+        "¿De qué información o personas me estoy alimentando?",
+        "¿Mis palabras nutren a otros o son ruido?",
+        "¿Estoy buscando fuera la satisfacción que ya tengo dentro?"
       ],
-      "micro_action_es": "Haz una “higiene de entrada” hoy: elimina una fuente de ruido (una cuenta, un chat, un snack) y reemplázala por una opción simple y estable.",
-      "ethics_note_es": "Nutrición no es moralidad. Es función: observar efecto real en cuerpo y mente."
+      "micro_action_es": "Haz un ayuno de información (noticias/redes) por 12 horas. Observa cómo cambia tu claridad mental.",
+      "ethics_note_es": "Cuidarse a uno mismo es el primer paso para poder cuidar a otros."
     },
     "28": {
-      "dynamic_core_es": "Exceso del grande. La estructura está sobrecargada: hay presión, responsabilidad o tensión más allá del límite.",
-      "image_es": "El lago sobre el viento. Una viga central cede: mucha carga sobre un soporte fatigado.",
-      "general_reading_es": "La situación es intensa y puede ser decisiva. El problema no es la falta de capacidad, sino el exceso de peso. Necesitas redistribuir carga, pedir apoyo o simplificar. Si intentas sostenerlo solo, el colapso se vuelve probable.",
+      "dynamic_core_es": "La gran preponderancia. La carga es excesiva para la estructura actual. Riesgo de colapso si no se actúa rápido.",
+      "image_es": "El lago sube por encima de los árboles. Inundación inminente. La tensión es máxima.",
+      "general_reading_es": "Estás bajo una presión inmensa. Has asumido demasiado o la situación ha crecido más allá de lo manejable. Es un momento crítico. No puedes seguir igual. Necesitas una acción extraordinaria para reforzar la estructura o aligerar la carga inmediatamente.",
       "lines_es": {
         "1": "Colocar esteras de junco blanco debajo. Sin culpa. Precaución extrema. La carga es pesada, así que preparas el terreno con delicadeza. Cuidar los fundamentos y los detalles iniciales evita que la estructura colapse después.",
         "2": "Un álamo seco echa un brote de raíz. Un hombre mayor toma una esposa joven. Todo es propicio. Una renovación extraordinaria. Algo que parecía muerto o estancado recibe una inyección de vitalidad nueva. Revitalización inesperada.",
@@ -584,40 +580,40 @@
         "5": "Un álamo seco da flores. Una mujer mayor toma un esposo joven. Sin culpa, sin elogio. Es una renovación superficial. Se ve bonito, pero no durará ni dará fruto (semillas). Disfruta el momento, pero no construyas tu futuro sobre esta anomalía.",
         "6": "Uno debe atravesar el agua. La cabeza se hunde. Desgracia. Sin culpa. Valor heroico pero trágico. Intentaste sostener lo insostenible hasta el final. Tu sacrificio es noble, pero el resultado es el fracaso. A veces, la carga simplemente es demasiado grande."
       },
-      "taoist_reading_es": "Wu wei es no desafiar el límite biológico y estructural. El Tao no premia el sacrificio teatral. Ajusta la carga, no el orgullo. Lo fuerte se mantiene porque sabe doblarse.",
+      "taoist_reading_es": "Cuando el peso es excesivo, el Tao sugiere flexibilidad o retirada, no rigidez. Wu wei es reconocer el límite de la viga antes de que se rompa. No seas un héroe muerto.",
       "guiding_questions_es": [
-        "¿Qué estoy sosteniendo que ya excede mi capacidad real?",
-        "¿Qué parte de esta carga puedo delegar o eliminar sin culpa?",
-        "¿Qué límite concreto evitaría el colapso?"
+        "¿Qué peso debo soltar hoy para no romperme?",
+        "¿Dónde necesito poner un refuerzo estructural urgentemente?",
+        "¿Estoy ignorando las señales de estrés en mi cuerpo o vida?"
       ],
-      "micro_action_es": "Haz una lista de cargas actuales y elimina o delega una (solo una) hoy. Si no puedes, define un límite horario explícito para ella.",
-      "ethics_note_es": "Este hexagrama no romantiza el aguante. Señala riesgo y prioriza reducción de daño."
+      "micro_action_es": "Delega, pospón o cancela una obligación grande hoy mismo. Aligera la viga.",
+      "ethics_note_es": "Reconocer que no puedes con todo no es fracaso, es inteligencia de supervivencia."
     },
     "29": {
-      "dynamic_core_es": "El abismo repetido. Situaciones de riesgo que se repiten: la lección es aprender a atravesar sin pánico.",
-      "image_es": "Agua sobre agua. Corriente profunda: caes en el mismo tipo de hueco hasta entender el cauce.",
-      "general_reading_es": "No estás ante un obstáculo único, sino ante un patrón. La salida no es evitar toda dificultad, sino desarrollar método: prudencia, entrenamiento, claridad. La ansiedad empeora la caída; la disciplina reduce daño.",
+      "dynamic_core_es": "El abismo. El agua fluye y llega a la meta precisamente porque no tiene miedo de caer. Peligro repetido.",
+      "image_es": "Agua sobre agua. Un desfiladero profundo. El peligro es el medio, no el final.",
+      "general_reading_es": "Estás en una situación de riesgo o crisis emocional profunda. No luches contra la corriente ni intentes escalar las paredes resbaladizas por pánico. La única salida es mantener el corazón sincero y fluir a través del peligro hasta encontrar la salida. La constancia te salva.",
       "lines_es": {
         "1": "Acostumbrarse al abismo. Cae en un agujero dentro del abismo. Desgracia. Te has habituado al peligro o a la toxicidad. Ya no luchas por salir, sino que te acomodas en el malestar. Perdiste la voluntad de cambio.",
         "2": "El abismo es peligroso. Uno debe esforzarse solo por lograr cosas pequeñas. No intentes grandes hazañas ahora. Salir del hoyo requiere pasos minúsculos y realistas. Confórmate con sobrevivir y avanzar un centímetro.",
         "3": "Adelante y atrás, abismo. En peligro, descansando. No actúes. Cualquier movimiento que hagas ahora empeora las cosas. Estás atrapado. La única acción correcta es la inmovilidad total hasta que la situación cambie por sí sola.",
         "4": "Una jarra de vino y un cuenco de arroz. Sencillez. Entregar a través de la ventana. En tiempos de crisis profunda, olvida el protocolo. Usa los canales más simples y directos para conectar con otros. La sinceridad desnuda es tu recurso.",
         "5": "El abismo no se llena hasta el borde. El agua fluye, se nivela. Salida del peligro. La crisis ha pasado su punto máximo. Mantén la calma y sigue el camino de menor resistencia. No necesitas luchar más, solo fluir hacia la salida.",
-        "6": "Atado con cuerdas y sogas, encerrado entre muros de espinas. Tres años sin encontrar el camino. Desgracia. Te has enredado en tus propias trampas mentales. La rigidez y la falta de aprendizaje te han aprisionado. Necesitas ayuda externa y un cambio de mentalidad radical para salir."
+        "6": "Atado con cuerdas y sogas, encerrado entre muros de espinas. Tres años sin encontrar el camino. Desgracia. Te has enredado en tus propias trampas mentales. La rigidez y la falta de aprendizaje te han aprisionado. Necesitas ayuda externa radical para salir."
       },
-      "taoist_reading_es": "Wu wei aquí es fluir sin perder centro. El agua atraviesa lo difícil porque no se rigidiza. Aprende el cauce: no luches contra la condición, ajusta tu forma.",
+      "taoist_reading_es": "Sé como el agua: en la caída no pierde su naturaleza. Wu wei aquí es fluir sin perder centro. No te congeles por miedo, no te agites por pánico. Sigue cayendo hacia adelante.",
       "guiding_questions_es": [
-        "¿Qué patrón de riesgo se repite en mi vida (decisiones, vínculos, hábitos)?",
-        "¿Qué método concreto reduce daño cuando aparece?",
-        "¿Qué apoyo externo sería sensato en esta fase?"
+        "¿Estoy luchando contra la situación o fluyendo a través de ella?",
+        "¿Me he acostumbrado tanto al drama que ya no busco la paz?",
+        "¿Qué paso pequeño y seguro puedo dar hoy?"
       ],
-      "micro_action_es": "Define un “protocolo de abismo” de 3 pasos (qué hacer, a quién avisar, qué evitar) para cuando aparezca el patrón.",
-      "ethics_note_es": "Reconocer peligro no es fatalismo. Es preparación para atravesar con menos daño."
+      "micro_action_es": "No tomes ninguna gran decisión hoy. Solo asegúrate de cumplir con lo básico (dormir, comer, cumplir). Sobrevivir es el éxito.",
+      "ethics_note_es": "El valor no es la ausencia de miedo, es la capacidad de seguir fluyendo a pesar de él."
     },
     "30": {
-      "dynamic_core_es": "La claridad que se adhiere. Fuego: ilumina, pero necesita un soporte. Discernimiento con dependencia saludable de estructura.",
-      "image_es": "Fuego sobre fuego. Luz que se mantiene al adherirse: claridad sostenida por un combustible estable.",
-      "general_reading_es": "Este hexagrama favorece ver, entender, nombrar. La claridad trae orden, pero también puede traer fijación. La tarea es mantener luz sin quemar: distinguir lo esencial, sostener hábitos que alimenten comprensión.",
+      "dynamic_core_es": "La claridad y la adherencia. El fuego necesita leña para arder. La conciencia necesita un soporte válido para sostenerse.",
+      "image_es": "Fuego sobre fuego. Luz brillante que se expande, pero depende de su combustible.",
+      "general_reading_es": "Es un momento de lucidez y visibilidad. Ves las cosas como son. Pero el fuego no es independiente; necesita adherirse a algo (un trabajo, una pareja, un ideal). Asegúrate de que aquello a lo que te aferras sea noble y capaz de sostener tu llama sin consumirse rápido.",
       "lines_es": {
         "1": "Las huellas corren entrecruzadas. Si uno es serio, no hay culpa. Al principio de la comprensión, todo es confuso. Hay mucha información y poco orden. Mantén la seriedad y el foco; la claridad llegará si no te dispersas.",
         "2": "Luz amarilla. Fortuna suprema. Has encontrado el camino medio. Tu claridad es suave, moderada y sostenible. No deslumbras a nadie, pero iluminas todo. Es el estado ideal de la consciencia.",
@@ -626,19 +622,19 @@
         "5": "Lágrimas en torrentes, suspirando y lamentando. Buena fortuna. La claridad a veces llega con dolor. Darse cuenta de la verdad provoca tristeza, pero ese duelo es necesario para sanar y cambiar. La crisis emocional limpia la visión.",
         "6": "El rey sale a castigar. Lo mejor es matar a los líderes y capturar a los seguidores. Sin culpa. Usa tu claridad para eliminar la causa raíz del problema (el mal hábito, la creencia limitante), no te desgastes peleando con los síntomas menores."
       },
-      "taoist_reading_es": "Wu wei es claridad sin rigidez. La luz sirve para ver el camino, no para atacar a otros con tu visión. Adhiérete al Tao, no a tu opinión.",
+      "taoist_reading_es": "El fuego ilumina pero también quema si no se controla. Wu wei es la 'claridad dócil' (Li). Acepta tu interdependencia. No intentes ser autosuficiente de forma arrogante; cuida lo que te nutre.",
       "guiding_questions_es": [
-        "¿Qué estoy viendo con claridad que antes evitaba?",
-        "¿Qué estructura sostiene mi claridad (sueño, rutina, límites)?",
-        "¿Mi discernimiento ilumina o se volvió arma?"
+        "¿A qué estoy adherido que me está consumiendo en lugar de sostenerme?",
+        "¿Mi ritmo actual es sostenible o es un incendio repentino?",
+        "¿Qué necesito cuidar para mantener mi luz encendida?"
       ],
-      "micro_action_es": "Escribe una frase de claridad: “Lo que realmente está pasando es…”. Luego define una acción pequeña coherente con eso.",
-      "ethics_note_es": "La claridad no autoriza crueldad. Autoriza decisiones más limpias."
+      "micro_action_es": "Reconoce y agradece hoy a una fuente de apoyo (persona o hábito) que te permite funcionar.",
+      "ethics_note_es": "La dependencia no es mala si es consciente y mutua. La falsa independencia es una ilusión."
     },
     "31": {
-      "dynamic_core_es": "Influencia y atracción. La fuerza de lo suave que mueve sin imponer: resonancia, cortejo, persuasión.",
-      "image_es": "Lago sobre montaña. Gozo arriba, quietud abajo: la influencia nace de una base estable.",
-      "general_reading_es": "Es tiempo de influir y dejarse influir, pero con conciencia. Lo que te atrae revela tu dirección. La influencia sana es mutua: no manipula, invita. La clave es la integridad del centro.",
+      "dynamic_core_es": "La influencia y la atracción mutua. El cortejo. Dejar espacio para que el otro entre.",
+      "image_es": "Lago sobre la montaña. El lago ofrece humedad, la montaña la recibe. Estímulo y respuesta natural.",
+      "general_reading_es": "Para influir, primero debes ser receptivo. Escuchar crea el vacío que atrae a los demás. Es un tiempo de conexión, atracción y comienzo de relaciones. No fuerces nada; la influencia real es involuntaria y surge de quién eres.",
       "lines_es": {
         "1": "Influencia en el dedo gordo del pie. La atracción comienza. Es solo un impulso inicial, una idea o un deseo vago. Aún no hay acción real, solo la intención de moverse. Obsérvalo sin comprometerte todavía.",
         "2": "Influencia en las pantorrillas. Desgracia. Querer moverse ciegamente. Te dejas llevar por el impulso antes de saber a dónde vas. Esperar es mejor. Si sigues a otros sin pensar, perderás tu camino.",
@@ -647,19 +643,19 @@
         "5": "Influencia en la nuca. Sin remordimiento. La influencia no llega a expresarse. Te mantienes rígido o demasiado intelectual. No cometes errores, pero tampoco conectas con nadie. Es seguro, pero estéril.",
         "6": "Influencia en las mandíbulas y la lengua. Solo palabras. Intentas influir o seducir hablando, pero no hay sustancia ni sentimiento real detrás. Es ruido. La verdadera influencia es silenciosa y profunda."
       },
-      "taoist_reading_es": "Wu wei es atraer sin empujar. Lo que tiene virtud no necesita forzar. La influencia más fuerte es la que no se anuncia.",
+      "taoist_reading_es": "El sabio influye sin hablar. Wu wei es vaciarse de prejuicios para recibir al otro. Si estás lleno de ti mismo, no puedes conectar con nadie.",
       "guiding_questions_es": [
-        "¿Qué me atrae y qué dice eso de mis necesidades reales?",
-        "¿Estoy intentando influir con presión o con ejemplo?",
-        "¿Qué silencio sería más persuasivo que mis explicaciones?"
+        "¿Estoy tratando de convencer o estoy escuchando?",
+        "¿Mi mente está abierta a ser influenciada por la verdad?",
+        "¿Qué impulso estoy siguiendo sin pensar?"
       ],
-      "micro_action_es": "En una conversación importante, reduce tu discurso: pregunta más y afirma menos. Observa qué cambia.",
-      "ethics_note_es": "Influir no es controlar. Es crear condiciones para que el otro elija con más claridad."
+      "micro_action_es": "En tu próxima interacción, escucha el doble de lo que hablas. Haz preguntas abiertas.",
+      "ethics_note_es": "La influencia es recíproca. No manipules las emociones ajenas si no estás dispuesto a comprometerte."
     },
     "32": {
-      "dynamic_core_es": "Duración y constancia. Lo que perdura se construye con hábitos, no con picos de intensidad.",
-      "image_es": "Trueno y viento. Movimiento continuo: energía que no se agota porque sabe renovarse.",
-      "general_reading_es": "Este hexagrama favorece compromiso sostenido. No pide rigidez, pide continuidad. El error típico es cambiar de rumbo por emoción. La virtud aquí es crear una forma de vida que soporte el objetivo.",
+      "dynamic_core_es": "La duración. La constancia en el cambio. Mantener el rumbo a través de las estaciones.",
+      "image_es": "Trueno y viento. Fenómenos móviles que, sin embargo, son constantes en su naturaleza.",
+      "general_reading_es": "No se trata de estar quieto (estancamiento), sino de mantener el carácter y el propósito mientras te adaptas a las circunstancias. La duración es resistencia flexible. Si buscas resultados rápidos, te frustrarás. Comprométete a largo plazo.",
       "lines_es": {
         "1": "Buscar duración demasiado pronto. Perseverancia trae desgracia. Quieres compromiso profundo o resultados eternos desde el primer día. Estás forzando la situación. Lo que dura crece despacio; la prisa mata la constancia.",
         "2": "El remordimiento desaparece. Estás en una posición donde la moderación funciona. No tienes exceso de energía ni falta de ella. Simplemente sostienes el ritmo. Eso es suficiente para el éxito a largo plazo.",
@@ -667,20 +663,12 @@
         "4": "No hay caza en el campo. Estás buscando en el lugar equivocado. Por más que persistas, si el método o el objetivo no es realista, no obtendrás nada. La constancia en el error no es virtud, es estupidez.",
         "5": "Dar duración al carácter a través de la perseverancia. Buena fortuna para la mujer, desgracia para el hombre. Adaptarse y seguir una rutina (rol receptivo) funciona bien aquí. Pero si tu rol exige innovar o liderar, la mera repetición te estancará.",
         "6": "Inquietud como estado duradero. Desgracia. Estás en constante agitación, siempre corriendo, siempre ansioso. Crees que moverse rápido es ser constante, pero solo es agotamiento. Detente."
-      },
-      "taoist_reading_es": "Wu wei es continuidad natural: como el río, no fuerza su ruta cada día. La duración correcta es flexible, pero no caprichosa.",
-      "guiding_questions_es": [
-        "¿Qué hábito pequeño sostendría mi objetivo si lo hago diario?",
-        "¿Dónde confundo constancia con terquedad?",
-        "¿Qué revisión semanal mínima mantendría el rumbo?"
-      ],
-      "micro_action_es": "Define un hábito de 5 minutos ligado a tu meta y hazlo hoy. Solo 5. La duración empieza así.",
-      "ethics_note_es": "La constancia no justifica permanecer en daño. Dura lo que nutre vida."
+      }
     },
     "33": {
-      "dynamic_core_es": "Retiro estratégico. Alejarse a tiempo preserva fuerza y claridad.",
-      "image_es": "Cielo sobre montaña. La altura se retira: no por miedo, por visión del terreno.",
-      "general_reading_es": "Hay momentos donde avanzar es improductivo. Retirarte, reducir exposición o decir ‘no’ es lo correcto. La clave es hacerlo con dignidad, sin resentimiento ni teatralidad. Retiro no es derrota; es conservación.",
+      "dynamic_core_es": "La retirada. Saber cuándo irse es tan importante como saber cuándo luchar. Distancia estratégica.",
+      "image_es": "La montaña bajo el cielo. El cielo se aleja hacia arriba, la montaña se queda quieta. Distancia creciente.",
+      "general_reading_es": "Las fuerzas hostiles están en ascenso. Pelear ahora es perder. La acción inteligente es retirarse para preservar tu energía y claridad. No es huida por miedo, es una decisión de no participar en un juego que no puedes ganar hoy.",
       "lines_es": {
         "1": "Retirada en la cola. Peligro. No te retires si estás demasiado cerca del enemigo o del problema. Estás expuesto. Mantente quieto y pasa desapercibido hasta que se abra una brecha para salir.",
         "2": "Lo sujeta con cuero de buey amarillo. Nadie puede soltarlo. Tu voluntad de retirarte es firme e inquebrantable. O bien, alguien que te valora te retiene con fuerza. En ambos casos, la decisión es sólida y correcta.",
@@ -689,19 +677,19 @@
         "5": "Retirada admirable. Perseverancia trae buena fortuna. Te retiras en el momento perfecto y de la manera perfecta. Sin conflictos, sin dejar tierra quemada. Tu salida es tan elegante que todos te respetan.",
         "6": "Retirada alegre. Todo es propicio. Estás completamente libre. Ya no tienes apegos ni dudas. El camino está despejado y tu espíritu es ligero. El mejor final posible para una situación difícil."
       },
-      "taoist_reading_es": "Wu wei es no chocar contra lo inevitable. El Tao enseña a ceder el terreno cuando la fricción sube. Retirarte es moverte con el ciclo, no contra él.",
+      "taoist_reading_es": "Wu wei es no forzar la presencia cuando el tiempo pide ausencia. Retírate antes de que te expulsen. En la soledad recuperarás el poder que el conflicto te roba.",
       "guiding_questions_es": [
-        "¿Qué batalla estoy peleando que no necesita pelea?",
-        "¿Qué salida digna puedo tomar hoy?",
-        "¿Qué preservo al retirarme a tiempo?"
+        "¿De qué situación necesito alejarme para sanar?",
+        "¿Estoy peleando una batalla perdida por puro orgullo?",
+        "¿Cómo puedo retirarme con elegancia y sin dar portazos?"
       ],
-      "micro_action_es": "Identifica una fuente de fricción y reduce tu participación un 20% esta semana (menos mensajes, menos reuniones, menos exposición).",
-      "ethics_note_es": "Retiro estratégico no aplica a obligaciones de cuidado urgente. Aplica a choques de ego o desgaste inútil."
+      "micro_action_es": "Di 'no' a una invitación o compromiso hoy. Crea espacio vacío para ti.",
+      "ethics_note_es": "Retirarse para protegerse es legítimo. No le debes tu presencia a quien te daña."
     },
     "34": {
-      "dynamic_core_es": "Gran poder. Fuerza disponible que debe usarse con contención ética y precisión.",
-      "image_es": "Trueno bajo el cielo. Potencia que asciende: energía que puede crear o destruir según su dirección.",
-      "general_reading_es": "Tienes fuerza, impulso o autoridad. El riesgo es usarla para imponer. El uso correcto del poder es proteger, sostener y abrir camino, no aplastar. La disciplina moral es el verdadero control aquí.",
+      "dynamic_core_es": "El gran poder. La fuerza es abundante, pero el peligro está en usarla sin freno. El carnero embiste la cerca.",
+      "image_es": "Trueno en el cielo. Poder que se manifiesta visiblemente y con estruendo.",
+      "general_reading_es": "Tienes la fuerza y la posición para avanzar. Sin embargo, la advertencia es clara: no te conviertas en un bruto. La verdadera fuerza se demuestra en la capacidad de detenerse o de actuar con suavidad. Si empujas demasiado, te quedarás atascado.",
       "lines_es": {
         "1": "Poder en los dedos de los pies. Perseverancia trae desgracia. Tienes ganas de usar tu fuerza, pero es demasiado pronto. Tu posición es baja. Si intentas avanzar ahora, solo te lastimarás. Espera.",
         "2": "Perseverancia trae buena fortuna. El poder está equilibrado. Tienes fuerza pero la usas con moderación y en el momento justo. No hay resistencia porque actúas con legitimidad.",
@@ -710,19 +698,19 @@
         "5": "Pierde la cabra con facilidad. Sin remordimiento. Dejas ir la terquedad o la agresividad. Al soltar la necesidad de luchar o de tener razón, la situación se resuelve a tu favor. La suavidad desarma.",
         "6": "El carnero embiste la cerca. No puede retroceder ni avanzar. Nada es propicio. Estás bloqueado por tu propia obstinación. Has ido demasiado lejos. La única solución es calmarse y esperar a que la situación se afloje sola."
       },
-      "taoist_reading_es": "Wu wei con poder es suavidad estratégica. Lo más fuerte es lo que puede detenerse. El Tao no necesita demostrar fuerza; la usa solo donde sirve.",
+      "taoist_reading_es": "El Tao es suave pero vence a lo duro. Wu wei es avanzar sin violencia. Si tienes que forzar, es que no estás en el camino correcto. Usa tu poder para sostener, no para aplastar.",
       "guiding_questions_es": [
-        "¿Estoy usando fuerza para servir o para probar valor?",
-        "¿Qué parte de mi poder necesita freno ahora?",
-        "¿Cuál sería la acción mínima efectiva?"
+        "¿Dónde estoy presionando demasiado?",
+        "¿Puedo lograr lo mismo con menos fuerza y más inteligencia?",
+        "¿Estoy actuando desde la confianza o desde la necesidad de dominar?"
       ],
-      "micro_action_es": "En una situación donde podrías imponer, elige una acción de fuerza mínima: un límite claro sin amenaza.",
-      "ethics_note_es": "Tener poder aumenta responsabilidad. La ética aquí es evitar daño por exceso de impulso."
+      "micro_action_es": "Encuentra un área donde estés 'empujando' y suelta la presión hoy. Deja que las cosas respiren.",
+      "ethics_note_es": "Tener poder no te da derecho a usarlo arbitrariamente. La contención es la prueba de la virtud."
     },
     "35": {
-      "dynamic_core_es": "Progreso y visibilidad. Avance gradual cuando la claridad es reconocida por otros.",
-      "image_es": "Fuego sobre la tierra. El sol asciende: lo visible se expande y orienta.",
-      "general_reading_es": "Es un buen momento para avanzar y mostrar trabajo. El progreso se apoya en consistencia y en mantener buenas relaciones. No aceleres por la aprobación: usa la visibilidad para construir, no para inflar ego.",
+      "dynamic_core_es": "El progreso. El sol sale sobre la tierra. Avance rápido, visibilidad y expansión.",
+      "image_es": "Fuego sobre la tierra. Luz que se eleva y aclara todo el paisaje.",
+      "general_reading_es": "Es un momento de avance fácil y recompensas. Tus talentos son reconocidos. Aprovecha este tiempo para expandirte y aclarar tus asuntos. No obstante, recuerda que el sol no se queda en el cenit para siempre; usa la luz mientras dure.",
       "lines_es": {
         "1": "Progresando, pero siendo rechazado. La perseverancia trae buena fortuna. Si uno no encuentra confianza, debe mantener la calma. Sin culpa. Intentas avanzar y te frenan. No te ofendas ni pelees. Sigue haciendo tu trabajo correctamente; al final, la calidad se impone.",
         "2": "Progresando con tristeza. Perseverancia trae buena fortuna. Se recibe gran felicidad de la ancestra. Aunque te sientas solo o incomprendido, sigue avanzando. Tienes un apoyo profundo (invisible o de una figura protectora) que se manifestará pronto.",
@@ -731,19 +719,19 @@
         "5": "El remordimiento desaparece. No tomes a pecho la ganancia ni la pérdida. Emprender trae buena fortuna. Actúa sin apego al resultado. Tu posición es tan sólida que los detalles menores no importan. Solo avanza con generosidad.",
         "6": "Progresar con los cuernos. Solo es útil para castigar la propia ciudad. Estás usando demasiada fuerza y agresividad para avanzar. Puedes lograr corregir un error local, pero esta actitud violenta te aislará si la mantienes. Peligroso."
       },
-      "taoist_reading_es": "Wu wei es avanzar sin ansia de aplauso. El sol no pide permiso para salir. Haz tu trabajo y deja que el ciclo de reconocimiento ocurra sin manipulación.",
+      "taoist_reading_es": "Avanza como el sol: constante y generoso, iluminando a todos sin discriminación. Wu wei es brillar sin esfuerzo. No persigas el éxito; manifiesta tu naturaleza y el éxito seguirá.",
       "guiding_questions_es": [
-        "¿Qué avance real puedo consolidar hoy sin anunciarlo demasiado?",
-        "¿Estoy usando visibilidad para servir o para ser visto?",
-        "¿Qué relación clave debo cuidar mientras progreso?"
+        "¿Estoy avanzando con claridad o solo corriendo?",
+        "¿Cómo puedo usar este momento de visibilidad para beneficiar a otros?",
+        "¿Me preocupa demasiado la aprobación externa?"
       ],
-      "micro_action_es": "Comparte un resultado concreto (no una intención) con alguien relevante: una página, un prototipo, un borrador.",
-      "ethics_note_es": "La visibilidad no mide valor. Solo cambia el contexto de responsabilidad."
+      "micro_action_es": "Haz visible un logro tuyo o de tu equipo hoy. No por vanidad, sino para aclarar el progreso.",
+      "ethics_note_es": "El progreso real incluye a los demás. Si subes pisando cabezas, caerás pronto."
     },
     "36": {
-      "dynamic_core_es": "Oscurecer la luz. Proteger tu claridad en un entorno hostil o incomprensivo.",
-      "image_es": "Fuego bajo la tierra. La luz se oculta: brilla hacia adentro para sobrevivir.",
-      "general_reading_es": "No es momento de exponerte. Si el entorno castiga la honestidad o malinterpreta tus intenciones, conviene protegerte. Mantén tu claridad interna, pero baja el perfil. La estrategia es discreción con integridad.",
+      "dynamic_core_es": "El oscurecimiento de la luz. Tiempos difíciles donde la inteligencia debe esconderse para sobrevivir.",
+      "image_es": "La tierra cubre el fuego. La luz está adentro, invisible desde fuera.",
+      "general_reading_es": "El entorno es hostil o estúpido. Mostrar tu talento o tu verdad ahora te pondrá en peligro. La estrategia correcta es ocultar tu brillo, parecer 'tonto' o conformista externamente, mientras mantienes tu claridad interna intacta. Sobrevive hasta que cambie el tiempo.",
       "lines_es": {
         "1": "Oscurecimiento de la luz durante el vuelo. Baja sus alas. El noble se va sin comer durante tres días. Estás siendo perseguido o criticado injustamente. No pierdas tiempo discutiendo ni defendiendo tu honor. Huye, baja el perfil y soporta la incomodidad temporal. La meta es sobrevivir, no ganar el debate.",
         "2": "Oscurecimiento de la luz; herido en el muslo izquierdo. Se salva con la fuerza de un caballo. Has sido herido en tu capacidad de avanzar. Busca apoyo en alguien fuerte y leal para que te ayude a moverte mientras sanas. No intentes caminar solo ahora.",
@@ -752,19 +740,19 @@
         "5": "Oscurecimiento de la luz como el príncipe Ji. Perseverancia trae ventaja. Estás atrapado en una situación imposible, bajo un poder tiránico o estúpido. La estrategia es: obediencia externa, resistencia interna. No te conviertas en mártir; mantén tu luz oculta adentro hasta que sea seguro brillar.",
         "6": "No luz, sino oscuridad. Primero subió al cielo, luego se hundió en la tierra. Quien usa su poder para dañar a otros o su inteligencia para engañar, termina destruido. Si eres la víctima, observa: el mal se consume a sí mismo al final. Si eres el agresor, detente o caerás."
       },
-      "taoist_reading_es": "Wu wei es conservar el fuego interno cuando afuera hay viento en contra. No necesitas mostrar tu luz para que exista. La sabiduría incluye ocultarse.",
+      "taoist_reading_es": "Wu wei es camuflaje. Adáptate al entorno oscuro sin volverte oscuro. Protege tu Jing (esencia) no exponiéndolo a quien no puede valorarlo. Sé flexible por fuera, firme por dentro.",
       "guiding_questions_es": [
-        "¿En qué entorno mi claridad se vuelve riesgo innecesario?",
-        "¿Qué parte de mí debo proteger sin mentirme a mí mismo?",
-        "¿Cuál es la chispa mínima que debo preservar cada día?"
+        "¿Dónde es más seguro callar que hablar?",
+        "¿Estoy tratando de 'salvar' a quien no quiere ser salvado?",
+        "¿Cómo puedo proteger mi energía en este ambiente hostil?"
       ],
-      "micro_action_es": "Reduce exposición en un frente (redes, discusiones, reuniones) por 7 días y usa ese tiempo para fortalecer tu práctica interna.",
-      "ethics_note_es": "Discreción no es complicidad. Si hay daño real a terceros, prioriza seguridad y vías formaless."
+      "micro_action_es": "En una situación tensa hoy, elige no dar tu opinión. Observa cómo el silencio te protege.",
+      "ethics_note_es": "Mentir para protegerse de un tirano no es falta de ética, es autodefensa."
     },
     "37": {
-      "dynamic_core_es": "La familia como sistema. Roles, límites y hábitos cotidianos que sostienen (o erosionan) la convivencia.",
-      "image_es": "Viento que surge del fuego. Calor interno que se expande: lo doméstico modela el clima emocional.",
-      "general_reading_es": "Este hexagrama habla de orden interno: casa, equipo, pareja, grupo pequeño. Lo importante no son discursos, sino reglas simples y consistentes. El liderazgo aquí es doméstico: cuidar el tono, sostener acuerdos, corregir sin humillar.",
+      "dynamic_core_es": "La familia (El Clan). La estructura orgánica donde cada uno tiene su rol y responsabilidad.",
+      "image_es": "Viento sale del fuego. El calor se expande desde el hogar hacia afuera.",
+      "general_reading_es": "El orden comienza en casa (o en el equipo cercano). Si las relaciones internas funcionan, todo funciona. Define los roles: ¿quién lidera, quién apoya, quién ejecuta? La claridad en las funciones trae armonía. La palabra clave es lealtad y consistencia.",
       "lines_es": {
         "1": "Firmeza en la familia. El remordimiento desaparece. Establece reglas claras desde el primer día. Si permites que el desorden se instale por 'ser amable', luego tendrás conflictos graves. La disciplina temprana es la forma más alta de amor.",
         "2": "Ella no debe seguir su capricho; debe atender a la comida. Perseverancia trae buena fortuna. Céntrate en lo básico y funcional. No es momento de grandes ambiciones externas, sino de asegurar que el sistema interno (casa, equipo, salud) funcione como un reloj. El cuidado sostiene la vida.",
@@ -773,19 +761,19 @@
         "5": "El rey se acerca a su familia. No temas. Buena fortuna. El líder actúa con amor y autoridad natural, sin necesidad de imponerse. Cuando tu presencia inspira seguridad y no miedo, la familia (o el equipo) prospera unida.",
         "6": "Su trabajo impone respeto. Al final, buena fortuna. Has sido consistente con tus valores y responsable con tus deberes. Tu carácter es tu legado. Cuando uno se respeta a sí mismo, los demás lo respetan naturalmente."
       },
-      "taoist_reading_es": "Wu wei en lo doméstico es crear condiciones: rutina, límites, cuidado. El Tao se expresa en lo pequeño repetido. Un hogar o equipo estable no se impone, se cultiva.",
+      "taoist_reading_es": "El Tao empieza por lo cercano. No intentes arreglar el mundo si tu cocina está sucia. Wu wei es cumplir tu rol con naturalidad, sin envidiar el rol del otro.",
       "guiding_questions_es": [
-        "¿Qué regla simple falta en mi sistema cercano (casa/equipo)?",
-        "¿Estoy corrigiendo desde el cuidado o desde irritación acumulada?",
-        "¿Qué hábito cotidiano mejoraría el clima general?"
+        "¿Cuál es mi rol específico en este grupo y lo estoy cumpliendo?",
+        "¿Hay reglas claras o asumimos cosas tácitamente?",
+        "¿Estoy cuidando a mi círculo cercano?"
       ],
-      "micro_action_es": "Define un acuerdo doméstico mínimo (una regla) y aplícalo 7 días con consistencia, sin sermones.",
-      "ethics_note_es": "Hablar de roles no justifica desigualdad. La función es orden y cuidado, no jerarquía rígida."
+      "micro_action_es": "Clarifica una expectativa con alguien cercano hoy. \"Yo espero esto de ti, ¿qué esperas tú de mí?\".",
+      "ethics_note_es": "La jerarquía familiar o de equipo debe servir para proteger, no para oprimir."
     },
     "38": {
-      "dynamic_core_es": "Diferencia y fricción. Dos miradas legítimas que no coinciden: aprender a coexistir sin guerra.",
-      "image_es": "Fuego y lago en direcciones opuestas. Claridad y placer no se alinean: distancia sin necesariamente ruptura.",
-      "general_reading_es": "Aquí hay desacuerdo real. La solución no es forzar unanimidad, sino reconocer la diferencia y buscar acuerdos mínimos. Pequeñas coincidencias sostienen la relación; grandes fusiones ahora generan conflicto.",
+      "dynamic_core_es": "La oposición. Fuego y agua chocan. Visiones diferentes que no pueden reconciliarse fácilmente, pero pueden coexistir.",
+      "image_es": "Fuego arriba, lago abajo. Se mueven en direcciones opuestas.",
+      "general_reading_es": "Las diferencias son irreconciliables en lo grande, pero manejables en lo pequeño. No trates de forzar la unidad ni de convencer al otro. Acepta la diversidad. El éxito viene de encontrar los puntos mínimos de coincidencia funcional, no de la fusión emocional.",
       "lines_es": {
         "1": "El remordimiento desaparece. Si pierdes tu caballo, no corras tras él; volverá por sí solo. Cuando veas gente mala, protégete contra errores. No fuerces la reconciliación ni persigas lo que se va. Deja espacio. La distancia a veces cura lo que la insistencia rompe.",
         "2": "Uno encuentra a su señor en un callejón estrecho. Sin culpa. Un encuentro casual o informal rompe el hielo. A veces, la formalidad impide la conexión. Una conversación breve y directa, cara a cara, resuelve el malentendido.",
@@ -794,19 +782,19 @@
         "5": "El remordimiento desaparece. El compañero se abre paso a través de la envoltura. Si vas con sinceridad, la desconfianza del otro se disuelve. El problema no era real, era una barrera de miedo. Al cruzarla, encuentras celebración.",
         "6": "Aislado por la oposición, uno ve a un cerdo cubierto de lodo y un carro lleno de fantasmas. Primero tensa el arco, luego lo baja. No es un bandido, es un pretendiente. Tu paranoia te hace ver enemigos donde hay aliados. Limpia tu mente, baja el arma y verás que la realidad es mucho más amable."
       },
-      "taoist_reading_es": "Wu wei es permitir la diferencia sin convertirla en amenaza. El Tao contiene opuestos. No necesitas convencer para convivir: necesitas límites y respeto.",
+      "taoist_reading_es": "El mundo es dualidad (Yin/Yang). La oposición es natural. Wu wei es no angustiarse por la contradicción. Usa la tensión creativa de la diferencia en lugar de querer eliminarla.",
       "guiding_questions_es": [
-        "¿Qué diferencia estoy intentando borrar en lugar de negociar?",
-        "¿Cuál es el acuerdo mínimo que hace esto vivible?",
-        "¿Qué parte de mi interpretación es suposición sin evidencia?"
+        "¿Por qué necesito que el otro esté de acuerdo conmigo?",
+        "¿Puedo trabajar con alguien que piensa totalmente distinto?",
+        "¿Qué malentendido estoy alimentando con mi sospecha?"
       ],
-      "micro_action_es": "Formula una pregunta honesta (una sola) al otro: busca un dato, no una confesión. Escucha sin interrumpir.",
-      "ethics_note_es": "No toda diferencia se reconcilia. A veces la ética es separar con respeto."
+      "micro_action_es": "Identifica a alguien con quien estés en desacuerdo y encuentra UNA cosa pequeña en la que sí coincidan. Enfócate solo en eso hoy.",
+      "ethics_note_es": "Respetar la diferencia es más ético que imponer una falsa unidad."
     },
     "39": {
-      "dynamic_core_es": "Obstrucción y dificultad. Avanzar directo no funciona: se requiere cambio de ruta y apoyo.",
-      "image_es": "Agua sobre montaña. Terreno resbaladizo y empinado: fuerza sin método termina en caída.",
-      "general_reading_es": "La situación está trabada. Insistir por orgullo empeora. La estrategia es retroceder un poco, buscar ayuda, cambiar enfoque. A veces la salida está ‘por el lado’, no por el frente.",
+      "dynamic_core_es": "El impedimento (Obstrucción). Dificultades externas que obligan a volverse hacia adentro.",
+      "image_es": "Agua sobre la montaña. Peligro adelante, barrera atrás.",
+      "general_reading_es": "El camino está bloqueado. No es culpa tuya, pero es tu responsabilidad cómo reaccionas. Seguir golpeando la pared es inútil. La estrategia es: detente, reflexiona, re-agrúpate y busca consejo. El obstáculo te está diciendo 'por aquí no, o así no'.",
       "lines_es": {
         "1": "Ir conduce a obstrucciones; venir encuentra elogio. No golpees la pared. Si avanzas, te bloqueas. Si retrocedes y esperas, ganas perspectiva y conservas fuerza. La retirada táctica es la acción inteligente ahora.",
         "2": "El sirviente del rey encuentra obstrucción tras obstrucción. No es por su propia culpa. Estás luchando por una causa mayor o cumpliendo un deber difícil. Las trabas no son señal de tu error, sino de la magnitud de la tarea. Persevera sin culparte.",
@@ -815,19 +803,19 @@
         "5": "En medio de las mayores obstrucciones, vienen amigos. Estás en el punto más difícil, pero tu compromiso es visible. Esa visibilidad atrae ayuda. No te rindas justo antes de que llegue el rescate.",
         "6": "Ir conduce a obstrucciones; venir conduce a gran buena fortuna. Es propicio ver al gran hombre. Deja de intentar avanzar por el camino viejo. Gira completamente. Busca un mentor o una nueva estrategia radical. El cambio de dirección te libera."
       },
-      "taoist_reading_es": "Wu wei es no empujar contra la montaña mojada. El Tao enseña a rodear, a esperar, a apoyarse. La obstinación no es virtud: es rigidez.",
+      "taoist_reading_es": "Cuando el agua encuentra una roca, se detiene y acumula volumen hasta que puede rodearla o superarla. Wu wei es esa pausa activa. Usa el obstáculo para crecer hacia adentro.",
       "guiding_questions_es": [
-        "¿Qué ruta alternativa existe si dejo de insistir en la vía ‘correcta’?",
-        "¿A quién puedo pedir ayuda sin vergüenza?",
-        "¿Qué parte del problema es terreno y cuál es método?"
+        "¿Estoy confundiendo perseverancia con terquedad?",
+        "¿A quién puedo pedir ayuda para ver esto desde otra perspectiva?",
+        "¿Qué parte de mí necesita fortalecerse antes de superar este reto?"
       ],
-      "micro_action_es": "Define una ruta alterna concreta (otro plan) y ejecuta el primer paso hoy, aunque sea pequeño.",
-      "ethics_note_es": "Pedir ayuda no es dependencia. Es ajuste inteligente ante una limitación real."
+      "micro_action_es": "Escribe el problema principal y luego escribe tres formas de *no* atacarlo directamente, sino de rodearlo.",
+      "ethics_note_es": "Reconocer la dificultad no es pesimismo, es el primer paso para superarla."
     },
     "40": {
-      "dynamic_core_es": "Liberación. La tensión se suelta cuando se nombra el nudo y se deshace con un acto claro.",
-      "image_es": "Trueno y lluvia tras la tormenta. La descarga limpia el aire: el cuerpo vuelve a respirar.",
-      "general_reading_es": "Es momento de desatar: resolver, perdonar, cerrar un ciclo, salir de un bloqueo. La liberación no siempre es euforia: a veces es alivio sobrio. El riesgo es volver a enredarte repitiendo el patrón.",
+      "dynamic_core_es": "La liberación. La tensión se rompe, la tormenta pasa, el aire se limpia.",
+      "image_es": "Trueno y lluvia. La atmósfera se descarga y alivia.",
+      "general_reading_es": "El tiempo de sufrimiento o bloqueo ha terminado. Es momento de perdonar, soltar y avanzar. No te quedes analizando el pasado ni lamiéndote las heridas. Actúa rápido para aprovechar la nueva libertad. Si hay algo que hacer, hazlo ya; si no, descansa.",
       "lines_es": {
         "1": "Sin culpa. La liberación ha comenzado. No hay mucho que hacer salvo descansar y recuperarse. No busques problemas donde no los hay. La paz es la meta.",
         "2": "Uno mata tres zorros en el campo y recibe una flecha amarilla. Buena fortuna. Eliminas a los aduladores o las pequeñas dudas que te rodean. Al actuar con decisión contra lo falso, ganas la herramienta (la flecha) para mantener el rumbo recto.",
@@ -836,19 +824,19 @@
         "5": "Si el noble solo puede liberarse a sí mismo, trae buena fortuna. Demuestra a los hombres pequeños que va en serio. La liberación requiere integridad total. No puedes negociar con lo tóxico. Tu firmeza interna es lo único que convence a los demás de soltarte.",
         "6": "El príncipe dispara a un halcón en un muro alto. Lo mata. Todo es propicio. Hay un obstáculo específico y alto (una idea, una persona poderosa, un bloqueo) que debe ser eliminado con precisión quirúrgica. Prepara tu tiro y ejecuta. El camino queda libre."
       },
-      "taoist_reading_es": "Wu wei es permitir que la descarga ocurra. Lo atrapado quiere salir. No prolongues el nudo por identidad o drama. Haz el corte mínimo que abre el flujo.",
+      "taoist_reading_es": "Wu wei es soltar el pasado. No cargues la balsa después de cruzar el río. La liberación es volver al estado natural sin tensión. Perdona y olvida, no por moral, sino por higiene energética.",
       "guiding_questions_es": [
-        "¿Qué nudo específico se puede desatar con una acción concreta?",
-        "¿Qué parte de mí se aferra al problema por costumbre?",
-        "¿Qué alivio temo porque implicaría cambiar?"
+        "¿Qué resentimiento estoy cargando que ya caducó?",
+        "¿Qué hábito necesito cortar para ser libre?",
+        "¿Estoy listo para vivir sin este problema?"
       ],
-      "micro_action_es": "Cierra un pendiente hoy: uno que te drene. Envíalo, págalo, agenda, cancela o decide.",
-      "ethics_note_es": "Liberación no implica reconciliación obligatoria. Implica salida del enredo."
+      "micro_action_es": "Perdona (mentalmente) a alguien o algo hoy. Di: 'Te libero para liberarme'. Y pasa página.",
+      "ethics_note_es": "La verdadera liberación incluye perdonarse a uno mismo."
     },
     "41": {
-      "dynamic_core_es": "Disminución. Reducir el exceso para recuperar equilibrio: menos ruido, más esencia.",
-      "image_es": "Montaña sobre lago. El lago se reduce y la montaña se afirma: contención que ordena.",
-      "general_reading_es": "Conviene recortar: gastos, expectativas, compromisos, estímulos. No es castigo: es higiene. Al disminuir lo superfluo, aparece capacidad real para lo importante. El peligro es reducir por miedo en vez de por claridad.",
+      "dynamic_core_es": "La disminución (La merma). Sacrificar lo inferior para nutrir lo superior. Menos es más.",
+      "image_es": "Montaña bajo el lago. La base se reduce para llenar lo de arriba.",
+      "general_reading_es": "Es tiempo de austeridad y simplicidad. Reducir gastos, reducir ego, reducir complejidad. No es una pérdida negativa, es una inversión. Al vaciarte de lo superfluo, creas espacio para lo esencial. La sinceridad con poco vale más que la hipocresía con mucho.",
       "lines_es": {
         "1": "Ir rápido cuando las tareas han terminado. No hay culpa. Pero hay que considerar cuánto se puede disminuir. Si ayudas a otros, hazlo rápido y vuelve. No te sacrifiques hasta quedar vacío. La ayuda debe ser sostenible.",
         "2": "Perseverancia trae buena fortuna. Emprender algo trae desgracia. Sin disminuirse a uno mismo, se puede aumentar a los demás. No necesitas empobrecerte para ser generoso. Mantén tu dignidad y tus recursos básicos; ayuda desde tu excedente, no desde tu esencia.",
@@ -857,19 +845,19 @@
         "5": "Alguien lo aumenta. Diez pares de tortugas no pueden oponerse a ello. Fortuna suprema. La suerte cambia a tu favor. Recibes ayuda o recursos inesperados. Acéptalos con gratitud, es el retorno de tu buen karma. Nada puede detener esta bendición.",
         "6": "Si uno aumenta a los demás sin privarse a sí mismo, no hay culpa. Perseverancia trae buena fortuna. Éxito total. Encuentras la forma de ganar haciendo ganar a otros. Es el modelo de negocio o de vida perfecto. Prosperidad compartida y sostenible."
       },
-      "taoist_reading_es": "Wu wei es simplicidad: quitar, no añadir. El Tao favorece lo esencial. Reducir fricción libera energía que ya estaba ahí.",
+      "taoist_reading_es": "El Tao reduce lo lleno. Wu wei es la práctica de la simplicidad. Despréndete de la necesidad de acumular. La disminución del deseo trae el aumento de la paz.",
       "guiding_questions_es": [
-        "¿Qué exceso me está robando claridad?",
-        "¿Qué podría reducir sin afectar lo esencial?",
-        "¿Estoy reduciendo para cuidarme o para esconderme?"
+        "¿Qué sobra en mi vida ahora mismo?",
+        "¿Dónde puedo dar un paso atrás para permitir que otro avance?",
+        "¿Estoy dispuesto a sacrificar una ganancia inmediata por un bien mayor?"
       ],
-      "micro_action_es": "Elimina una fuente de exceso (una suscripción, una tarea, un estímulo) por 14 días. Observa el efecto.",
-      "ethics_note_es": "Disminuir no es austeridad moral. Es intervención funcional para recuperar equilibrio."
+      "micro_action_es": "Reduce una posesión, un gasto o una actividad hoy. Siente la ligereza de tener menos.",
+      "ethics_note_es": "El sacrificio debe ser voluntario. Exigir sacrificio a otros es opresión."
     },
     "42": {
-      "dynamic_core_es": "Aumento. Invertir energía donde hay retorno real: crecimiento por dar y por ampliar capacidad.",
-      "image_es": "Viento y trueno. Movimiento ascendente: impulso que multiplica.",
-      "general_reading_es": "Es un buen momento para expandir, aprender, invertir, ayudar. El crecimiento es sano cuando mejora el sistema completo, no solo el ego. La clave es dirección: aumentar lo correcto, no lo ruidoso.",
+      "dynamic_core_es": "El aumento. Expansión, generosidad y crecimiento. El momento de hacer más.",
+      "image_es": "Viento y trueno. Energía dinámica que se potencia mutuamente.",
+      "general_reading_es": "Es tiempo de aprovechar la abundancia para emprender grandes cosas. Sé generoso. Corrige tus errores rápidamente y muévete hacia el bien. El universo apoya el crecimiento ahora. No seas mezquino; circula la energía.",
       "lines_es": {
         "1": "Es propicio realizar grandes obras. Fortuna suprema. Sin culpa. Tienes el viento a favor y la energía alta. No seas tímido. Es el momento de lanzar ese proyecto audaz o hacer ese cambio radical. El universo aplaude tu iniciativa.",
         "2": "Alguien lo aumenta. Diez pares de tortugas no pueden oponerse. Perseverancia constante trae buena fortuna. El rey lo presenta ante Dios. Tu virtud interna resuena con el tiempo. Tienes acceso a recursos espirituales o materiales profundos. Úsalos con responsabilidad sagrada.",
@@ -878,19 +866,18 @@
         "5": "Si tienes un corazón sincero, no necesitas preguntar. Fortuna suprema. Tu bondad es genuina y espontánea. No calcules ni dudes. Tu intuición de generosidad es correcta y traerá resultados maravillosos. Confía en tu corazón.",
         "6": "Él no trae aumento a nadie. De hecho, alguien lo golpea. Su corazón no es constante. Desgracia. Si eres egoísta en un tiempo de abundancia y cortas el flujo hacia otros, te conviertes en un objetivo. La avaricia te aísla y provoca ataques. Comparte o pierde."
       },
-      "taoist_reading_es": "Wu wei es aumentar sin codicia. El Tao da crecimiento donde hay circulación. Si retienes, se pudre; si compartes, se renueva.",
+      "taoist_reading_es": "Cuando el Tao da, tú das. Wu wei es fluir con la expansión sin apego. 'Viendo el bien, se imita; viendo el error, se corrige'. El crecimiento es moral, no solo material.",
       "guiding_questions_es": [
-        "¿Qué aumento concreto mejoraría mi sistema (salud, trabajo, vínculos)?",
-        "¿Qué inversión pequeña tiene alto retorno real?",
-        "¿Dónde el crecimiento se volvió ansiedad por ‘más’?"
+        "¿Dónde puedo ser más generoso hoy?",
+        "¿Qué proyecto audaz he estado postergando?",
+        "¿Cómo puedo usar este impulso para beneficiar a mi comunidad?"
       ],
-      "micro_action_es": "Elige una inversión pequeña (tiempo o dinero) que mejore tu capacidad: un libro, una herramienta, una hora de práctica.",
-      "ethics_note_es": "Aumentar no es superioridad. Es expansión de función y responsabilidad."
-    },
-    "43": {
-      "dynamic_core_es": "Ruptura y declaración. Decir la verdad de frente para cortar una influencia dañina.",
-      "image_es": "Lago bajo el cielo. La presión sube: algo oculto debe ser expuesto y resuelto.",
-      "general_reading_es": "Hay una interferencia o patrón que debe terminar. La acción correcta es declarar con claridad y sostener una línea. No se trata de humillar, sino de nombrar y cortar. El riesgo es actuar con rabia o espectáculo.",
+      "micro_action_es": "Haz un favor significativo a alguien que no pueda devolvértelo. Activa el flujo del aumento.",
+      "ethics_note_es": "El aumento real mejora la vida de todos. El lucro a costa de otros es robo disfrazado."
+    },"43": {
+      "dynamic_core_es": "El desbordamiento (La Resolución). La tensión acumulada debe liberarse. Declarar la verdad abiertamente.",
+      "image_es": "El lago sube hasta el cielo. El agua amenaza con desbordarse si no se abre un cauce.",
+      "general_reading_es": "Una situación inestable que requiere una decisión firme. No puedes seguir tolerando una ambigüedad o una influencia negativa. Debes hacerla pública y resolverla. Pero cuidado: la resolución no es violencia. Es una declaración clara de límites ante testigos.",
       "lines_es": {
         "1": "Fuerza en los dedos de los pies. Si uno avanza y no es capaz de ganar, es un error. Quieres actuar ya, pero tu posición es débil. Si te lanzas ahora, fracasarás. Espera a acumular más fuerza o mejor posición antes de declarar la guerra.",
         "2": "Un grito de alarma. Armas en la noche. No temas nada. Estás alerta y preparado. Aunque el peligro surja de repente, tu precaución te salva. La vigilancia interna es tu mejor escudo contra lo inesperado.",
@@ -899,19 +886,19 @@
         "5": "Al tratar con las malas hierbas, firme resolución. Caminar por el medio trae libertad. No hay culpa. No reacciones con ira explosiva. Arranca el problema con constancia y método, sin drama. La neutralidad firme es más efectiva que la furia.",
         "6": "Sin grito. Al final llega la desgracia. Si no declaras la verdad y no pones el límite, el mal vuelve. La omisión por cobardía o pereza te costará caro. Es necesario hablar claro y cerrar la puerta definitivamente."
       },
-      "taoist_reading_es": "Wu wei es claridad sin teatralidad. Cortas lo que daña con un acto simple, no con guerra. El Tao no necesita gritar: necesita coherencia.",
+      "taoist_reading_es": "Wu wei es no permitir que la presión se acumule hasta estallar. Haz pequeños ajustes constantes. Si llegaste al punto de quiebre, rompe limpio y rápido, sin crueldad.",
       "guiding_questions_es": [
-        "¿Qué verdad estoy evitando decir por miedo a consecuencias?",
-        "¿Qué límite concreto marcaría el final del patrón?",
-        "¿Estoy dispuesto a sostener el límite después de decirlo?"
+        "¿Qué verdad estoy callando para evitar problemas?",
+        "¿Estoy listo para sostener mi decisión públicamente?",
+        "¿Puedo ser firme sin ser agresivo?"
       ],
-      "micro_action_es": "Escribe tu declaración en una frase breve y operativa. Luego comunícala sin justificarte con diez argumentos.",
-      "ethics_note_es": "Nombrar lo dañino no es agresión. Es prevención. Prioriza seguridad si hay riesgo de violencia."
+      "micro_action_es": "Haz una declaración pública (o a tu equipo/pareja) sobre un límite que ya no vas a negociar.",
+      "ethics_note_es": "Revelar el problema no es crear conflicto, es el primer paso para la salud del sistema."
     },
     "44": {
-      "dynamic_core_es": "Encuentro súbito. Una influencia aparece de golpe: atractiva, potente, potencialmente disruptiva.",
-      "image_es": "Viento bajo el cielo. Algo entra y se propaga rápido: una idea, una persona, un deseo.",
-      "general_reading_es": "Algo nuevo irrumpe. No todo lo que seduce conviene integrarlo. La advertencia es clara: no permitas que una influencia pequeña se vuelva dominante. El éxito está en reconocer temprano y poner límites.",
+      "dynamic_core_es": "Ir al encuentro (El acoplamiento). Lo suave encuentra a lo fuerte. La irrupción de un elemento inferior o tentador.",
+      "image_es": "Viento bajo el cielo. La influencia penetra por todas partes.",
+      "general_reading_es": "Un principio oscuro o débil entra en escena y seduce. Puede ser una tentación, una idea fácil, una persona manipuladora o un viejo vicio. El encuentro es intenso y magnético, pero peligroso. No te cases con la primera impresión. Mantén el control.",
       "lines_es": {
         "1": "Debe ser frenado con un freno de bronce. La perseverancia trae buena fortuna. Si uno lo deja seguir, sufrirá desgracia. Incluso un cerdo flaco tiene ímpetu. Detén la tentación o el mal hábito apenas aparece. Sé radicalmente estricto al principio para no tener que luchar después.",
         "2": "Hay un pez en el tanque. Sin culpa. No es propicio para los invitados. Mantén el elemento disruptivo controlado y aislado. No lo compartas ni lo dejes salir a lo público. Si lo contienes en privado, no hará daño.",
@@ -920,19 +907,19 @@
         "5": "Un melón cubierto con hojas de sauce. Líneas ocultas. Entonces cae del cielo. Proteges tu virtud o tu proyecto con discreción, sin alardear. Esa belleza interior madura en silencio y, en el momento justo, el destino te regala el éxito sin que tengas que forzarlo.",
         "6": "Él viene a encontrarse con sus cuernos. Humillación. Sin culpa. Te pones rígido y defensivo ante la influencia. Rechazas todo contacto. Es una actitud amarga que te aísla, pero al menos mantienes tu integridad. Es triste, pero a veces necesario."
       },
-      "taoist_reading_es": "Wu wei es reconocer el inicio. Lo pequeño crece. No demonices lo nuevo, pero no lo invites a gobernar. El Tao regula por límite, no por paranoia.",
+      "taoist_reading_es": "Wu wei es notar la semilla del problema antes de que sea árbol. No subestimes las influencias pequeñas y seductoras. Si algo parece demasiado bueno y fácil, activa tu alerta.",
       "guiding_questions_es": [
-        "¿Qué influencia nueva está intentando entrar a mi sistema?",
-        "¿Qué límite temprano sería sano sin volverme rígido?",
-        "¿Estoy confundiendo intensidad con destino?"
+        "¿Qué tentación inmediata me está distrayendo de mi meta a largo plazo?",
+        "¿A quién estoy dejando entrar en mi círculo sin filtros?",
+        "¿Estoy siendo rígido o prudente?"
       ],
-      "micro_action_es": "Define un límite explícito para lo nuevo (tiempo, acceso, frecuencia) y cúmplelo esta semana.",
-      "ethics_note_es": "Poner límites no es rechazo moral. Es cuidado del sistema ante lo disruptivo."
+      "micro_action_es": "Di 'no' a una distracción placentera hoy. Fortalece tu músculo de resistencia.",
+      "ethics_note_es": "No demonices el deseo, pero no dejes que tome el volante de tu vida."
     },
     "45": {
-      "dynamic_core_es": "Reunión y convergencia. Personas y recursos se juntan: requiere centro, propósito y ritual.",
-      "image_es": "Lago sobre tierra. El agua se junta en un lugar: la comunidad necesita contención.",
-      "general_reading_es": "Es tiempo de reunir: convocar, organizar, construir comunidad o equipo. La clave es propósito claro y coherencia. Sin centro, la reunión se vuelve ruido. Con centro, se vuelve fuerza colectiva.",
+      "dynamic_core_es": "La reunión. Juntar fuerzas alrededor de un propósito o líder. La masa necesita un centro.",
+      "image_es": "El lago sobre la tierra. El agua se acumula y sube de nivel, nutriendo todo.",
+      "general_reading_es": "Es tiempo de congregar. Tienes la capacidad de unir recursos, personas y voluntades. Pero la reunión requiere un sacrificio: dejar de lado los egos individuales para servir al todo. Revisa tus armas y tu templo: prepárate para liderar o seguir con lealtad.",
       "lines_es": {
         "1": "Si eres sincero, pero no hasta el final, habrá confusión y luego reunión. Si gritas, tras una sola sonrisa, no temas. Estás inseguro sobre si unirte o no. Tienes dudas. Es normal. Expresa tu necesidad de conexión y acércate. La indecisión inicial se resuelve actuando.",
         "2": "Dejarse atraer trae buena fortuna. Sin culpa. Si eres sincero, es propicio incluso hacer una pequeña ofrenda. No necesitas grandes gestos. Déjate llevar por la corriente que te une a los demás. Tu intuición de pertenencia es correcta.",
@@ -941,19 +928,19 @@
         "5": "Si tienes una posición, no necesitas culpa. Si la confianza no es total, mantente firme y duradero. El remordimiento desaparece. Eres el líder, pero la gente aún duda de ti. No te preocupes por convencer con palabras; convence con tu permanencia y estabilidad. El tiempo te validará.",
         "6": "Lamentos y suspiros, torrentes de lágrimas. Sin culpa. Quieres unirte pero no puedes, o el grupo se ha disuelto. La tristeza es profunda. Exprésala. Llorar es la única forma de liberar la tensión cuando la unión es imposible."
       },
-      "taoist_reading_es": "Wu wei es el centro vacío que organiza. El buen líder crea marco (ritual, agenda, propósito) y deja que el grupo haga el resto.",
+      "taoist_reading_es": "El agua se reúne en el punto más bajo. Wu wei para el líder es ser el valle: recibir a todos. No fuerces la unión; crea el espacio seguro donde la unión ocurra naturalmente.",
       "guiding_questions_es": [
-        "¿Cuál es el centro de esta reunión (propósito real)?",
-        "¿Qué ritual o estructura mínima evitaría caos?",
-        "¿Estoy buscando comunidad o validación?"
+        "¿Cuál es el propósito que nos une?",
+        "¿Estoy dispuesto a invertir (sacrificar) algo para pertenecer a este grupo?",
+        "¿Soy un líder que atrae o que empuja?"
       ],
-      "micro_action_es": "Convoca una reunión breve (20–30 min) con agenda de 3 puntos y un cierre con decisión clara.",
-      "ethics_note_es": "La comunidad no debe tragarse al individuo. El objetivo es cooperación, no conformidad."
+      "micro_action_es": "Convoca una reunión o llamada con un objetivo claro y común. Sé el anfitrión que facilita, no el jefe que manda.",
+      "ethics_note_es": "La masa puede volverse turba sin ética. La dirección moral del líder es vital."
     },
     "46": {
-      "dynamic_core_es": "Ascenso gradual. Subir paso a paso por persistencia humilde y apoyo adecuado.",
-      "image_es": "La tierra sobre el viento. La madera crece desde abajo: avance lento pero constante.",
-      "general_reading_es": "Este hexagrama favorece progresar de forma incremental. No hay salto mágico: hay escalera. Buscar aliados y mentores ayuda. La clave es mantener humildad y ritmo. Si quieres correr, te agotas.",
+      "dynamic_core_es": "El ascenso. Crecer verticalmente como un árbol, paso a paso, desde la oscuridad hacia la luz.",
+      "image_es": "Madera bajo la tierra. La semilla empuja hacia arriba buscando el sol.",
+      "general_reading_es": "El movimiento es hacia arriba. El esfuerzo constante rinde frutos. No es un salto explosivo, es un crecimiento vegetativo, imparable y paciente. Busca ver a gente influyente y no tengas miedo de tu propia ambición si es legítima.",
       "lines_es": {
         "1": "Ascenso que encuentra confianza. Gran fortuna. Tienes el permiso y el apoyo para subir. No dudes. Es el momento de aprovechar la corriente favorable. La duda ahora sería un desperdicio de oportunidad.",
         "2": "Si uno es sincero, es propicio ofrecer un pequeño sacrificio. Sin culpa. No necesitas grandes riquezas o gestos espectaculares para avanzar. Tu autenticidad y compromiso, aunque sean modestos, son suficientes para conectar con los superiores o con el objetivo.",
@@ -962,19 +949,19 @@
         "5": "Perseverancia trae buena fortuna. Ascender paso a paso. No te saltes escalones. El éxito sostenible se construye con una secuencia lógica y pausada. La prisa es el único enemigo aquí. Calma y ritmo.",
         "6": "Ascenso en la oscuridad. Es propicio ser perseverante sin cesar. Estás subiendo a ciegas o por inercia, sin saber ya para qué. Peligro de perder el contacto con la realidad. Detente y revisa tu brújula interior: ¿estás subiendo o solo huyendo hacia arriba?"
       },
-      "taoist_reading_es": "Wu wei es crecimiento orgánico. La planta no se estira por voluntad; se nutre y sube. Mantén el paso que puedas sostener y el ascenso ocurre.",
+      "taoist_reading_es": "El árbol no se esfuerza por crecer, simplemente sigue su naturaleza. Wu wei es crecer sin ansiedad. No te compares con la altura de otros, concéntrate en tu propia raíz.",
       "guiding_questions_es": [
-        "¿Qué escalón pequeño puedo subir hoy sin heroísmo?",
-        "¿Qué apoyo o mentor aceleraría mi avance real?",
-        "¿Estoy subiendo hacia algo o huyendo de algo?"
+        "¿Estoy creciendo o solo hinchándome?",
+        "¿Qué paso pequeño puedo dar hoy para elevar mi nivel?",
+        "¿Estoy dispuesto a ser paciente con mi propio proceso?"
       ],
-      "micro_action_es": "Define tu ‘escalón’ de hoy: una tarea pequeña que empuje el proyecto 1%. Hazla antes de cualquier tarea secundaria.",
-      "ethics_note_es": "Ascender no es superioridad. Es desarrollo. Si el costo humano es alto, no es progreso."
+      "micro_action_es": "Haz una cosa que eleve tu estándar profesional o personal hoy (vestirte mejor, organizar tu escritorio, estudiar 15 min).",
+      "ethics_note_es": "Subir no implica pisar a otros. El bosque crece junto."
     },
     "47": {
-      "dynamic_core_es": "Opresión y agotamiento. La energía está limitada: menos recursos, menos margen, más presión.",
-      "image_es": "Lago sin agua. El contenedor existe, pero el contenido se ha drenado.",
-      "general_reading_es": "Este es un periodo de restricción real. No se resuelve con optimismo ni con fuerza de voluntad. La clave es resistencia interior, economía de energía y claridad ética. Lo externo no ayuda mucho ahora; lo interno sí.",
+      "dynamic_core_es": "La opresión (El agotamiento). El lago se seca. Los recursos fallan y las palabras no son creídas.",
+      "image_es": "El lago bajo el agua se ha secado. La vida sigue, pero en condiciones extremas.",
+      "general_reading_es": "Estás en un callejón sin salida. Te sientes atrapado, incomprendido y sin recursos. Todo lo que intentas parece fallar. Es una prueba de carácter suprema. Si logras mantener tu alegría interna y tu integridad en medio de la escasez, saldrás fortalecido. Hablar no sirve; actúa o calla.",
       "lines_es": {
         "1": "Uno se sienta bajo un árbol desnudo y entra en un valle sombrío. Durante tres años no ve a nadie. Te has aislado en tu propia negatividad. La opresión es real, pero tu actitud de víctima la empeora. Salir requiere buscar luz, no esconderse en la queja.",
         "2": "Oprimido mientras come y bebe. El hombre del mantel escarlata viene. Es propicio ofrecer sacrificios. Tienes recursos físicos pero te sientes espiritualmente vacío o bloqueado. La ayuda está en camino (una nueva idea, una persona). Mantén la fe y prepárate para recibir.",
@@ -983,19 +970,19 @@
         "5": "Le cortan la nariz y los pies. Oprimido por el del mantel escarlata. Es propicio ofrecer sacrificios. Estás inmovilizado y humillado por una autoridad o situación injusta. No pelees físicamente ahora. Tu fuerza debe ser espiritual. Mantén tu dignidad interna intacta hasta que el ciclo cambie.",
         "6": "Oprimido por enredaderas. Dice: 'El movimiento trae remordimiento'. Si uno siente remordimiento y avanza, buena fortuna. Te sientes atrapado mentalmente. Crees que no puedes moverte, pero las enredaderas son frágiles. Si decides con fuerza 'voy a salir', te liberarás. La trampa es psicológica."
       },
-      "taoist_reading_es": "Wu wei aquí es resistencia sin dramatismo. Cuando el flujo se seca, no luches contra el desierto: conserva agua, camina de noche, espera.",
+      "taoist_reading_es": "Cuando el pozo se seca, se busca el manantial profundo. Wu wei es aceptar la limitación externa para descubrir la libertad interna. No gastes saliva explicando tu dolor.",
       "guiding_questions_es": [
-        "¿Qué gasto energético debo recortar ya?",
-        "¿Qué dignidad personal no debo sacrificar, aun bajo presión?",
-        "¿Qué parte del sufrimiento es externa y cuál es resistencia interna?"
+        "¿Cuánto de mi opresión es real y cuánto es mental?",
+        "¿En qué me estoy apoyando que me lastima (piedras y espinas)?",
+        "¿Puedo encontrar paz incluso en esta restricción?"
       ],
-      "micro_action_es": "Reduce hoy una demanda innecesaria sobre ti (social, laboral o emocional). Conserva energía.",
-      "ethics_note_es": "La opresión no es culpa personal. Reconocer límites no es rendición."
+      "micro_action_es": "Acepta una limitación hoy sin quejarte. Di: 'Esto es lo que hay' y trabaja con ello.",
+      "ethics_note_es": "El sufrimiento no te da derecho a ser cruel con otros."
     },
     "48": {
-      "dynamic_core_es": "La fuente compartida. Recursos profundos que sostienen a muchos si se cuidan.",
-      "image_es": "El pozo del pueblo. Siempre disponible, pero inútil si no se limpia.",
-      "general_reading_es": "El valor está en lo constante y profundo, no en lo novedoso. Puede haber desgaste por dar sin renovar. El problema no es la falta de recursos, sino la forma de acceder a ellos.",
+      "dynamic_core_es": "El pozo. La fuente inagotable que nutre a todos, pero que requiere mantenimiento y herramientas adecuadas.",
+      "image_es": "Agua bajo madera (árboles). Las raíces bajan a buscar el sustento profundo.",
+      "general_reading_es": "La estructura externa cambia (la ciudad se mueve), pero la necesidad humana fundamental permanece (el pozo). Tienes un talento o recurso valioso, pero quizás no puedes acceder a él (la cuerda es corta) o está sucio. El trabajo es profundizar y limpiar tu fuente para servir a otros.",
       "lines_es": {
         "1": "El pozo está fangoso, no se bebe. No hay animales en el pozo viejo. Has descuidado tus talentos o recursos hasta que se volvieron inutilizables. Nadie busca tu ayuda porque no tienes nada claro que ofrecer. Necesitas limpiarte y renovarte antes de ser útil.",
         "2": "En el pozo se disparan peces. El cántaro está roto y gotea. Tienes talento, pero lo estás usando mal o de forma trivial. O bien, tus herramientas (métodos) están rotas y desperdicias tu energía. Arregla tu enfoque.",
@@ -1004,19 +991,19 @@
         "5": "En el pozo hay un manantial claro y frío. Uno puede beber. Has alcanzado la maestría y la claridad. Eres una fuente de sabiduría o ayuda real. Tu sola presencia nutre a los demás. Comparte sin reservas.",
         "6": "Uno saca agua del pozo sin obstáculos. Es confiable. Fortuna suprema. La fuente está abierta para todos. No hay tapa ni egoísmo. Tu éxito es colectivo y tu recurso inagotable porque fluye. Plenitud total."
       },
-      "taoist_reading_es": "Wu wei es mantenimiento. El Tao fluye en lo ordinario sostenido. Cuida la fuente antes de repartir el agua.",
+      "taoist_reading_es": "El Tao es el pozo del universo. Wu wei es dejar que el agua llegue a ti bajando el balde, no cavando con las manos. Cuida tu herramienta de conexión (tu mente/cuerpo).",
       "guiding_questions_es": [
-        "¿Qué recurso profundo tengo descuidado?",
-        "¿El problema es escasez o acceso?",
-        "¿Estoy dando sin renovarme?"
+        "¿Está mi agua limpia o fangosa (mis intenciones/habilidades)?",
+        "¿Tengo la cuerda (herramientas) necesaria para sacar mi potencial?",
+        "¿Estoy compartiendo lo que sé o lo estoy estancando?"
       ],
-      "micro_action_es": "Dedica tiempo a mantener una fuente clave (salud, conocimiento, relación) sin buscar resultado inmediato.",
-      "ethics_note_es": "Compartir no implica agotarse. El cuidado del recurso es responsabilidad ética."
+      "micro_action_es": "Haz una tarea de 'mantenimiento' personal (estudiar, reparar, descansar) para mejorar tu capacidad de dar.",
+      "ethics_note_es": "El talento no usado es un desperdicio, pero el talento usado para envenenar es un crimen."
     },
     "49": {
-      "dynamic_core_es": "Transformación radical. Cambio de piel cuando la forma actual ya no sirve.",
-      "image_es": "Fuego dentro del lago. Presión interna que exige cambio.",
-      "general_reading_es": "La reforma es necesaria, pero debe estar madura. Cambiar demasiado pronto genera rechazo; demasiado tarde, estancamiento. La legitimidad del cambio importa más que la fuerza.",
+      "dynamic_core_es": "La revolución (La muda). Fuego y agua chocan para transformarse. El cambio radical de la forma.",
+      "image_es": "Fuego en el lago. El agua hierve y se evapora; el cambio de estado es irreversible.",
+      "general_reading_es": "Es tiempo de cambiar la piel. Las viejas formas ya no contienen la nueva vida. La revolución no es un capricho, es una necesidad vital cuando el ciclo se agota. Requiere un timing perfecto: ni antes (caos) ni después (estancamiento). Asegúrate de tener la confianza de la gente antes de actuar.",
       "lines_es": {
         "1": "Atado con cuero de buey amarillo. No es tiempo de actuar. La revolución debe esperar. Mantén tu disciplina y no te precipites. Cambiar antes de tiempo solo trae caos. Contención.",
         "2": "En su propio día, uno puede revolucionar. Ir trae buena fortuna. Sin culpa. Cuando el momento ha madurado y la necesidad de cambio es evidente para todos, actúa. Prepara el terreno, anuncia tu intención y muévete con confianza.",
@@ -1025,19 +1012,19 @@
         "5": "El gran hombre cambia como un tigre. Incluso antes de consultar el oráculo, tiene confianza. El cambio es visible, brillante y decidido. No necesitas pedir permiso a nadie. Tu autoridad natural hace que la nueva forma sea aceptada de inmediato.",
         "6": "El noble cambia como un leopardo. El hombre pequeño cambia su cara. Ir trae desgracia. Quedarse trae buena fortuna. El cambio mayor ya pasó. Ahora toca refinar los detalles (leopardo) y aceptar que algunos solo obedecerán superficialmente. No fuerces una pureza total. Confórmate con la estabilidad lograda."
       },
-      "taoist_reading_es": "Wu wei es no aferrarse a la forma. El Tao cambia de piel sin drama. La transformación auténtica no necesita violencia.",
+      "taoist_reading_es": "El cambio natural es cíclico (estaciones). La revolución humana debe imitar esa naturalidad. Wu wei es cambiar cuando es inevitable, no por aburrimiento. Deja caer lo viejo solo cuando lo nuevo está listo.",
       "guiding_questions_es": [
-        "¿Qué forma ya no sostiene la función?",
-        "¿El cambio está maduro o es reacción?",
-        "¿Cómo legitimar el cambio ante otros?"
+        "¿Es una necesidad real de cambio o solo inquietud?",
+        "¿Tengo el apoyo necesario para sostener la nueva estructura?",
+        "¿Estoy listo para eliminar lo obsoleto sin piedad?"
       ],
-      "micro_action_es": "Identifica una estructura obsoleta y define qué conservar y qué soltar.",
-      "ethics_note_es": "Reformar no justifica arrasar. La ética está en proteger lo esencial."
+      "micro_action_es": "Cambia radicalmente una rutina pequeña hoy. Hazlo diferente y observa la resistencia.",
+      "ethics_note_es": "La revolución debe traer un orden mejor, no solo destruir el anterior."
     },
     "50": {
-      "dynamic_core_es": "Integración y nutrición superior. Transformar lo crudo en alimento compartido.",
-      "image_es": "El caldero ritual. Donde lo ordinario se vuelve sustento sagrado.",
-      "general_reading_es": "Momento de integrar aprendizajes y ofrecerlos. Lo que has trabajado ahora nutre a otros. La calidad importa más que la cantidad.",
+      "dynamic_core_es": "El caldero. Transformación alquímica y nutrición espiritual. Lo crudo se vuelve cocido y sagrado.",
+      "image_es": "Fuego sobre madera/viento. La llama cocina lo que está dentro del recipiente.",
+      "general_reading_es": "Este es un hexagrama de gran potencial y cultura. Se trata de tomar los elementos brutos de tu vida y transformarlos en algo valioso y refinado. Es un tiempo de integración, éxito y servicio público. Asegúrate de que tu 'caldero' (tu capacidad, tu estructura) esté limpio y firme.",
       "lines_es": {
         "1": "El caldero tiene las patas volcadas. Propicio para eliminar lo estancado. Se toma una concubina por el bien de su hijo. Sin culpa. Para empezar algo nuevo, a veces hay que volcar todo y limpiar la basura acumulada. Un método no convencional o una ayuda 'inferior' puede ser la solución inicial correcta.",
         "2": "El caldero está lleno. Mis enemigos tienen envidia, pero no pueden hacerme daño. Buena fortuna. Tienes sustancia y valor. Ignora las críticas o la envidia de quienes están vacíos. Mientras mantengas tu integridad, eres intocable.",
@@ -1046,19 +1033,19 @@
         "5": "El caldero tiene asas amarillas, anillas de oro. Perseverancia fructífera. Liderazgo modesto y valioso. Eres accesible pero firme. Sabes escuchar y sostener la situación con sabiduría. El éxito viene de tu carácter equilibrado.",
         "6": "El caldero tiene anillas de jade. Gran buena fortuna. Todo es propicio. El jade es suave y duro a la vez. Has alcanzado una sabiduría que beneficia a todos, combinando la máxima calidad espiritual con una suavidad en el trato. Culminación perfecta."
       },
-      "taoist_reading_es": "Wu wei es alquimia cotidiana. Cocinar, no forzar. El Tao transforma cuando hay paciencia y cuidado.",
+      "taoist_reading_es": "La vida es el caldero, la experiencia es el fuego. Wu wei es dejar que la transformación ocurra sin destapar la olla a cada rato. Cocina a fuego lento.",
       "guiding_questions_es": [
-        "¿Qué experiencia puedo convertir en aporte?",
-        "¿La forma está a la altura del contenido?",
-        "¿Estoy nutriendo o impresionando?"
+        "¿Qué estoy cocinando en mi vida: alimento o veneno?",
+        "¿Mi estructura (cuerpo/mente) es lo bastante fuerte para sostener este proceso?",
+        "¿A quién voy a alimentar con mi éxito?"
       ],
-      "micro_action_es": "Comparte un aprendizaje útil de forma concreta con alguien que lo necesite.",
-      "ethics_note_es": "El conocimiento se vuelve ético cuando nutre, no cuando domina."
+      "micro_action_es": "Combina dos habilidades o recursos que tienes para crear algo nuevo hoy. Alquimia práctica.",
+      "ethics_note_es": "El objetivo final de la transformación personal es servir a la comunidad, no solo el auto-engrandecimiento."
     },
     "51": {
-      "dynamic_core_es": "El sobresalto y el despertar. Impacto que sacude y obliga a reaccionar.",
-      "image_es": "Trueno repetido. El sonido irrumpe y despierta.",
-      "general_reading_es": "Un evento inesperado altera el equilibrio. El miedo es natural; el error es perder presencia. Quien se recompone rápido, aprende y avanza.",
+      "dynamic_core_es": "El trueno (La conmoción). El shock despierta la conciencia. Miedo que lleva a la prudencia.",
+      "image_es": "Trueno sobre trueno. El impacto se repite, sacudiendo todo.",
+      "general_reading_es": "Algo inesperado te sacude. Puede ser un evento externo o una crisis interna. El miedo es la reacción natural, pero su función es despertarte. No te paralices. Usa la adrenalina para revisar tu vida, ordenar tus prioridades y fortalecer tu carácter. El que ríe después del trueno es quien aprendió la lección.",
       "lines_es": {
         "1": "El trueno viene: ¡pum, pum! Luego risas y charlas: ¡ja, ja! Buena fortuna. El shock inicial te asusta, pero te despierta. Al reaccionar y adaptarte, el miedo se transforma en alivio y alegría. El susto fue una bendición disfrazada.",
         "2": "El trueno viene peligrosamente. Uno pierde sus tesoros y sube a las nueve colinas. No los busques. En siete días los recuperarás. Ante una crisis mayor, olvida las pérdidas materiales y salva tu piel (sube a la colina). Lo que es tuyo volverá cuando se calme la tormenta. Prioriza la vida.",
@@ -1067,19 +1054,19 @@
         "5": "El trueno va y viene. Peligro. Sin embargo, no se pierde nada, solo hay cosas que hacer. Estás en el ojo del huracán. Hay caos alrededor, pero tú mantienes el centro y sigues trabajando. Tu estabilidad en medio de la crisis es admirable.",
         "6": "El trueno trae ruina y miradas aterradas. Avanzar trae desgracia. Si no ha llegado a ti todavía, pero sí a tu vecino, no hay culpa. El pánico total. Has perdido el control. No intentes actuar ahora; estás demasiado alterado. Quédate quieto y protégete hasta que pase."
       },
-      "taoist_reading_es": "Wu wei es presencia bajo impacto. El Tao no evita el trueno, pero no se dispersa con él.",
+      "taoist_reading_es": "El shock rompe el estancamiento. Wu wei es no añadir drama al evento. Si tiembla, busca refugio, no grites. Mantén tu 'espíritu' (Shen) tranquilo aunque tu cuerpo corra.",
       "guiding_questions_es": [
-        "¿Qué me sacudió realmente?",
-        "¿Dónde perdí centro ante el impacto?",
-        "¿Qué aprendizaje trae el sobresalto?"
+        "¿Qué me está tratando de decir este susto?",
+        "¿Qué es lo único que importa salvar ahora?",
+        "¿Puedo reírme de mi propio miedo una vez pasado el peligro?"
       ],
-      "micro_action_es": "Respira conscientemente durante 2 minutos antes de responder a un evento inesperado.",
-      "ethics_note_es": "El shock no justifica dañar a otros. Responsabilidad incluso bajo presión."
+      "micro_action_es": "Si algo te asusta hoy, detente, respira tres veces y pregúntate: '¿Qué tengo que aprender de esto ya mismo?'.",
+      "ethics_note_es": "El miedo es un mensajero, no un maestro permanente."
     },
     "52": {
-      "dynamic_core_es": "Detención consciente. Quietud del cuerpo y la mente.",
-      "image_es": "Montaña sobre montaña. Inmovilidad sólida.",
-      "general_reading_es": "Detenerse es la acción correcta. La mente quiere resolver, pero ahora estorba. La quietud ordena lo interno.",
+      "dynamic_core_es": "La quietud (La montaña). Detenerse cuando es tiempo de detenerse. Meditación y límite.",
+      "image_es": "Montaña sobre montaña. Inmovilidad absoluta y estabilidad.",
+      "general_reading_es": "Tu mente y tu cuerpo necesitan parar. No es un bloqueo externo, es una necesidad interna. Deja de correr tras tus deseos o pensamientos. La quietud no es la muerte, es el momento donde se acumula la verdadera fuerza. Mantén tu espalda recta y tu ego en silencio.",
       "lines_es": {
         "1": "Mantener quietos los dedos de los pies. Sin culpa. Perseverancia fructífera. Detente antes de empezar. Ves que el camino no es correcto y frenas el impulso inicial. Es la forma más fácil de evitar problemas: no dar el primer paso.",
         "2": "Mantener quietas las pantorrillas. No puede rescatar a quien sigue. Su corazón no está contento. Te ves obligado a detenerte o a seguir a alguien que se detiene, aunque tú quieres avanzar. La fricción interna es fuerte, pero no tienes el control. Acepta la pausa.",
@@ -1088,19 +1075,19 @@
         "5": "Mantener quietas las mandíbulas. Las palabras tienen orden. El remordimiento desaparece. Cuidas lo que dices. El silencio consciente o el hablar solo lo necesario evita conflictos y malentendidos. La disciplina verbal trae paz.",
         "6": "Quietud noble. Buena fortuna. Has alcanzado un estado de calma que no depende de las circunstancias. Tu paz es interna y sólida como una montaña. Nada te perturba."
       },
-      "taoist_reading_es": "Wu wei es no mover lo que debe reposar. El Tao se aclara en la quietud.",
+      "taoist_reading_es": "Wu wei en su forma más pura: no-acción. No te muevas si no hay impulso genuino. 'Cuando el tigre camina, no hace ruido'. La quietud es la base del movimiento correcto.",
       "guiding_questions_es": [
-        "¿Qué movimiento innecesario debo detener?",
-        "¿Puedo tolerar no hacer ahora?",
-        "¿Qué se ordena si me aquieto?"
+        "¿Puedo estar quieto sin sentir culpa?",
+        "¿Qué pensamiento recurrente necesito detener?",
+        "¿Estoy descansando o reprimiéndome?"
       ],
-      "micro_action_es": "Permanece 5 minutos en silencio sin estímulos ni objetivos.",
-      "ethics_note_es": "Detenerse es cuidado, no evasión."
+      "micro_action_es": "Quédate 5 minutos totalmente quieto, mirando una pared o cerrando los ojos. Sin música, sin hacer nada.",
+      "ethics_note_es": "Saber detenerse a tiempo es la mayor sabiduría."
     },
     "53": {
-      "dynamic_core_es": "Progreso gradual. Desarrollo orgánico y estable.",
-      "image_es": "El ganso salvaje se posa. Avance por etapas.",
-      "general_reading_es": "El crecimiento verdadero es lento. Forzar etapas rompe el proceso. La constancia supera al talento impaciente.",
+      "dynamic_core_es": "El desarrollo (Progreso gradual). El árbol crece lento en la montaña. El matrimonio se formaliza paso a paso.",
+      "image_es": "Árbol sobre la montaña. Raíces firmes, crecimiento visible pero lento.",
+      "general_reading_es": "Las cosas buenas toman tiempo. No intentes saltarte etapas. Como el vuelo de los gansos salvajes o el crecimiento de un árbol, el progreso debe ser orgánico y ordenado. La impaciencia es el único peligro. Si respetas el ritmo natural, llegarás lejos.",
       "lines_es": {
         "1": "El ganso salvaje se acerca a la orilla. El joven está en peligro. Hay palabras, pero no culpa. Al principio de un proyecto o relación, eres inexperto y vulnerable. Puedes cometer errores y recibir críticas, pero es parte del aprendizaje. Sigue intentando.",
         "2": "El ganso salvaje se acerca a la roca. Come y bebe en paz. Buena fortuna. Has encontrado un lugar seguro y estable para descansar y nutrirte. Disfruta de esta seguridad; es la base para el siguiente vuelo.",
@@ -1109,40 +1096,40 @@
         "5": "El ganso salvaje se acerca a la cumbre. La mujer no queda embarazada. Al final nada puede impedirlo. Buena fortuna. Hay obstáculos y malentendidos que retrasan el éxito o la unión, pero la conexión es real. Al final, las barreras caen y el objetivo se logra.",
         "6": "El ganso salvaje se acerca a las nubes. Sus plumas pueden usarse para el ritual. Buena fortuna. Has superado el camino mundano. Tu éxito sirve de ejemplo e inspiración para otros. Dejas un legado de belleza y orden."
       },
-      "taoist_reading_es": "Wu wei es respetar el ritmo. El Tao no acelera la maduración.",
+      "taoist_reading_es": "La naturaleza no se apresura y, sin embargo, todo se logra. Wu wei es confiar en el proceso lento. Un paso a la vez, sin ansiedad por la meta.",
       "guiding_questions_es": [
-        "¿Qué etapa estoy intentando saltar?",
-        "¿Qué progreso pequeño es suficiente hoy?",
-        "¿Estoy respetando mi propio ritmo?"
+        "¿Por qué tengo tanta prisa?",
+        "¿Estoy construyendo bases sólidas o castillos en el aire?",
+        "¿Puedo disfrutar de la etapa actual sin pensar en la siguiente?"
       ],
-      "micro_action_es": "Avanza solo un paso claro en un proceso largo y detente ahí.",
-      "ethics_note_es": "El progreso ético no aplasta tiempos humanos."
+      "micro_action_es": "Divide tu meta principal en pasos ridículamente pequeños y haz solo el primero hoy.",
+      "ethics_note_es": "Respetar los tiempos del otro es una forma de amor."
     },
     "54": {
-      "dynamic_core_es": "Posición secundaria y adaptación. Relación desigual que exige realismo.",
-      "image_es": "La doncella se casa. Ajuste a una realidad no ideal.",
-      "general_reading_es": "No tienes control total. La clave es actuar con dignidad dentro de límites reales. Pretender igualdad ficticia genera conflicto.",
+      "dynamic_core_es": "La muchacha que se casa (La subordinación). Entrar en una situación donde no tienes el control principal.",
+      "image_es": "Trueno sobre el lago. La acción agita la emoción. Pasión impulsiva.",
+      "general_reading_es": "Estás en una posición secundaria. No eres el jefe, ni el dueño, ni el principal protagonista. Acepta tu rol de apoyo o adaptación. No es momento para imponer tu voluntad ni para iniciar grandes proyectos propios. Fluye con la jerarquía existente y aprende.",
       "lines_es": {
-        "1": "La muchacha que se une en un rol secundario. Un cojo que puede caminar. Es propicio emprender algo. Estás en una posición de apoyo o de bajo rango. Acepta tu rol de apoyo. Aunque no seas el líder, puedes ser útil y avanzar si reconoces tus límites.",
+        "1": "La muchacha que se casa como concubina. Un cojo que puede caminar. Es propicio emprender algo. Estás en una posición secundaria o de bajo rango. Acepta tu rol de apoyo. Aunque no seas el líder, puedes ser útil y avanzar si reconoces tus límites.",
         "2": "Un tuerto que puede ver. La perseverancia de un hombre solitario trae ventaja. Tienes lealtad y visión, pero estás solo o ignorado. Mantén tu fidelidad interna aunque nadie te vea. Tu integridad en la sombra es valiosa.",
-        "3": "La muchacha que acepta un rol secundario. Se une con sus hermanas. Quiere demasiado y pierde dignidad. Si no aceptas tu posición real y tratas de aparentar o exigir más de lo que te toca, terminas humillado. Vuelve a la realidad.",
+        "3": "La muchacha que se casa como esclava. Se casa con sus hermanas. Quiere demasiado y pierde dignidad. Si no aceptas tu posición real y tratas de aparentar o exigir más de lo que te toca, terminas humillado. Vuelve a la realidad.",
         "4": "La muchacha que se casa se retrasa. El tiempo llegará. Un matrimonio tardío. No te vendas barato por prisa. Es mejor esperar el momento y la persona correcta que precipitarse en una mala unión. La espera vale la pena.",
         "5": "El soberano I casa a su hija. Sus ropas bordadas no son tan espléndidas como las de la sirvienta. La luna casi llena trae buena fortuna. Tienes un rango alto real, por lo que no necesitas presumir. La verdadera nobleza es modesta y no compite en apariencias.",
         "6": "La mujer sostiene la canasta, pero no hay frutos. El hombre sacrifica la oveja, pero no hay sangre. Nada es propicio. Todo es forma vacía. La relación o el proyecto no tiene sustancia ni compromiso real. Es pura fachada. No hay futuro aquí."
       },
-      "taoist_reading_es": "Wu wei es aceptar la posición sin resentimiento ni fantasía. El Tao se adapta sin perder centro.",
+      "taoist_reading_es": "A veces toca ser el agua que llena el hueco, no la roca que define el cauce. Wu wei es adaptar tu forma al contenedor que te toca hoy. La humildad es estrategia.",
       "guiding_questions_es": [
-        "¿Qué límites reales debo aceptar?",
-        "¿Dónde estoy luchando contra la realidad?",
-        "¿Cómo actuar con dignidad sin poder total?"
+        "¿Estoy luchando contra una autoridad que no puedo vencer?",
+        "¿Puedo encontrar dignidad en servir o apoyar?",
+        "¿Estoy exigiendo derechos que no me corresponden en esta situación?"
       ],
-      "micro_action_es": "Ajusta expectativas en una relación o rol concreto.",
-      "ethics_note_es": "Aceptar límites no valida abuso. Retírate si hay daño."
+      "micro_action_es": "Pregunta a quien lidera: '¿Cómo puedo ayudarte mejor hoy?' y hazlo sin cuestionar.",
+      "ethics_note_es": "Subordinación no es esclavitud. Es reconocer la estructura de poder del momento."
     },
     "55": {
-      "dynamic_core_es": "Abundancia máxima. Plenitud intensa y pasajera.",
-      "image_es": "Trueno y relámpago. Luz total por un instante.",
-      "general_reading_es": "Momento de máxima visibilidad y energía. Aprovecha, pero no te identifiques con el pico. La sombra sigue al exceso.",
+      "dynamic_core_es": "La plenitud (La abundancia). El sol al mediodía. El punto máximo de poder y claridad, que anuncia el declive.",
+      "image_es": "Trueno y fuego. Actividad eléctrica y luz brillante. Energía al máximo.",
+      "general_reading_es": "Es tu momento cumbre. Tienes energía, claridad e influencia. No tengas miedo: actúa, decide, juzga. Sé como el sol al mediodía: ilumina todo sin parcialidad. Pero recuerda con sobriedad: después del mediodía, el sol empieza a bajar. Aprovecha el ahora.",
       "lines_es": {
         "1": "Cuando un hombre encuentra a su señor destinado, pueden estar juntos diez días. No es un error. Ir encuentra reconocimiento. Has encontrado un aliado poderoso o una oportunidad clara. Únete a ella con total intensidad mientras dure. No dudes.",
         "2": "La cortina es tal que se ve la Estrella Polar al mediodía. Ir trae duda y odio. Si uno lo despierta a través de la verdad, buena fortuna. Estás rodeado de oscuridad o envidia que oculta tu luz. No trates de brillar a la fuerza. Mantén tu verdad interna y espera; la sinceridad acabará por disipar la sospecha.",
@@ -1151,19 +1138,19 @@
         "5": "Llegan líneas, viene bendición. Riqueza y fama se acercan. Buena fortuna. El momento de máxima plenitud. Tienes talento, apoyo y claridad. Eres un líder benévolo y exitoso. Disfruta y comparte.",
         "6": "Su casa es grande, pero oculta a su familia. Espía por la puerta y no ve a nadie. Durante tres años no ve nada. Desgracia. La arrogancia del éxito te ha aislado. Has construido un palacio pero estás solo dentro. El deseo de control total te ha dejado sin vida real. Despierta."
       },
-      "taoist_reading_es": "Wu wei es disfrutar sin aferrarse. El Tao pasa por el pico y desciende.",
+      "taoist_reading_es": "La plenitud es transitoria. Wu wei es disfrutar el pico sin apegarse a él, sabiendo que el descenso es parte del ciclo. Sé generoso mientras tengas.",
       "guiding_questions_es": [
-        "¿Cómo uso este pico sin perderme?",
-        "¿Qué debo preparar para el descenso?",
-        "¿Estoy confundiendo intensidad con permanencia?"
+        "¿Estoy aprovechando mi momento o tengo miedo de brillar?",
+        "¿Estoy compartiendo mi abundancia o aislándome?",
+        "¿Soy consciente de que esto también pasará?"
       ],
-      "micro_action_es": "Decide hoy qué conservarás cuando la intensidad baje.",
-      "ethics_note_es": "El poder máximo exige máxima responsabilidad."
+      "micro_action_es": "Toma una decisión importante que has estado posponiendo. Tienes la claridad para hacerlo hoy.",
+      "ethics_note_es": "El poder conlleva la obligación de la justicia."
     },
     "56": {
-      "dynamic_core_es": "El viajero. Transitoriedad, adaptación y sobriedad.",
-      "image_es": "Fuego sobre la montaña. Luz que no se queda.",
-      "general_reading_es": "No estás para echar raíces. La clave es moverse ligero, respetar normas locales y no exigir pertenencia. Observa, aprende y sigue.",
+      "dynamic_core_es": "El viajero. Moverse en tierra extraña. Precaución, modestia y falta de red de seguridad.",
+      "image_es": "Fuego sobre la montaña. El fuego no se queda, avanza quemando y sigue. Inestabilidad.",
+      "general_reading_es": "No estás en casa. Las reglas son diferentes y no tienes tus apoyos habituales. Debes ser cauteloso, reservado y respetuoso con los locales. No impongas tus costumbres. Asegura tu supervivencia día a día. Es tiempo de paso, no de construcción eterna.",
       "lines_es": {
         "1": "Si el viajero se ocupa de cosas triviales, atrae la desgracia sobre sí. Estás en un entorno ajeno o inestable, y te pones a discutir por tonterías o a actuar con mezquindad. Al no respetar tu vulnerabilidad, pierdes la dignidad y el refugio.",
         "2": "El viajero llega a una posada. Tiene sus bienes consigo. Gana la lealtad de un sirviente joven. Modestia y recursos. Te aseguras lo básico antes de intentar nada más. Tienes donde dormir y quien te ayude. En tiempos de cambio, asegurar la logística es el primer éxito.",
@@ -1172,19 +1159,19 @@
         "5": "Dispara a un faisán. Cae con la primera flecha. Al final, esto trae alabanza y cargo. Tu habilidad te abre puertas en tierras extrañas. Al demostrar tu competencia con un éxito rápido y elegante, ganas el respeto de los locales y una posición.",
         "6": "El pájaro quema su nido. El viajero ríe primero, luego grita y llora. Pierde su vaca en la negligencia. Desgracia. Te has confiado demasiado. Creíste que eras intocable y olvidaste que estás de paso. La arrogancia final destruye todo lo acumulado. El olvido de la precaución es fatal."
       },
-      "taoist_reading_es": "Wu wei es no aferrarse al lugar. El Tao viaja ligero.",
+      "taoist_reading_es": "La vida es un viaje, nadie tiene residencia fija en el Tao. Wu wei es la adaptabilidad del nómada. No cargues demasiado equipaje y respeta el lugar donde duermes hoy.",
       "guiding_questions_es": [
-        "¿Dónde estoy de paso?",
-        "¿Qué debo aprender antes de seguir?",
-        "¿Qué apego me hace torpe?"
+        "¿Estoy actuando con la prudencia de un invitado?",
+        "¿Qué apegos me pesan en este viaje?",
+        "¿Tengo asegurado lo básico (refugio/recursos)?"
       ],
-      "micro_action_es": "Simplifica hoy: lleva solo lo necesario.",
-      "ethics_note_es": "La transitoriedad no excusa irresponsabilidad."
+      "micro_action_es": "Asegura un recurso básico hoy (dinero, comida, contacto de emergencia). Protégete.",
+      "ethics_note_es": "El extranjero debe respetar la ley local. La adaptación es respeto."
     },
     "57": {
-      "dynamic_core_es": "Penetración suave y persistente. La influencia avanza por constancia, no por fuerza.",
-      "image_es": "El viento sobre el viento. Lo sutil atraviesa todo sin ruido.",
-      "general_reading_es": "Este hexagrama describe un avance gradual y estratégico. La clave es la consistencia: pequeñas acciones repetidas que terminan cambiando el entorno. La influencia real aquí es suave, pero firme.",
+      "dynamic_core_es": "Lo suave (El viento/La penetración). Influencia sutil pero constante. Entrar sin romper.",
+      "image_es": "Viento sigue al viento. La persistencia suave cambia la forma de las cosas.",
+      "general_reading_es": "No uses la fuerza bruta. Usa la insistencia suave. Como el viento o las raíces de un árbol, penetra en la situación poco a poco. La indecisión es tu enemigo aquí; una vez que decidas una dirección, mantén el soplo constante. La flexibilidad trae éxito.",
       "lines_es": {
         "1": "Avanzar y retroceder. Perseverancia de un guerrero trae ventaja. Dudas demasiado. Tu mente va y viene sin decidir. Necesitas la disciplina de un soldado: recibe una orden (interna o externa) y ejecútala sin cuestionar más. La duda mata la influencia.",
         "2": "Penetración bajo la cama. Se emplean sacerdotes y magos en gran número. Buena fortuna. Sin culpa. El problema está oculto en lo profundo (bajo la cama). Necesitas investigar las causas invisibles o inconscientes. Usar terapia, análisis o expertos para sacar a la luz lo oculto es correcto.",
@@ -1193,19 +1180,19 @@
         "5": "Perseverancia trae buena fortuna. El remordimiento desaparece. Nada que no sea propicio. Un nuevo comienzo. Hubo errores, pero los corriges con una decisión firme. Si el cambio es bien planeado y ejecutado, el resultado será excelente.",
         "6": "Penetración bajo la cama. Pierde sus bienes y su hacha. Desgracia. Has cavado tan hondo buscando problemas que has perdido el contacto con la realidad y tus herramientas de defensa. La obsesión por el detalle oculto te ha desarmado. Sal de tu cabeza."
       },
-      "taoist_reading_es": "Wu wei aquí es persistencia sin fricción. El viento no empuja: insiste. La suavidad continua vence donde el choque falla.",
+      "taoist_reading_es": "Wu wei es acción sutil. No golpees la puerta, busca la rendija. La suavidad vence porque no genera resistencia defensiva.",
       "guiding_questions_es": [
-        "¿Qué puedo hacer de forma pequeña pero constante que cambie el escenario?",
-        "¿Dónde estoy intentando forzar algo que requiere sutileza?",
-        "¿Mi influencia es estable o volátil?"
+        "¿Dónde necesito ser más flexible?",
+        "¿Estoy dudando tanto que no avanzo?",
+        "¿Qué puedo lograr con constancia en lugar de fuerza?"
       ],
-      "micro_action_es": "Elige una acción mínima y repítela durante 7 días seguidos sin negociar contigo mismo.",
-      "ethics_note_es": "La influencia ética no manipula: crea condiciones para que lo correcto emerja."
+      "micro_action_es": "Repite una petición o acción suave que ya intentaste antes, pero hazlo de nuevo hoy, amablemente. La gota horada la piedra.",
+      "ethics_note_es": "La penetración psicológica debe usarse para sanar, no para manipular."
     },
     "58": {
-      "dynamic_core_es": "Gozo y apertura. La alegría compartida suaviza tensiones y abre caminos.",
-      "image_es": "El lago sobre el lago. Agua que refleja y multiplica la luz.",
-      "general_reading_es": "Momento para la alegría, el intercambio y la claridad emocional. La advertencia es no confundir placer con evasión: la verdadera alegría aquí es limpia y coherente.",
+      "dynamic_core_es": "La alegría (El lago). Comunicación, intercambio y placer compartido. Apertura hacia afuera.",
+      "image_es": "Lago junto a lago. El agua se mezcla y se renueva. Amistad estimulante.",
+      "general_reading_es": "La alegría verdadera da fuerza para afrontar dificultades. Es tiempo de compartir, hablar y conectar con amigos. Pero distingue entre la alegría que nace de la verdad interior y la diversión vacía que solo distrae. La comunicación abierta resuelve problemas.",
       "lines_es": {
         "1": "Alegría contenta. Buena fortuna. La felicidad que no depende de nada externo. Estás en paz contigo mismo y no necesitas estímulos. Esta autosuficiencia emocional es la base de la libertad.",
         "2": "Alegría sincera. Buena fortuna. El remordimiento desaparece. Disfrutas de la compañía y los placeres, pero sin perder tu integridad. No te vendes por diversión. Tu alegría es limpia y honesta.",
@@ -1214,19 +1201,19 @@
         "5": "Sinceridad hacia lo que se desintegra. Peligro. Confías en personas o situaciones que te están dañando o corrompiendo. El placer te ciega ante el peligro. Despierta antes de que la estructura caiga sobre ti.",
         "6": "Alegría seducida. Estás completamente perdido en la vanidad y la distracción. Ya no diriges tu vida; te arrastra la corriente del placer momentáneo. Es un estado de inercia peligrosa."
       },
-      "taoist_reading_es": "Wu wei es gozo sin apego. La alegría auténtica no necesita demostrar nada: solo fluye.",
+      "taoist_reading_es": "La sonrisa del sabio no depende de chistes. Wu wei es la alegría serena de estar en armonía. Comparte tu luz sin volverte dependiente del espejo de los otros.",
       "guiding_questions_es": [
-        "¿Mi alegría es libre o depende de que otros me validen?",
-        "¿Dónde confundo placer con descanso real?",
-        "¿Qué alegría pequeña puedo sostener sin exceso?"
+        "¿Mi alegría viene de dentro o depende de estímulos?",
+        "¿Con quién puedo tener una conversación estimulante hoy?",
+        "¿Me estoy distrayendo para no sentir?"
       ],
-      "micro_action_es": "Agenda un momento breve de disfrute simple (15–20 min) sin pantallas ni culpa.",
-      "ethics_note_es": "La alegría no justifica irresponsabilidad. Es un recurso para vivir con más claridad."
+      "micro_action_es": "Llama a un amigo con quien puedas reír o hablar de cosas interesantes. Nutre tu red social.",
+      "ethics_note_es": "El placer es legítimo, la frivolidad que ignora el dolor ajeno no lo es."
     },
     "59": {
-      "dynamic_core_es": "Disolución de bloqueos. Lo rígido se rompe para permitir nuevo flujo.",
-      "image_es": "Viento sobre el agua. La bruma se disipa y revela el camino.",
-      "general_reading_es": "Este hexagrama señala una etapa de dispersión necesaria: soltar estructuras viejas para liberar energía. La clave es actuar a tiempo para evitar la separación caótica.",
+      "dynamic_core_es": "La dispersión (La disolución). El viento sopla sobre el agua, creando ondas y espuma. Disolver rigideces.",
+      "image_es": "Viento sobre agua. La energía se esparce, rompiendo estancamientos.",
+      "general_reading_es": "Las barreras se disuelven. Es bueno para superar malentendidos, rigideces o bloqueos emocionales. Deja ir el egoísmo y únete a algo más grande. La dispersión no es caos, es fluidez que permite que la vida vuelva a circular. Suelta el control rígido.",
       "lines_es": {
         "1": "Él trae ayuda con la fuerza de un caballo. Buena fortuna. Ante el primer signo de dispersión o malentendido, actúas rápido y con fuerza para reunir a la gente. La intervención temprana evita la separación.",
         "2": "Dispersión. Él corre hacia su soporte. El remordimiento desaparece. Te das cuenta del peligro de disolverte y corres hacia lo que te da seguridad (tu altar, tu rutina, tu gente). Reconocer tu necesidad de estructura te salva.",
@@ -1235,40 +1222,40 @@
         "5": "Disolución como sudor. Gritos fuertes. El rey dispersa sus residencias. Sin culpa. La crisis llega a su punto máximo y la fiebre se rompe (sudas). El líder distribuye sus recursos para salvar la situación. Una gran liberación de tensión que cura.",
         "6": "Él disuelve su sangre. Salir, mantenerse a distancia, salir. Sin culpa. Evitas el daño físico o el conflicto sangriento alejándote por completo. La dispersión aquí es salvación: te disuelves del mapa para que el peligro no te encuentre."
       },
-      "taoist_reading_es": "Wu wei es disolver sin violencia. El Tao abre espacio para lo nuevo cuando lo rígido se suelta.",
+      "taoist_reading_es": "Wu wei es disolver los nudos del corazón. Deja que el viento se lleve lo que te pesa. La rigidez es muerte, la fluidez es vida.",
       "guiding_questions_es": [
-        "¿Qué estructura se volvió rígida y necesita soltarse?",
-        "¿Dónde debo reunir fuerzas antes de dispersarme?",
-        "¿Qué puedo disolver sin perder lo esencial?"
+        "¿Qué rigidez necesito disolver hoy?",
+        "¿Estoy aferrado a una forma vieja de hacer las cosas?",
+        "¿Puedo perdonar y soltar?"
       ],
-      "micro_action_es": "Elimina una rigidez concreta (una regla, un hábito o un miedo) que ya no sirve.",
-      "ethics_note_es": "Disolver no es destruir por capricho. Es abrir espacio para una forma más sana."
+      "micro_action_es": "Haz un ejercicio de respiración o movimiento libre para 'sacudir' la tensión física y mental.",
+      "ethics_note_es": "Disolver barreras une a la gente; destruir límites necesarios la pone en peligro. Distingue."
     },
     "60": {
-      "dynamic_core_es": "Limitación consciente. Los límites correctos generan libertad y orden.",
-      "image_es": "Agua dentro de límites. Contención que hace posible la vida.",
-      "general_reading_es": "El momento pide definir reglas claras y sostenibles. Los límites correctos ordenan la energía; los límites excesivos la asfixian.",
+      "dynamic_core_es": "La restricción (El límite). El agua en el lago tiene orillas; si no, se desperdicia.",
+      "image_es": "Agua sobre el lago. El volumen está medido. Regulación.",
+      "general_reading_es": "La libertad necesita límites para ser útil. Es tiempo de establecer presupuestos, horarios, reglas y medidas. Sin contención, la energía se dispersa. Pero el límite no debe ser tiránico; debe ser sostenible y permitir la vida. La disciplina correcta da libertad.",
       "lines_es": {
-        "1": "No salir del patio de la puerta. Sin culpa. Sabes que no es el momento y te quedas dentro. Conoces tus límites y los respetas. Esta prudencia te ahorra energía y problemas.",
+        "1": "No salir del patio de la puerta. Sin culpa. Sabes que no es el momento y te quedaste dentro. Conoces tus límites y los respetas. Esta prudencia te ahorra energía y problemas.",
         "2": "No salir del patio de la puerta. Trae desgracia. Ahora sí era el momento de actuar y te quedaste parado. Perdiste la oportunidad por exceso de cautela o pereza. El límite se convirtió en prisión.",
         "3": "El que no conoce limitación tendrá que lamentarse. Si no te pones límites tú mismo, la vida te los pondrá con dolor. El exceso de placer o gasto lleva inevitablemente al agotamiento. Autocontrol o sufrimiento.",
         "4": "Limitación contenta. Éxito. Aceptas las reglas y la estructura con naturalidad. No sufres por lo que no puedes tener; usas bien lo que tienes. La disciplina se vuelve fluida y fácil.",
         "5": "Limitación dulce. Buena fortuna. Ir trae estima. Tus límites son justos y equilibrados, por lo que los demás los aceptan con gusto. Eres un líder o padre que educa con el ejemplo, no con el látigo.",
         "6": "Limitación amarga. La perseverancia trae desgracia. El remordimiento desaparece. Reglas draconianas, austeridad excesiva o crueldad. Esto no se puede sostener. Si eres así contigo mismo, te rompes. Si eres así con otros, se rebelan."
       },
-      "taoist_reading_es": "Wu wei es límite funcional. El Tao no prohíbe: ordena el flujo para que no se disperse.",
+      "taoist_reading_es": "El bambú es fuerte porque tiene nudos (límites). Wu wei es aceptar la forma necesaria. No te derrames. Economiza tu Jing.",
       "guiding_questions_es": [
-        "¿Qué límite me protege sin asfixiarme?",
-        "¿Dónde me excedo por falta de reglas?",
-        "¿Qué norma simple haría esto sostenible?"
+        "¿Dónde me falta un límite claro?",
+        "¿Son mis reglas actuales demasiado rígidas o demasiado laxas?",
+        "¿Estoy respetando mi propio presupuesto (de dinero o energía)?"
       ],
-      "micro_action_es": "Define un límite concreto (tiempo, energía o gasto) y cúmplelo hoy.",
-      "ethics_note_es": "Limitar no es castigar. Es cuidar recursos propios y ajenos."
+      "micro_action_es": "Pon un límite claro hoy: 'No trabajaré después de las X horas' o 'Solo gastaré X cantidad'. Y cúmplelo.",
+      "ethics_note_es": "El límite protege lo valioso. Sin límites, no hay valor."
     },
     "61": {
-      "dynamic_core_es": "Verdad interior. Coherencia que une y orienta sin forzar.",
-      "image_es": "Viento sobre el lago. El aire mueve con suavidad la superficie: resonancia íntima.",
-      "general_reading_es": "La fuerza aquí es la sinceridad. No se trata de convencer, sino de sostener una verdad clara que inspire confianza y conexión.",
+      "dynamic_core_es": "La verdad interior. Sinceridad que conecta el centro con el centro. Confianza radical.",
+      "image_es": "Viento sobre el lago. La superficie se mueve visiblemente por una fuerza invisible.",
+      "general_reading_es": "La influencia real nace de la verdad interior. Si eres auténtico, puedes mover incluso a 'cerdos y peces' (seres difíciles). Deja de intentar convencer con lógica y conecta desde el corazón. La resonancia es la clave. Escucha tu propia verdad antes de hablar.",
       "lines_es": {
         "1": "Estar preparado trae buena fortuna. Si hay designios secretos, es inquietante. La verdad interior requiere paz. Si estás calculando o manipulando, pierdes tu conexión. Quédate en tu centro y confía en lo que sientes.",
         "2": "Una grulla llama en la sombra. Su cría le responde. Tengo una buena copa. Compartiré contigo. La resonancia telepática. Cuando tu verdad es pura, influyes a otros incluso sin verlos. Las almas afines se encuentran y comparten.",
@@ -1277,19 +1264,19 @@
         "5": "Posee la verdad, que une. Sin culpa. Tu sinceridad es tan fuerte que actúa como un pegamento universal. Puedes unir a personas diversas o situaciones complejas simplemente siendo tú mismo. Integridad magnética.",
         "6": "El canto del gallo penetra hasta el cielo. Perseverancia trae desgracia. Palabras grandes, promesas vacías. Haces mucho ruido pero no tienes sustancia. Querer demostrar fe con gritos es señal de que no hay fe. Silencio."
       },
-      "taoist_reading_es": "Wu wei es coherencia interna. Cuando el centro es verdadero, la influencia sucede sin esfuerzo.",
+      "taoist_reading_es": "El vacío central del hexagrama permite que entre la verdad. Wu wei es dejar de fingir. Sé transparente y el mundo confiará en ti.",
       "guiding_questions_es": [
-        "¿Qué verdad estoy sosteniendo aunque no se vea?",
-        "¿Dónde estoy actuando por imagen en lugar de convicción?",
-        "¿Qué relación necesita más sinceridad y menos performance?"
+        "¿Estoy siendo honesto conmigo mismo sobre lo que siento?",
+        "¿Confío en mi intuición?",
+        "¿Estoy tratando de manipular la percepción de otros?"
       ],
-      "micro_action_es": "Di una verdad simple y directa en una conversación importante, sin adornos.",
-      "ethics_note_es": "La sinceridad no es brutalidad. Es claridad con cuidado."
+      "micro_action_es": "Di una verdad incómoda pero necesaria a ti mismo frente al espejo. Admítela.",
+      "ethics_note_es": "La verdad sin empatía puede ser cruel, pero la empatía sin verdad es engaño."
     },
     "62": {
-      "dynamic_core_es": "El peso de lo pequeño. Precisión y humildad en momentos delicados.",
-      "image_es": "Trueno en la montaña. El movimiento existe, pero contenido.",
-      "general_reading_es": "Este hexagrama aconseja prudencia. Lo grande no es posible ahora; lo correcto es cuidar los detalles y evitar la exposición excesiva.",
+      "dynamic_core_es": "La pequeña preponderancia. Enfocarse en lo pequeño y el detalle. No es tiempo de volar alto.",
+      "image_es": "Trueno sobre la montaña. El sonido queda atrapado, no resuena lejos.",
+      "general_reading_es": "Tienes ambición, pero el momento pide humildad y perfil bajo. Sé meticuloso, ahorrativo y cauto. No intentes grandes hazañas ahora. El pájaro debe volar bajo para encontrar comida y seguridad. El éxito está en el detalle, no en la escala.",
       "lines_es": {
         "1": "El pájaro se encuentra con desgracia al volar. Demasiado alto. Quieres lograr algo grande sin estar preparado. Ignoras la advertencia de mantenerte bajo. La ambición desmedida te hace un blanco fácil.",
         "2": "Pasa junto a su abuelo, encuentra a su abuela. No llega a su príncipe, encuentra al oficial. Sin culpa. No busques lo máximo ni lo superior. Confórmate con lo intermedio o lo modesto. Baja tus expectativas y encontrarás la ayuda que realmente necesitas.",
@@ -1298,19 +1285,19 @@
         "5": "Nubes densas, sin lluvia. El príncipe dispara y acierta al que está en la cueva. En un tiempo de escasez aparente, encuentras la solución buscando en lo oculto. No esperes ayuda del cielo; usa tu habilidad para encontrar el recurso escondido.",
         "6": "No lo encuentra, lo pasa por alto. El pájaro se aleja de él. Desgracia. Esto significa calamidad y desastre. Has ignorado todas las señales de humildad. Te has creído grande en tiempo de lo pequeño. La caída es inevitable por pura soberbia."
       },
-      "taoist_reading_es": "Wu wei es bajar el vuelo. El Tao protege lo pequeño hasta que pueda crecer.",
+      "taoist_reading_es": "Lo grande está hecho de lo pequeño. Wu wei es atender lo minúsculo con respeto infinito. 'Demasiado alto quema sus alas'.",
       "guiding_questions_es": [
-        "¿Qué detalle pequeño sostiene la estabilidad?",
-        "¿Dónde estoy intentando crecer antes de tiempo?",
-        "¿Qué prudencia concreta evitaría un error mayor?"
+        "¿Estoy subestimando los detalles?",
+        "¿Puedo aceptar un éxito modesto en lugar de uno grandioso?",
+        "¿Estoy volando más alto de lo que mis alas permiten?"
       ],
-      "micro_action_es": "Reduce el alcance de una acción y hazla con precisión total.",
-      "ethics_note_es": "La humildad táctica evita daños cuando el entorno es frágil."
+      "micro_action_es": "Revisa tres veces un trabajo o comunicación antes de enviarlo. El error está en el detalle.",
+      "ethics_note_es": "La humildad no es falta de ambición, es realismo estratégico."
     },
     "63": {
-      "dynamic_core_es": "Después de la culminación. El orden está logrado, pero es inestable.",
-      "image_es": "Agua sobre fuego. El equilibrio es posible, pero requiere cuidado constante.",
-      "general_reading_es": "Lo difícil ya pasó, pero el peligro es confiarse. La tarea es sostener el orden sin sobre-accionar ni descuidar las grietas.",
+      "dynamic_core_es": "Después de la culminación. El orden perfecto se ha logrado. El peligro es relajarse.",
+      "image_es": "Agua sobre el fuego. Equilibrio perfecto que genera vapor/energía. Pero el agua puede apagar el fuego.",
+      "general_reading_es": "Todo está en su sitio. Has cruzado el río. Pero el I Ching advierte: el caos nace del orden. Justo cuando crees que terminaste, empieza la decadencia si te descuidas. Mantén la vigilancia. El mantenimiento es más difícil que la conquista.",
       "lines_es": {
         "1": "Frena sus ruedas. Se moja la cola. Sin culpa. Todo está en orden, pero el impulso de seguir actuando es peligroso. Detente. Aprende a no hacer nada cuando la tarea está hecha. El perfeccionismo ahora solo estropea la obra.",
         "2": "La mujer pierde la cortina de su carruaje. No corras tras ella; al séptimo día la recuperarás. Pierdes protección o privacidad momentáneamente. No reacciones con pánico. Mantén la dignidad y espera; el orden natural restaurará lo que es tuyo.",
@@ -1319,19 +1306,19 @@
         "5": "El vecino del este sacrifica un buey. No es tan grande como el sacrificio humilde del vecino del oeste. La sinceridad trae la bendición. La forma vacía y ostentosa ya no sirve. Lo que sostiene el éxito ahora es la actitud interna real, no el espectáculo externo.",
         "6": "Se moja la cabeza. Peligro. Te has confiado tanto en tu éxito que has perdido el respeto por el peligro. Crees que ya cruzaste el río y te ahogas en la orilla. La arrogancia final convierte la victoria en derrota."
       },
-      "taoist_reading_es": "Wu wei es mantenimiento. Después del logro, la virtud es la vigilancia tranquila.",
+      "taoist_reading_es": "Lo difícil no es llegar, es mantenerse. Wu wei es la vigilancia relajada. Cuando la taza está llena, deja de servir o se derramará.",
       "guiding_questions_es": [
-        "¿Qué éxito necesita mantenimiento, no expansión?",
-        "¿Dónde puedo evitar el exceso de control?",
-        "¿Qué señal temprana debo atender hoy?"
+        "¿Dónde me estoy relajando demasiado?",
+        "¿Qué pequeña grieta estoy ignorando en mi éxito?",
+        "¿Estoy listo para empezar de nuevo?"
       ],
-      "micro_action_es": "Haz una revisión breve de lo logrado y corrige una grieta pequeña.",
-      "ethics_note_es": "El éxito sostenible exige humildad y cuidado, no triunfo vacío."
+      "micro_action_es": "Revisa algo que funciona bien (tu coche, tu relación, tu cuenta) y hazle un mantenimiento preventivo hoy.",
+      "ethics_note_es": "Cuidar lo logrado es un acto de respeto hacia el esfuerzo pasado."
     },
     "64": {
-      "dynamic_core_es": "Antes de la culminación. La meta está cerca, pero aún no se consolida.",
-      "image_es": "Fuego sobre agua. La tensión empuja, pero el cruce aún no termina.",
-      "general_reading_es": "La situación está casi resuelta, pero falta un tramo crítico. La prudencia y el ritmo correcto evitan que el final se vuelva fracaso.",
+      "dynamic_core_es": "Antes de la culminación. Todo está en movimiento y el cierre aún no llega. El ciclo recomienza.",
+      "image_es": "Fuego sobre agua. El orden está por consolidarse. Potencial puro.",
+      "general_reading_es": "Estás cerca, pero no es momento de celebrar. La fase final requiere precisión y paciencia. La prisa puede arruinar lo que ya está casi completo. Mantén la mente fresca: el final de esto es el principio de lo siguiente. El caos vital siempre vuelve.",
       "lines_es": {
         "1": "Se moja la cola. Humillación. Intentas terminar antes de tiempo. Te precipitas hacia la meta y calculas mal la distancia. Quedas en ridículo. La impaciencia de último minuto es tu enemiga.",
         "2": "Frena sus ruedas. Perseverancia trae buena fortuna. Tienes la fuerza para cruzar, pero esperas el momento exacto. Esta capacidad de contenerte justo antes del final es lo que garantiza el éxito. Paciencia maestra.",
@@ -1340,14 +1327,15 @@
         "5": "Perseverancia trae buena fortuna. Sin remordimiento. La luz del noble es verdadera. Has logrado la claridad necesaria. El éxito está asegurado porque tu carácter está alineado con la meta. Brillas y atraes el resultado.",
         "6": "Bebe vino con confianza genuina. Sin culpa. Pero si se moja la cabeza, pierde la verdad. Celebrar está bien, pero si pierdes la consciencia en la celebración, el nuevo ciclo empezará con caos. Disfruta, pero no te embriagues de éxito."
       },
-      "taoist_reading_es": "Wu wei es esperar el punto exacto. El Tao culmina cuando la forma está lista, no cuando el ego se impacienta.",
+      "taoist_reading_es": "Wu wei es no anticipar el final. El Tao se completa cuando cada paso está en su lugar. El último tramo pide sobriedad. Acepta que la vida es un proceso sin fin.",
       "guiding_questions_es": [
-        "¿Qué falta real para completar este ciclo?",
-        "¿Estoy presionando el cierre por ansiedad?",
-        "¿Qué paso final requiere más precisión?"
+        "¿Qué falta real por ajustar antes de cerrar?",
+        "¿Dónde estoy apurando el final?",
+        "¿Qué paso concreto asegura la transición?"
       ],
-      "micro_action_es": "Enumera los 3 últimos pasos y ejecuta solo el primero hoy.",
-      "ethics_note_es": "Cerrar bien es tan importante como abrir: respeta el proceso."
+      "micro_action_es": "Define el último paso verificable y complétalo sin añadir tareas extra.",
+      "ethics_note_es": "El ciclo nunca termina realmente. Mantente abierto al cambio."
     }
   }
+}
 }

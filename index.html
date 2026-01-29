@@ -14,74 +14,37 @@
     rel="stylesheet">
 
   <link rel="stylesheet" href="./styles.css" />
+
 </head>
 
 <body>
+  <div class="paper">
+    <main id="app" class="max-w" style="flex:1; width:100%; display:flex; flex-direction:column; gap:12px;"></main>
 
-  <body>
-    <div class="paper">
-      <header class="topbar">
-        <div class="brand">
-          <div class="seal">IC</div>
-          <div class="vstack" style="gap:2px;">
-            <div class="brand__title">I Ching</div>
-            <div class="brand__subtitle">Reflexión local</div>
-          </div>
-        </div>
-        <div class="toolbar">
-          <button id="btnTheme" class="btn btn--ghost btn--sm" type="button">Tema</button>
-          <button id="btnAbout" class="btn btn--ghost btn--sm" type="button">Acerca de</button>
-        </div>
-      </header>
+    <footer class="footer" style="text-align:center; margin-top:40px; opacity:0.6; font-size:12px;">
+      <div id="footerText">Elaborado por Dr. César Celada (CACB). Uso personal. No sustituye criterio clínico.</div>
+    </footer>
+  </div>
 
-      <main id="app" style="width:100%; max-width:var(--maxw); display:flex; flex-direction:column; gap:12px;"></main>
 
-      <footer class="footer">
-        <div id="footerText">Elaborado por Dr. César Celada (CACB). Uso personal. No sustituye criterio clínico.</div>
-      </footer>
-    </div>
-
-    <dialog id="modal" class="modal">
-      <div class="vstack">
-        <h3 id="modalTitle" class="hexTitle" style="margin-top:0;">Título</h3>
-        <div id="modalBody">Cuerpo del modal...</div>
-        <div class="row" style="margin-top:20px; justify-content:flex-end;">
-          <form method="dialog">
-            <button class="btn btn--primary">Cerrar</button>
-          </form>
-        </div>
+  <dialog id="modal" class="modal">
+    <div class="vstack">
+      <h3 id="modalTitle" class="hexTitle" style="margin-top:0;">Título</h3>
+      <div id="modalBody">Cuerpo del modal...</div>
+      <div class="row" style="margin-top:20px; justify-content:flex-end;">
+        <form method="dialog">
+          <button class="btn btn--primary">Cerrar</button>
+        </form>
       </div>
-    </dialog>
+    </div>
+  </dialog>
 
-    <script type="module" src="./app.js"></script>
-    <script>
-      (function () {
-        // Unificación de tema: iching_theme_v0 (ink | paper)
-        const LS_THEME = "iching_theme_v0";
-        const html = document.documentElement;
 
-        const saved = localStorage.getItem(LS_THEME) || "ink";
-        // Aplicar estado inicial
-        html.setAttribute("data-theme", saved);
-        updateMeta(saved);
-
-        const btn = document.getElementById("btnTheme");
-        btn?.addEventListener("click", () => {
-          const current = html.getAttribute("data-theme") || "ink";
-          const next = (current === "paper") ? "ink" : "paper";
-
-          html.setAttribute("data-theme", next);
-          localStorage.setItem(LS_THEME, next);
-          updateMeta(next);
-        });
-
-        function updateMeta(themeName) {
-          const meta = document.querySelector('meta[name="theme-color"]');
-          // Ajusta estos colores según tu CSS real
-          if (meta) meta.setAttribute("content", themeName === "ink" ? "#1a1a18" : "#f3efe4");
-        }
-      })();
-    </script>
-  </body>
+  <script type="module" src="./app.js"></script>
+  <script>
+    // Boot loader or minimal init if needed
+    // Most logic is now in app.js
+  </script>
+</body>
 
 </html>
