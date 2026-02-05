@@ -1,7 +1,10 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "line_order": "bottom_to_top",
-  "line_encoding": { "yang": 1, "yin": 0 },
+  "line_encoding": {
+    "yang": 1,
+    "yin": 0
+  },
   "trigrams": [
     {
       "id": "qian",
@@ -9,8 +12,20 @@
       "symbol_unicode": "☰",
       "symbol_name_unicode_es": "Trigrama del Cielo",
       "name_es": "Cielo",
-      "keywords_es": ["iniciativa", "fuerza", "dirección"],
-      "binary_lines_bottom_to_top": [1, 1, 1]
+      "keywords_es": [
+        "iniciativa",
+        "fuerza",
+        "dirección"
+      ],
+      "binary_lines_bottom_to_top": [
+        1,
+        1,
+        1
+      ],
+      "aliases": [
+        "Khien",
+        "Kh-yen"
+      ]
     },
     {
       "id": "kun",
@@ -18,8 +33,20 @@
       "symbol_unicode": "☷",
       "symbol_name_unicode_es": "Trigrama de la Tierra",
       "name_es": "Tierra",
-      "keywords_es": ["receptividad", "sostén", "nutrición"],
-      "binary_lines_bottom_to_top": [0, 0, 0]
+      "keywords_es": [
+        "receptividad",
+        "sostén",
+        "nutrición"
+      ],
+      "binary_lines_bottom_to_top": [
+        0,
+        0,
+        0
+      ],
+      "aliases": [
+        "Khwan",
+        "Kh-wan"
+      ]
     },
     {
       "id": "zhen",
@@ -27,8 +54,20 @@
       "symbol_unicode": "☳",
       "symbol_name_unicode_es": "Trigrama del Trueno",
       "name_es": "Trueno",
-      "keywords_es": ["inicio", "impulso", "despertar"],
-      "binary_lines_bottom_to_top": [1, 0, 0]
+      "keywords_es": [
+        "inicio",
+        "impulso",
+        "despertar"
+      ],
+      "binary_lines_bottom_to_top": [
+        1,
+        0,
+        0
+      ],
+      "aliases": [
+        "Khen",
+        "Kan (thunder)"
+      ]
     },
     {
       "id": "kan",
@@ -36,8 +75,19 @@
       "symbol_unicode": "☵",
       "symbol_name_unicode_es": "Trigrama del Agua",
       "name_es": "Agua",
-      "keywords_es": ["profundidad", "riesgo", "aprendizaje"],
-      "binary_lines_bottom_to_top": [0, 1, 0]
+      "keywords_es": [
+        "profundidad",
+        "riesgo",
+        "aprendizaje"
+      ],
+      "binary_lines_bottom_to_top": [
+        0,
+        1,
+        0
+      ],
+      "aliases": [
+        "Khan"
+      ]
     },
     {
       "id": "gen",
@@ -45,17 +95,41 @@
       "symbol_unicode": "☶",
       "symbol_name_unicode_es": "Trigrama de la Montaña",
       "name_es": "Montaña",
-      "keywords_es": ["detención", "límite", "quietud"],
-      "binary_lines_bottom_to_top": [0, 0, 1]
+      "keywords_es": [
+        "detención",
+        "límite",
+        "quietud"
+      ],
+      "binary_lines_bottom_to_top": [
+        0,
+        0,
+        1
+      ],
+      "aliases": [
+        "Ken",
+        "Kan (mountain)"
+      ]
     },
     {
       "id": "xun",
       "hanzi": "巽",
       "symbol_unicode": "☴",
       "symbol_name_unicode_es": "Trigrama del Viento",
-      "name_es": "Viento",
-      "keywords_es": ["penetración", "influencia", "flexibilidad"],
-      "binary_lines_bottom_to_top": [0, 1, 1]
+      "name_es": "Viento (Madera)",
+      "keywords_es": [
+        "penetración",
+        "influencia",
+        "flexibilidad",
+        "madera"
+      ],
+      "binary_lines_bottom_to_top": [
+        0,
+        1,
+        1
+      ],
+      "aliases": [
+        "Sun"
+      ]
     },
     {
       "id": "li",
@@ -63,8 +137,20 @@
       "symbol_unicode": "☲",
       "symbol_name_unicode_es": "Trigrama del Fuego",
       "name_es": "Fuego",
-      "keywords_es": ["claridad", "adhesión", "discernimiento"],
-      "binary_lines_bottom_to_top": [1, 0, 1]
+      "keywords_es": [
+        "claridad",
+        "adhesión",
+        "discernimiento"
+      ],
+      "binary_lines_bottom_to_top": [
+        1,
+        0,
+        1
+      ],
+      "aliases": [
+        "Li",
+        "Lee"
+      ]
     },
     {
       "id": "dui",
@@ -72,8 +158,20 @@
       "symbol_unicode": "☱",
       "symbol_name_unicode_es": "Trigrama del Lago",
       "name_es": "Lago",
-      "keywords_es": ["apertura", "gozo", "comunicación"],
-      "binary_lines_bottom_to_top": [1, 1, 0]
+      "keywords_es": [
+        "apertura",
+        "gozo",
+        "comunicación"
+      ],
+      "binary_lines_bottom_to_top": [
+        1,
+        1,
+        0
+      ],
+      "aliases": [
+        "Tui",
+        "Twee"
+      ]
     }
   ]
 }

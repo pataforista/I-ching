@@ -2,80 +2,67 @@
   "version": "0.1.1",
   "line_order": "bottom_to_top",
   "line_count": 6,
-  "line_encoding": { "yang": 1, "yin": 0 },
-
+  "line_encoding": {
+    "yang": 1,
+    "yin": 0
+  },
   "primary_hexagram": {
-    "source": "coins_rules.sum_outcomes.*.line_bit",
-    "description_es": "El hexagrama primario se construye con los bits line_bit de cada línea, de abajo hacia arriba."
+    "source": "three_coins",
+    "description_es": "Hexagrama primario formado por 6 líneas construidas de abajo hacia arriba a partir de sumas 6/7/8/9."
   },
-
   "moving_lines": {
-    "definition_es": "Una línea es mutante si sum_outcomes.*.is_moving == true (6 o 9 en tres monedas).",
-    "indices_es": "Las líneas se indexan 1..6 (1 = inferior, 6 = superior)."
+    "definition_es": "Líneas con is_moving=true (sumas 6 y 9).",
+    "indices_es": "Índices 1–6 (bottom_to_top) donde la suma fue 6 o 9."
   },
-
   "resulting_hexagram": {
-    "source": "coins_rules.sum_outcomes.*.transforms_to_bit",
-    "description_es": "El hexagrama resultante se construye mapeando transforms_to_bit en las seis líneas. Esto es equivalente a cambiar solo las líneas mutantes, porque 7 y 8 preservan su bit."
+    "source": "moving_lines_transform",
+    "description_es": "Hexagrama resultante tras reemplazar en cada línea móvil su line_bit por transforms_to_bit."
   },
-
   "trigram_extraction": {
     "lower_trigram": {
-      "lines_indices": [1, 2, 3],
+      "lines_indices": [
+        1,
+        2,
+        3
+      ],
       "binary_lines_bottom_to_top": "primary_hexagram.lines[1..3]"
     },
     "upper_trigram": {
-      "lines_indices": [4, 5, 6],
+      "lines_indices": [
+        4,
+        5,
+        6
+      ],
       "binary_lines_bottom_to_top": "primary_hexagram.lines[4..6]"
     },
     "lookup_note_es": "Se usa trigrams.json para traducir cada tripleta de bits a un id de trigrama (qian/kun/zhen/kan/gen/xun/li/dui)."
   },
-
   "hexagram_lookup": {
-    "source": "hexagrams_meta.json",
-    "key": ["upper_trigram", "lower_trigram"],
-    "return": ["id", "slug", "hanzi", "symbol_unicode"],
-    "collision_rule_es": "Debe existir exactamente un hexagrama por par de trigramas; si no, es error de dataset."
-  },
-
-  "display_rules_es": {
-    "show_primary_always": true,
-    "show_resulting_if_moving_lines": true,
-    "show_moving_lines_only": true
-  },
-
-  "consistency_tests": {
-    "dataset_rules": [
-      {
-        "id": "TRIGRAM_COUNT_8",
-        "assert_es": "trigrams.json debe contener exactamente 8 trigramas con ids únicos."
-      },
-      {
-        "id": "TRIGRAM_BITS_VALID",
-        "assert_es": "Cada trigrama debe tener binary_lines_bottom_to_top con longitud 3 y solo valores 0/1."
-      },
-      {
-        "id": "HEXAGRAM_META_COUNT_64",
-        "assert_es": "hexagrams_meta.json debe contener exactamente 64 entradas con ids únicos 1..64."
-      },
-      {
-        "id": "HEXAGRAM_TRIGRAM_KEYS_VALID",
-        "assert_es": "upper_trigram y lower_trigram deben existir en trigrams.json (solo las 8 claves canónicas)."
-      },
-      {
-        "id": "HEXAGRAM_PAIR_INVERSE",
-        "assert_es": "Para todo hexagrama A con pair=B, debe cumplirse que el hexagrama B tiene pair=A."
-      }
+    "source": "hexagrams_meta",
+    "key": [
+      "upper_trigram",
+      "lower_trigram"
     ],
-    "engine_rules": [
-      {
-        "id": "RESULTING_EQUIVALENCE",
-        "assert_es": "Construir resultante con transforms_to_bit es equivalente a cambiar solo líneas mutantes (6 y 9)."
-      },
-      {
-        "id": "LINE_ORDER_BOTTOM_FIRST",
-        "assert_es": "La primera tirada corresponde a la línea 1 (inferior) y la sexta a la línea 6 (superior)."
-      }
+    "return": [
+      "id"
+    ],
+    "collision_rule_es": "upper_trigram+lower_trigram debe identificar unívocamente un hexagrama."
+  },
+  "display_rules_es": {
+    "moving_lines_highlight": true,
+    "show_resulting_only_if_moving": true
+  },
+  "consistency_tests": {
+    "toss_count": 6,
+    "allowed_sums": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "moving_sums": [
+      6,
+      9
     ]
   }
 }

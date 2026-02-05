@@ -1,6 +1,6 @@
 {
-  "version": "0.1.0",
-  "last_updated_iso": "2026-01-10T00:00:00Z",
+  "version": "0.1.1",
+  "last_updated_iso": "2026-02-05T02:10:00Z",
   "app_shell_config": {
     "min_client_version": "0.1.0",
     "force_refresh_on_version_change": true
@@ -10,7 +10,7 @@
       "id": "licenses",
       "path": "/data/licenses.json",
       "type": "config",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "required_for_boot": true,
       "cache_strategy": "network_first"
     },
@@ -18,7 +18,7 @@
       "id": "products",
       "path": "/data/products.json",
       "type": "config",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "required_for_boot": true,
       "cache_strategy": "network_first"
     },
@@ -26,7 +26,7 @@
       "id": "trigrams",
       "path": "/data/trigrams.json",
       "type": "static_data",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "required_for_boot": true,
       "cache_strategy": "stale_while_revalidate"
     },
@@ -34,7 +34,7 @@
       "id": "hexagrams_meta",
       "path": "/data/hexagrams_meta.json",
       "type": "static_data",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "required_for_boot": true,
       "cache_strategy": "stale_while_revalidate"
     },

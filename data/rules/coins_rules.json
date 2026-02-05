@@ -7,32 +7,36 @@
   },
   "sum_outcomes": {
     "6": {
-      "name_es": "yin_mutante",
+      "name_es": "seis (yin móvil)",
       "line_bit": 0,
       "is_moving": true,
       "transforms_to_bit": 1
     },
     "7": {
-      "name_es": "yang_estable",
+      "name_es": "siete (yang fijo)",
       "line_bit": 1,
       "is_moving": false,
       "transforms_to_bit": 1
     },
     "8": {
-      "name_es": "yin_estable",
+      "name_es": "ocho (yin fijo)",
       "line_bit": 0,
       "is_moving": false,
       "transforms_to_bit": 0
     },
     "9": {
-      "name_es": "yang_mutante",
+      "name_es": "nueve (yang móvil)",
       "line_bit": 1,
       "is_moving": true,
       "transforms_to_bit": 0
     }
   },
   "implementation_notes_es": {
-    "resulting_hexagram_no_conditionals": "El hexagrama resultante puede construirse mapeando transforms_to_bit en las 6 líneas. En 7 y 8 transforms_to_bit == line_bit, por lo que no se requieren condicionales.",
-    "line_order_note": "Se generan 6 líneas de abajo hacia arriba (línea 1 primero)."
+    "line_order": "Construcción bottom_to_top. Cada tirada produce una línea por suma (6/7/8/9).",
+    "moving_lines": "Las líneas móviles son 6 y 9; el hexagrama resultante se obtiene transformando esas líneas a su opuesto.",
+    "chinese_coin_hint": "Si usas monedas chinas: cara lisa=3, cara con inscripción=2."
+  },
+  "ui_hints_es": {
+    "moving_lines": "Mostrar 6 y 9 como 'móviles' y resaltar las líneas cambiantes."
   }
 }

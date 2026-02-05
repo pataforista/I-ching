@@ -442,7 +442,8 @@
       ],
       "micro_action_es": "Define una regla concreta (una frase) que aplique desde hoy. Escríbela y comunícala sin justificarte en exceso.",
       "ethics_note_es": "La firmeza es distinta de la violencia. Si hay abuso, prioriza seguridad y apoyo externo."
-    },"22": {
+    },
+    "22": {
       "dynamic_core_es": "La gracia y la forma. La belleza es necesaria para dar orden y dignidad a la vida, pero no debe ocultar la falta de sustancia.",
       "image_es": "Fuego al pie de la montaña. La luz ilumina la forma de las cosas, haciéndolas agradables.",
       "general_reading_es": "Es un momento para cuidar las formas, la estética y el protocolo. La apariencia importa porque facilita la conexión. Sin embargo, el hexagrama advierte: el adorno no sustituye a la verdad. Usa la forma para comunicar el fondo, no para esconderlo.",
@@ -663,7 +664,15 @@
         "4": "No hay caza en el campo. Estás buscando en el lugar equivocado. Por más que persistas, si el método o el objetivo no es realista, no obtendrás nada. La constancia en el error no es virtud, es estupidez.",
         "5": "Dar duración al carácter a través de la perseverancia. Buena fortuna para la mujer, desgracia para el hombre. Adaptarse y seguir una rutina (rol receptivo) funciona bien aquí. Pero si tu rol exige innovar o liderar, la mera repetición te estancará.",
         "6": "Inquietud como estado duradero. Desgracia. Estás en constante agitación, siempre corriendo, siempre ansioso. Crees que moverse rápido es ser constante, pero solo es agotamiento. Detente."
-      }
+      },
+      "taoist_reading_es": "La duración no es inercia, es renovarse constantemente en el mismo propósito. Wu wei es mantener el ritmo sin agotarse. No intentes ser eterno, intenta ser constante hoy.",
+      "guiding_questions_es": [
+        "¿Qué hábito necesito sostener a pesar del aburrimiento?",
+        "¿Estoy buscando una solución rápida o una construcción duradera?",
+        "¿Mi dirección actual es fiel a mi naturaleza?"
+      ],
+      "micro_action_es": "Realiza una tarea de tu rutina diaria con total atención, como si fuera un ritual de larga duración.",
+      "ethics_note_es": "La constancia no justifica la cerrazón. Si el camino es erróneo, durar en él es un error redoblado."
     },
     "33": {
       "dynamic_core_es": "La retirada. Saber cuándo irse es tan importante como saber cuándo luchar. Distancia estratégica.",
@@ -874,7 +883,8 @@
       ],
       "micro_action_es": "Haz un favor significativo a alguien que no pueda devolvértelo. Activa el flujo del aumento.",
       "ethics_note_es": "El aumento real mejora la vida de todos. El lucro a costa de otros es robo disfrazado."
-    },"43": {
+    },
+    "43": {
       "dynamic_core_es": "El desbordamiento (La Resolución). La tensión acumulada debe liberarse. Declarar la verdad abiertamente.",
       "image_es": "El lago sube hasta el cielo. El agua amenaza con desbordarse si no se abre un cauce.",
       "general_reading_es": "Una situación inestable que requiere una decisión firme. No puedes seguir tolerando una ambigüedad o una influencia negativa. Debes hacerla pública y resolverla. Pero cuidado: la resolución no es violencia. Es una declaración clara de límites ante testigos.",
@@ -1337,5 +1347,4 @@
       "ethics_note_es": "El ciclo nunca termina realmente. Mantente abierto al cambio."
     }
   }
-}
 }

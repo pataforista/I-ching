@@ -1,71 +1,583 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "ordering": "king_wen",
-  "notes_es": "Metadatos de navegación completos. El símbolo_unicode sigue el bloque Yijing Hexagram Symbols (䷀–䷿).",
+  "notes_es": "Metadatos de navegación. symbol_unicode usa el bloque Unicode Yijing Hexagram Symbols (䷀–䷿).",
   "hexagrams": [
-    { "id": 1, "slug": "qian", "hanzi": "乾", "symbol_unicode": "䷀", "pair": 2, "upper_trigram": "qian", "lower_trigram": "qian" },
-    { "id": 2, "slug": "kun", "hanzi": "坤", "symbol_unicode": "䷁", "pair": 1, "upper_trigram": "kun", "lower_trigram": "kun" },
-    { "id": 3, "slug": "chun", "hanzi": "屯", "symbol_unicode": "䷂", "pair": 4, "upper_trigram": "kan", "lower_trigram": "zhen" },
-    { "id": 4, "slug": "meng", "hanzi": "蒙", "symbol_unicode": "䷃", "pair": 3, "upper_trigram": "gen", "lower_trigram": "kan" },
-    { "id": 5, "slug": "xu", "hanzi": "需", "symbol_unicode": "䷄", "pair": 6, "upper_trigram": "kan", "lower_trigram": "qian" },
-    { "id": 6, "slug": "song", "hanzi": "訟", "symbol_unicode": "䷅", "pair": 5, "upper_trigram": "qian", "lower_trigram": "kan" },
-    { "id": 7, "slug": "shi", "hanzi": "師", "symbol_unicode": "䷆", "pair": 8, "upper_trigram": "kun", "lower_trigram": "kan" },
-    { "id": 8, "slug": "bi", "hanzi": "比", "symbol_unicode": "䷇", "pair": 7, "upper_trigram": "kan", "lower_trigram": "kun" },
-    { "id": 9, "slug": "xiao_chu", "hanzi": "小畜", "symbol_unicode": "䷈", "pair": 10, "upper_trigram": "xun", "lower_trigram": "qian" },
-    { "id": 10, "slug": "lu", "hanzi": "履", "symbol_unicode": "䷉", "pair": 9, "upper_trigram": "qian", "lower_trigram": "dui" },
-    { "id": 11, "slug": "tai", "hanzi": "泰", "symbol_unicode": "䷊", "pair": 12, "upper_trigram": "kun", "lower_trigram": "qian" },
-    { "id": 12, "slug": "pi", "hanzi": "否", "symbol_unicode": "䷋", "pair": 11, "upper_trigram": "qian", "lower_trigram": "kun" },
-    { "id": 13, "slug": "tong_ren", "hanzi": "同人", "symbol_unicode": "䷌", "pair": 14, "upper_trigram": "qian", "lower_trigram": "li" },
-    { "id": 14, "slug": "da_you", "hanzi": "大有", "symbol_unicode": "䷍", "pair": 13, "upper_trigram": "li", "lower_trigram": "qian" },
-    { "id": 15, "slug": "qian_modesty", "hanzi": "謙", "symbol_unicode": "䷎", "pair": 16, "upper_trigram": "kun", "lower_trigram": "gen" },
-    { "id": 16, "slug": "yu", "hanzi": "豫", "symbol_unicode": "䷏", "pair": 15, "upper_trigram": "zhen", "lower_trigram": "kun" },
-    { "id": 17, "slug": "sui", "hanzi": "隨", "symbol_unicode": "䷐", "pair": 18, "upper_trigram": "dui", "lower_trigram": "zhen" },
-    { "id": 18, "slug": "gu", "hanzi": "蠱", "symbol_unicode": "䷑", "pair": 17, "upper_trigram": "gen", "lower_trigram": "xun" },
-    { "id": 19, "slug": "lin", "hanzi": "臨", "symbol_unicode": "䷒", "pair": 20, "upper_trigram": "kun", "lower_trigram": "dui" },
-    { "id": 20, "slug": "guan", "hanzi": "觀", "symbol_unicode": "䷓", "pair": 19, "upper_trigram": "xun", "lower_trigram": "kun" },
-    { "id": 21, "slug": "shi_he", "hanzi": "噬嗑", "symbol_unicode": "䷔", "pair": 22, "upper_trigram": "li", "lower_trigram": "zhen" },
-    { "id": 22, "slug": "bi_grace", "hanzi": "賁", "symbol_unicode": "䷕", "pair": 21, "upper_trigram": "gen", "lower_trigram": "li" },
-    { "id": 23, "slug": "bo", "hanzi": "剝", "symbol_unicode": "䷖", "pair": 24, "upper_trigram": "gen", "lower_trigram": "kun" },
-    { "id": 24, "slug": "fu", "hanzi": "復", "symbol_unicode": "䷗", "pair": 23, "upper_trigram": "kun", "lower_trigram": "zhen" },
-    { "id": 25, "slug": "wu_wang", "hanzi": "無妄", "symbol_unicode": "䷘", "pair": 26, "upper_trigram": "qian", "lower_trigram": "zhen" },
-    { "id": 26, "slug": "da_chu", "hanzi": "大畜", "symbol_unicode": "䷙", "pair": 25, "upper_trigram": "gen", "lower_trigram": "qian" },
-    { "id": 27, "slug": "yi", "hanzi": "頤", "symbol_unicode": "䷚", "pair": 28, "upper_trigram": "gen", "lower_trigram": "zhen" },
-    { "id": 28, "slug": "da_guo", "hanzi": "大過", "symbol_unicode": "䷛", "pair": 27, "upper_trigram": "dui", "lower_trigram": "xun" },
-    { "id": 29, "slug": "kan", "hanzi": "坎", "symbol_unicode": "䷜", "pair": 30, "upper_trigram": "kan", "lower_trigram": "kan" },
-    { "id": 30, "slug": "li", "hanzi": "離", "symbol_unicode": "䷝", "pair": 29, "upper_trigram": "li", "lower_trigram": "li" },
-    { "id": 31, "slug": "xian", "hanzi": "咸", "symbol_unicode": "䷞", "pair": 32, "upper_trigram": "dui", "lower_trigram": "gen" },
-    { "id": 32, "slug": "heng", "hanzi": "恆", "symbol_unicode": "䷟", "pair": 31, "upper_trigram": "zhen", "lower_trigram": "xun" },
-    { "id": 33, "slug": "dun", "hanzi": "遯", "symbol_unicode": "䷠", "pair": 34, "upper_trigram": "qian", "lower_trigram": "gen" },
-    { "id": 34, "slug": "da_zhuang", "hanzi": "大壯", "symbol_unicode": "䷡", "pair": 33, "upper_trigram": "zhen", "lower_trigram": "qian" },
-    { "id": 35, "slug": "jin", "hanzi": "晉", "symbol_unicode": "䷢", "pair": 36, "upper_trigram": "li", "lower_trigram": "kun" },
-    { "id": 36, "slug": "ming_yi", "hanzi": "明夷", "symbol_unicode": "䷣", "pair": 35, "upper_trigram": "kun", "lower_trigram": "li" },
-    { "id": 37, "slug": "jia_ren", "hanzi": "家人", "symbol_unicode": "䷤", "pair": 38, "upper_trigram": "xun", "lower_trigram": "li" },
-    { "id": 38, "slug": "kui", "hanzi": "睽", "symbol_unicode": "䷥", "pair": 37, "upper_trigram": "li", "lower_trigram": "dui" },
-    { "id": 39, "slug": "jian", "hanzi": "蹇", "symbol_unicode": "䷦", "pair": 40, "upper_trigram": "kan", "lower_trigram": "gen" },
-    { "id": 40, "slug": "xie", "hanzi": "解", "symbol_unicode": "䷧", "pair": 39, "upper_trigram": "zhen", "lower_trigram": "kan" },
-    { "id": 41, "slug": "sun", "hanzi": "損", "symbol_unicode": "䷨", "pair": 42, "upper_trigram": "gen", "lower_trigram": "dui" },
-    { "id": 42, "slug": "yi_increase", "hanzi": "益", "symbol_unicode": "䷩", "pair": 41, "upper_trigram": "xun", "lower_trigram": "zhen" },
-    { "id": 43, "slug": "guai", "hanzi": "夬", "symbol_unicode": "䷪", "pair": 44, "upper_trigram": "dui", "lower_trigram": "qian" },
-    { "id": 44, "slug": "gou", "hanzi": "姤", "symbol_unicode": "䷫", "pair": 43, "upper_trigram": "qian", "lower_trigram": "xun" },
-    { "id": 45, "slug": "cui", "hanzi": "萃", "symbol_unicode": "䷬", "pair": 46, "upper_trigram": "dui", "lower_trigram": "kun" },
-    { "id": 46, "slug": "sheng", "hanzi": "升", "symbol_unicode": "䷭", "pair": 45, "upper_trigram": "kun", "lower_trigram": "xun" },
-    { "id": 47, "slug": "kun_oppression", "hanzi": "困", "symbol_unicode": "䷮", "pair": 48, "upper_trigram": "dui", "lower_trigram": "kan" },
-    { "id": 48, "slug": "jing", "hanzi": "井", "symbol_unicode": "䷯", "pair": 47, "upper_trigram": "kan", "lower_trigram": "xun" },
-    { "id": 49, "slug": "ge", "hanzi": "革", "symbol_unicode": "䷰", "pair": 50, "upper_trigram": "dui", "lower_trigram": "li" },
-    { "id": 50, "slug": "ding", "hanzi": "鼎", "symbol_unicode": "䷱", "pair": 49, "upper_trigram": "li", "lower_trigram": "xun" },
-    { "id": 51, "slug": "zhen", "hanzi": "震", "symbol_unicode": "䷲", "pair": 52, "upper_trigram": "zhen", "lower_trigram": "zhen" },
-    { "id": 52, "slug": "gen", "hanzi": "艮", "symbol_unicode": "䷳", "pair": 51, "upper_trigram": "gen", "lower_trigram": "gen" },
-    { "id": 53, "slug": "jian_progress", "hanzi": "漸", "symbol_unicode": "䷴", "pair": 54, "upper_trigram": "xun", "lower_trigram": "gen" },
-    { "id": 54, "slug": "gui_mei", "hanzi": "歸妹", "symbol_unicode": "䷵", "pair": 53, "upper_trigram": "zhen", "lower_trigram": "dui" },
-    { "id": 55, "slug": "feng", "hanzi": "豐", "symbol_unicode": "䷶", "pair": 56, "upper_trigram": "zhen", "lower_trigram": "li" },
-    { "id": 56, "slug": "lu_traveler", "hanzi": "旅", "symbol_unicode": "䷷", "pair": 55, "upper_trigram": "li", "lower_trigram": "gen" },
-    { "id": 57, "slug": "xun", "hanzi": "巽", "symbol_unicode": "䷸", "pair": 58, "upper_trigram": "xun", "lower_trigram": "xun" },
-    { "id": 58, "slug": "dui", "hanzi": "兌", "symbol_unicode": "䷹", "pair": 57, "upper_trigram": "dui", "lower_trigram": "dui" },
-    { "id": 59, "slug": "huan", "hanzi": "渙", "symbol_unicode": "䷺", "pair": 60, "upper_trigram": "xun", "lower_trigram": "kan" },
-    { "id": 60, "slug": "jie", "hanzi": "節", "symbol_unicode": "䷻", "pair": 59, "upper_trigram": "kan", "lower_trigram": "dui" },
-    { "id": 61, "slug": "zhong_fu", "hanzi": "中孚", "symbol_unicode": "䷼", "pair": 62, "upper_trigram": "xun", "lower_trigram": "dui" },
-    { "id": 62, "slug": "xiao_guo", "hanzi": "小過", "symbol_unicode": "䷽", "pair": 61, "upper_trigram": "zhen", "lower_trigram": "gen" },
-    { "id": 63, "slug": "ji_ji", "hanzi": "既濟", "symbol_unicode": "䷾", "pair": 64, "upper_trigram": "kan", "lower_trigram": "li" },
-    { "id": 64, "slug": "wei_ji", "hanzi": "未濟", "symbol_unicode": "䷿", "pair": 63, "upper_trigram": "li", "lower_trigram": "kan" }
+    {
+      "id": 1,
+      "slug": "qian",
+      "hanzi": "乾",
+      "symbol_unicode": "䷀",
+      "pair": 2,
+      "upper_trigram": "qian",
+      "lower_trigram": "qian"
+    },
+    {
+      "id": 2,
+      "slug": "kun",
+      "hanzi": "坤",
+      "symbol_unicode": "䷁",
+      "pair": 1,
+      "upper_trigram": "kun",
+      "lower_trigram": "kun"
+    },
+    {
+      "id": 3,
+      "slug": "zhun",
+      "hanzi": "屯",
+      "symbol_unicode": "䷂",
+      "pair": 4,
+      "upper_trigram": "kan",
+      "lower_trigram": "zhen"
+    },
+    {
+      "id": 4,
+      "slug": "meng",
+      "hanzi": "蒙",
+      "symbol_unicode": "䷃",
+      "pair": 3,
+      "upper_trigram": "gen",
+      "lower_trigram": "kan"
+    },
+    {
+      "id": 5,
+      "slug": "xu",
+      "hanzi": "需",
+      "symbol_unicode": "䷄",
+      "pair": 6,
+      "upper_trigram": "kan",
+      "lower_trigram": "qian"
+    },
+    {
+      "id": 6,
+      "slug": "song",
+      "hanzi": "訟",
+      "symbol_unicode": "䷅",
+      "pair": 5,
+      "upper_trigram": "qian",
+      "lower_trigram": "kan"
+    },
+    {
+      "id": 7,
+      "slug": "shi",
+      "hanzi": "師",
+      "symbol_unicode": "䷆",
+      "pair": 8,
+      "upper_trigram": "kun",
+      "lower_trigram": "kan"
+    },
+    {
+      "id": 8,
+      "slug": "bi",
+      "hanzi": "比",
+      "symbol_unicode": "䷇",
+      "pair": 7,
+      "upper_trigram": "kan",
+      "lower_trigram": "kun"
+    },
+    {
+      "id": 9,
+      "slug": "xiao-chu",
+      "hanzi": "小畜",
+      "symbol_unicode": "䷈",
+      "pair": 10,
+      "upper_trigram": "xun",
+      "lower_trigram": "qian"
+    },
+    {
+      "id": 10,
+      "slug": "lu",
+      "hanzi": "履",
+      "symbol_unicode": "䷉",
+      "pair": 9,
+      "upper_trigram": "qian",
+      "lower_trigram": "dui"
+    },
+    {
+      "id": 11,
+      "slug": "tai",
+      "hanzi": "泰",
+      "symbol_unicode": "䷊",
+      "pair": 12,
+      "upper_trigram": "kun",
+      "lower_trigram": "qian"
+    },
+    {
+      "id": 12,
+      "slug": "pi",
+      "hanzi": "否",
+      "symbol_unicode": "䷋",
+      "pair": 11,
+      "upper_trigram": "qian",
+      "lower_trigram": "kun"
+    },
+    {
+      "id": 13,
+      "slug": "tong-ren",
+      "hanzi": "同人",
+      "symbol_unicode": "䷌",
+      "pair": 14,
+      "upper_trigram": "qian",
+      "lower_trigram": "li"
+    },
+    {
+      "id": 14,
+      "slug": "da-you",
+      "hanzi": "大有",
+      "symbol_unicode": "䷍",
+      "pair": 13,
+      "upper_trigram": "li",
+      "lower_trigram": "qian"
+    },
+    {
+      "id": 15,
+      "slug": "qian",
+      "hanzi": "謙",
+      "symbol_unicode": "䷎",
+      "pair": 16,
+      "upper_trigram": "kun",
+      "lower_trigram": "gen"
+    },
+    {
+      "id": 16,
+      "slug": "yu",
+      "hanzi": "豫",
+      "symbol_unicode": "䷏",
+      "pair": 15,
+      "upper_trigram": "zhen",
+      "lower_trigram": "kun"
+    },
+    {
+      "id": 17,
+      "slug": "sui",
+      "hanzi": "隨",
+      "symbol_unicode": "䷐",
+      "pair": 18,
+      "upper_trigram": "dui",
+      "lower_trigram": "zhen"
+    },
+    {
+      "id": 18,
+      "slug": "gu",
+      "hanzi": "蠱",
+      "symbol_unicode": "䷑",
+      "pair": 17,
+      "upper_trigram": "gen",
+      "lower_trigram": "xun"
+    },
+    {
+      "id": 19,
+      "slug": "lin",
+      "hanzi": "臨",
+      "symbol_unicode": "䷒",
+      "pair": 20,
+      "upper_trigram": "kun",
+      "lower_trigram": "dui"
+    },
+    {
+      "id": 20,
+      "slug": "guan",
+      "hanzi": "觀",
+      "symbol_unicode": "䷓",
+      "pair": 19,
+      "upper_trigram": "xun",
+      "lower_trigram": "kun"
+    },
+    {
+      "id": 21,
+      "slug": "shi-he",
+      "hanzi": "噬嗑",
+      "symbol_unicode": "䷔",
+      "pair": 22,
+      "upper_trigram": "li",
+      "lower_trigram": "zhen"
+    },
+    {
+      "id": 22,
+      "slug": "bi",
+      "hanzi": "賁",
+      "symbol_unicode": "䷕",
+      "pair": 21,
+      "upper_trigram": "gen",
+      "lower_trigram": "li"
+    },
+    {
+      "id": 23,
+      "slug": "bo",
+      "hanzi": "剝",
+      "symbol_unicode": "䷖",
+      "pair": 24,
+      "upper_trigram": "gen",
+      "lower_trigram": "kun"
+    },
+    {
+      "id": 24,
+      "slug": "fu",
+      "hanzi": "復",
+      "symbol_unicode": "䷗",
+      "pair": 23,
+      "upper_trigram": "kun",
+      "lower_trigram": "zhen"
+    },
+    {
+      "id": 25,
+      "slug": "wu-wang",
+      "hanzi": "無妄",
+      "symbol_unicode": "䷘",
+      "pair": 26,
+      "upper_trigram": "qian",
+      "lower_trigram": "zhen"
+    },
+    {
+      "id": 26,
+      "slug": "da-chu",
+      "hanzi": "大畜",
+      "symbol_unicode": "䷙",
+      "pair": 25,
+      "upper_trigram": "gen",
+      "lower_trigram": "qian"
+    },
+    {
+      "id": 27,
+      "slug": "yi",
+      "hanzi": "頤",
+      "symbol_unicode": "䷚",
+      "pair": 28,
+      "upper_trigram": "gen",
+      "lower_trigram": "zhen"
+    },
+    {
+      "id": 28,
+      "slug": "da-guo",
+      "hanzi": "大過",
+      "symbol_unicode": "䷛",
+      "pair": 27,
+      "upper_trigram": "dui",
+      "lower_trigram": "xun"
+    },
+    {
+      "id": 29,
+      "slug": "kan",
+      "hanzi": "坎",
+      "symbol_unicode": "䷜",
+      "pair": 30,
+      "upper_trigram": "kan",
+      "lower_trigram": "kan"
+    },
+    {
+      "id": 30,
+      "slug": "li",
+      "hanzi": "離",
+      "symbol_unicode": "䷝",
+      "pair": 29,
+      "upper_trigram": "li",
+      "lower_trigram": "li"
+    },
+    {
+      "id": 31,
+      "slug": "xian",
+      "hanzi": "咸",
+      "symbol_unicode": "䷞",
+      "pair": 32,
+      "upper_trigram": "dui",
+      "lower_trigram": "gen"
+    },
+    {
+      "id": 32,
+      "slug": "heng",
+      "hanzi": "恆",
+      "symbol_unicode": "䷟",
+      "pair": 31,
+      "upper_trigram": "zhen",
+      "lower_trigram": "xun"
+    },
+    {
+      "id": 33,
+      "slug": "dun",
+      "hanzi": "遯",
+      "symbol_unicode": "䷠",
+      "pair": 34,
+      "upper_trigram": "qian",
+      "lower_trigram": "gen"
+    },
+    {
+      "id": 34,
+      "slug": "da-zhuang",
+      "hanzi": "大壯",
+      "symbol_unicode": "䷡",
+      "pair": 33,
+      "upper_trigram": "zhen",
+      "lower_trigram": "qian"
+    },
+    {
+      "id": 35,
+      "slug": "jin",
+      "hanzi": "晉",
+      "symbol_unicode": "䷢",
+      "pair": 36,
+      "upper_trigram": "li",
+      "lower_trigram": "kun"
+    },
+    {
+      "id": 36,
+      "slug": "ming-yi",
+      "hanzi": "明夷",
+      "symbol_unicode": "䷣",
+      "pair": 35,
+      "upper_trigram": "kun",
+      "lower_trigram": "li"
+    },
+    {
+      "id": 37,
+      "slug": "jia-ren",
+      "hanzi": "家人",
+      "symbol_unicode": "䷤",
+      "pair": 38,
+      "upper_trigram": "xun",
+      "lower_trigram": "li"
+    },
+    {
+      "id": 38,
+      "slug": "kui",
+      "hanzi": "睽",
+      "symbol_unicode": "䷥",
+      "pair": 37,
+      "upper_trigram": "li",
+      "lower_trigram": "dui"
+    },
+    {
+      "id": 39,
+      "slug": "jian",
+      "hanzi": "蹇",
+      "symbol_unicode": "䷦",
+      "pair": 40,
+      "upper_trigram": "kan",
+      "lower_trigram": "gen"
+    },
+    {
+      "id": 40,
+      "slug": "jie",
+      "hanzi": "解",
+      "symbol_unicode": "䷧",
+      "pair": 39,
+      "upper_trigram": "zhen",
+      "lower_trigram": "kan"
+    },
+    {
+      "id": 41,
+      "slug": "sun",
+      "hanzi": "損",
+      "symbol_unicode": "䷨",
+      "pair": 42,
+      "upper_trigram": "gen",
+      "lower_trigram": "dui"
+    },
+    {
+      "id": 42,
+      "slug": "yi",
+      "hanzi": "益",
+      "symbol_unicode": "䷩",
+      "pair": 41,
+      "upper_trigram": "xun",
+      "lower_trigram": "zhen"
+    },
+    {
+      "id": 43,
+      "slug": "guai",
+      "hanzi": "夬",
+      "symbol_unicode": "䷪",
+      "pair": 44,
+      "upper_trigram": "dui",
+      "lower_trigram": "qian"
+    },
+    {
+      "id": 44,
+      "slug": "gou",
+      "hanzi": "姤",
+      "symbol_unicode": "䷫",
+      "pair": 43,
+      "upper_trigram": "qian",
+      "lower_trigram": "xun"
+    },
+    {
+      "id": 45,
+      "slug": "cui",
+      "hanzi": "萃",
+      "symbol_unicode": "䷬",
+      "pair": 46,
+      "upper_trigram": "dui",
+      "lower_trigram": "kun"
+    },
+    {
+      "id": 46,
+      "slug": "sheng",
+      "hanzi": "升",
+      "symbol_unicode": "䷭",
+      "pair": 45,
+      "upper_trigram": "kun",
+      "lower_trigram": "xun"
+    },
+    {
+      "id": 47,
+      "slug": "kun",
+      "hanzi": "困",
+      "symbol_unicode": "䷮",
+      "pair": 48,
+      "upper_trigram": "dui",
+      "lower_trigram": "kan"
+    },
+    {
+      "id": 48,
+      "slug": "jing",
+      "hanzi": "井",
+      "symbol_unicode": "䷯",
+      "pair": 47,
+      "upper_trigram": "kan",
+      "lower_trigram": "xun"
+    },
+    {
+      "id": 49,
+      "slug": "ge",
+      "hanzi": "革",
+      "symbol_unicode": "䷰",
+      "pair": 50,
+      "upper_trigram": "dui",
+      "lower_trigram": "li"
+    },
+    {
+      "id": 50,
+      "slug": "ding",
+      "hanzi": "鼎",
+      "symbol_unicode": "䷱",
+      "pair": 49,
+      "upper_trigram": "li",
+      "lower_trigram": "xun"
+    },
+    {
+      "id": 51,
+      "slug": "zhen",
+      "hanzi": "震",
+      "symbol_unicode": "䷲",
+      "pair": 52,
+      "upper_trigram": "zhen",
+      "lower_trigram": "zhen"
+    },
+    {
+      "id": 52,
+      "slug": "gen",
+      "hanzi": "艮",
+      "symbol_unicode": "䷳",
+      "pair": 51,
+      "upper_trigram": "gen",
+      "lower_trigram": "gen"
+    },
+    {
+      "id": 53,
+      "slug": "jian",
+      "hanzi": "漸",
+      "symbol_unicode": "䷴",
+      "pair": 54,
+      "upper_trigram": "xun",
+      "lower_trigram": "gen"
+    },
+    {
+      "id": 54,
+      "slug": "gui-mei",
+      "hanzi": "歸妹",
+      "symbol_unicode": "䷵",
+      "pair": 53,
+      "upper_trigram": "zhen",
+      "lower_trigram": "dui"
+    },
+    {
+      "id": 55,
+      "slug": "feng",
+      "hanzi": "豐",
+      "symbol_unicode": "䷶",
+      "pair": 56,
+      "upper_trigram": "zhen",
+      "lower_trigram": "li"
+    },
+    {
+      "id": 56,
+      "slug": "lu",
+      "hanzi": "旅",
+      "symbol_unicode": "䷷",
+      "pair": 55,
+      "upper_trigram": "li",
+      "lower_trigram": "gen"
+    },
+    {
+      "id": 57,
+      "slug": "xun",
+      "hanzi": "巽",
+      "symbol_unicode": "䷸",
+      "pair": 58,
+      "upper_trigram": "xun",
+      "lower_trigram": "xun"
+    },
+    {
+      "id": 58,
+      "slug": "dui",
+      "hanzi": "兌",
+      "symbol_unicode": "䷹",
+      "pair": 57,
+      "upper_trigram": "dui",
+      "lower_trigram": "dui"
+    },
+    {
+      "id": 59,
+      "slug": "huan",
+      "hanzi": "渙",
+      "symbol_unicode": "䷺",
+      "pair": 60,
+      "upper_trigram": "xun",
+      "lower_trigram": "kan"
+    },
+    {
+      "id": 60,
+      "slug": "jie",
+      "hanzi": "節",
+      "symbol_unicode": "䷻",
+      "pair": 59,
+      "upper_trigram": "kan",
+      "lower_trigram": "dui"
+    },
+    {
+      "id": 61,
+      "slug": "zhong-fu",
+      "hanzi": "中孚",
+      "symbol_unicode": "䷼",
+      "pair": 62,
+      "upper_trigram": "xun",
+      "lower_trigram": "dui"
+    },
+    {
+      "id": 62,
+      "slug": "xiao-guo",
+      "hanzi": "小過",
+      "symbol_unicode": "䷽",
+      "pair": 61,
+      "upper_trigram": "zhen",
+      "lower_trigram": "gen"
+    },
+    {
+      "id": 63,
+      "slug": "ji-ji",
+      "hanzi": "既濟",
+      "symbol_unicode": "䷾",
+      "pair": 64,
+      "upper_trigram": "kan",
+      "lower_trigram": "li"
+    },
+    {
+      "id": 64,
+      "slug": "wei-ji",
+      "hanzi": "未濟",
+      "symbol_unicode": "䷿",
+      "pair": 63,
+      "upper_trigram": "li",
+      "lower_trigram": "kan"
+    }
   ]
 }
