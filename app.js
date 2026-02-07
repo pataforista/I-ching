@@ -8,7 +8,8 @@ import {
   purchaseLocal,
   revokeLocal,
   isContentLoaded,
-  getLicenses
+  getLicenses,
+  t
 } from "./engine.js";
 
 // Global UI Instances
@@ -267,17 +268,21 @@ function render() {
 
   // 2. Update Shell State (Open/Closed)
   const book = document.getElementById("theBook");
-  if (state._bookOpen) book.classList.add("open");
-  else book.classList.remove("open");
+  if (state._bookOpen) {
+    book.classList.add("open");
+    document.body.classList.add("book-is-open");
+  } else {
+    book.classList.remove("open");
+    document.body.classList.remove("book-is-open");
+  }
 
   // 3. Render Page Content inside the Book
   const pageContainer = document.getElementById("bookPageContent");
-  if (!pageContainer) return; // Should exist if shell exists
+  if (!pageContainer) return;
 
   // If boot error, override
   if (!state.boot.ok) {
-    pageContainer.innerHTML = BootErrorView(); // Returns string now for simplicity? No, let's keep consistent.
-    // Actually our previous views returned strings (HTML).
+    pageContainer.innerHTML = BootErrorView();
     return;
   }
 
@@ -291,46 +296,363 @@ function render() {
     default: contentHTML = HomeFormView();
   }
 
-  // Simple diff to avoid destructive re-renders if not needed?
-  // For now, simpler to just replace innerHTML. 
-  // IMPORTANT: Re-binding events is needed after innerHTML replacement.
-  pageContainer.innerHTML = contentHTML;
+  pageContainer.innerHTML = `<div class="fade-in">${contentHTML}</div>`;
 
-  // 4. Post-Render logic (Events, Typewriters)
+  // 4. Post-Render logic
   bindPageEvents(pageContainer);
-  initPageEffects(); // e.g. Typewriter
+  initPageEffects();
 }
 
 function BookShellHTML() {
   return `
-    <section class="max-w" style="display:grid; place-items:center; min-height:85vh;">
-       <div class="book-scene">
-          <div class="book" id="theBook">
-             <!-- Cover -->
-             <div class="book-face book-front">
-                <div class="book-cover-title-box">
-                   <div class="seal" style="width:60px; height:60px; font-size:32px; margin:0 auto 10px; background:var(--vermilion);">IC</div>
-                   <h1 class="hexTitle gold-foil" style="font-size:36px; margin:0; opacity:0.9;">I CHING</h1>
-                   <div class="muted" style="margin-top:10px; font-family:var(--font-serif); font-style:italic;">Libro de las Mutaciones</div>
-                </div>
-                <button class="book-btn" id="btnOpenBook">Consultar</button>
-             </div>
+    <div class="app-container">
+      <div class="content-wrapper">
+        <div class="book-scene">
+           <div class="book" id="theBook">
+              <!-- Cover -->
+              <div class="book-face book-front">
+                 <div class="vstack" style="align-items:center; gap:40px;">
+                    <div class="seal" style="width:80px; height:80px; font-size:32px;">IC</div>
+                    <div style="text-align:center;">
+                       <h1 style="font-size:3rem; margin:0; color:var(--gold);">I CHING</h1>
+                       <p class="serif" style="font-style:italic; opacity:0.8;">El Libro de las Mutaciones</p>
+                    </div>
+                    <button class="btn btn--primary" id="btnOpenBook" style="padding:20px 40px; font-size:1.2rem;">Consultar el Oráculo</button>
+                 </div>
+              </div>
 
-             <!-- Inside (Pages) -->
-             <div class="book-face book-inside">
-                <!-- Dynamic Content Here -->
-                <div id="bookPageContent" class="vstack" style="flex:1;"></div>
-                
-                <!-- Footer inside book -->
-                <div style="margin-top:20px; text-align:center; opacity:0.4; font-size:10px; font-family:var(--font-serif);">
-                   Reflexión Local · v1.0
-                </div>
-             </div>
+              <!-- Inside (Pages) -->
+              <div class="book-face book-inside">
+                 <div id="bookPageContent" class="vstack" style="flex:1;"></div>
+                 
+                 <div class="divider"></div>
+                 <div style="text-align:center;" class="muted serif">
+                    Reflexión Local · v1.1 Premium
+                 </div>
+              </div>
+           </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function HomeFormView() {
+  return `
+    <div class="vstack" style="gap:40px;">
+      <div style="text-align:center;">
+         <div class="seal" style="width:50px; height:50px; margin:0 auto; background:var(--indigo);">IC</div>
+         <h2 class="hexTitle" style="margin-top:20px;">Nueva Consulta</h2>
+         <p class="muted serif">Silencia tu mente y formula tu pregunta con claridad.</p>
+      </div>
+      
+      <div class="vstack" style="gap:30px;">
+        <div class="vstack" style="gap:8px;">
+          <label class="muted serif">${t("home.label_focus")}</label>
+          <select id="qMode" class="input-field">
+              ${opt("reflexion", t("home.focus_options.reflexion"))}
+              ${opt("decision", t("home.focus_options.decision"))}
+              ${opt("relacion", t("home.focus_options.relacion"))}
+              ${opt("trabajo", t("home.focus_options.trabajo"))}
+              ${opt("salud", t("home.focus_options.salud"))}
+              ${opt("otro", t("home.focus_options.otro"))}
+          </select>
+        </div>
+
+        <div class="vstack" style="gap:8px;">
+          <label class="muted serif">${t("home.label_question")}</label>
+          <textarea id="qText" class="input-field" style="min-height:120px; resize:none;" placeholder="${t("home.placeholder_question")}">${escapeHtml(state.draft.question.text_es || "")}</textarea>
+        </div>
+      </div>
+
+      <div class="row" style="justify-content:center; margin-top:20px;">
+        <button class="btn btn--primary" id="btnBegin" style="width:100%; max-width:300px;">Iniciar Ritual</button>
+      </div>
+    </div>
+  `;
+}
+
+function TossView() {
+  const n = state.draft.tosses.length;
+  return `
+    <div class="vstack" style="gap:30px;">
+      <div class="sage-container">
+         <div class="sage-avatar">
+            <img src="./assets/sage.png" alt="Sage">
+         </div>
+         <div class="sage-bubble">
+            <span id="zenText"></span>
+         </div>
+      </div>
+
+      <div class="card" style="text-align:center;">
+        <div class="hstack" style="justify-content:center; margin-bottom:20px;">
+           <span class="muted serif">Línea ${n + 1} de 6</span>
+        </div>
+
+        <div class="coin-stage" id="coinStage">
+           ${renderStageCoins()}
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="hstack" style="justify-content:center; gap:20px;">
+          <button class="btn btn--primary" id="btnToss" ${state._tossing ? "disabled" : ""} style="min-width:160px;">
+            ${n < 6 ? t("toss.btn_toss") : t("toss.btn_finish")}
+          </button>
+          <button class="btn btn--ghost" id="btnBackHome" ${state._tossing ? "disabled" : ""}>Abandonar</button>
+        </div>
+      </div>
+
+      <div class="hex-visual" style="margin-top:20px;">
+        ${renderHexLines(state.draft.tosses)}
+      </div>
+    </div>
+  `;
+}
+
+function renderHexLines(tosses) {
+  if (tosses.length === 0) return `<div class="muted serif">El hexagrama se revelará aquí...</div>`;
+
+  return tosses.map((t, idx) => {
+    const isYang = t.line_bit === 1;
+    const isMoving = t.is_moving;
+    return `<div class="hex-line ${isYang ? 'yang' : 'yin'} ${isMoving ? 'moving' : ''}"></div>`;
+  }).reverse().join('');
+}
+
+function ReadingView() {
+  if (!state.session) return `<div class="card"><div class="muted">Sesión no encontrada.</div></div>`;
+
+  const { primary, resulting, is_mutating } = state.session.hexagrams;
+  const title = primary ? `${primary.id}. ${primary.hanzi} · ${primary.slug}` : "Desconocido";
+
+  return `
+    <div class="vstack" style="gap:40px;">
+      <div class="vstack" style="align-items:center; text-align:center;">
+        <div class="seal" style="margin-bottom:20px;">${primary?.id || '!!'}</div>
+        <h1 class="hexTitle" style="font-size:2.5rem;">${escapeHtml(title)}</h1>
+        <div class="badge" style="margin-top:10px;">Enfoque: ${escapeHtml(state.session.question.mode)}</div>
+      </div>
+
+      <div class="card" style="background:var(--accent-soft); border:none;">
+        <p class="serif" style="font-style:italic; font-size:1.2rem; text-align:center; color:var(--text);">
+          “${escapeHtml(state.session.question.text_es)}”
+        </p>
+      </div>
+
+      <div class="vstack" style="gap:40px;">
+        <section>
+          <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">El Dictamen</h3>
+          <p style="font-size:1.15rem; font-weight:500;">${escapeHtml(primary?.dynamic_core_es || "—")}</p>
+        </section>
+
+        <section>
+          <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">La Imagen</h3>
+          <p>${escapeHtml(primary?.image_es || "—")}</p>
+        </section>
+
+        <section>
+          <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Interpretación General</h3>
+          <p class="serif" style="white-space:pre-wrap;">${escapeHtml(primary?.general_reading_es || "—")}</p>
+        </section>
+
+        ${renderLinesDetail(primary)}
+        ${renderResultingSection(is_mutating, resulting)}
+        ${renderPremiumReading(primary)}
+      </div>
+
+      <div class="hstack" style="justify-content:center; gap:16px; margin-top:40px;">
+        <button class="btn btn--primary" id="btnSave">Guardar en mi Memoria</button>
+        <button class="btn btn--ghost" id="btnPDF">Exportar PDF</button>
+        <button class="btn btn--ghost" id="btnClose">Nueva Consulta</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderLinesDetail(hex) {
+  if (!hex?.active_lines_content?.length) return "";
+
+  return `
+    <div class="divider"></div>
+    <section>
+      <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Líneas en Movimiento</h3>
+      <div class="vstack" style="gap:20px; margin-top:20px;">
+        ${hex.active_lines_content.map(l => `
+          <div class="card" style="padding:24px; border-style:dashed;">
+            <div class="muted serif" style="margin-bottom:8px;">Línea ${l.position}</div>
+            <p class="serif">${escapeHtml(l.text)}</p>
           </div>
-       </div>
+        `).join("")}
+      </div>
     </section>
   `;
 }
+
+function renderResultingSection(isMutating, hex) {
+  if (!isMutating || !hex) return "";
+
+  return `
+    <div class="divider"></div>
+    <section>
+      <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Hexagrama de Transformación</h3>
+      <div class="card" style="margin-top:20px; display:flex; gap:30px; align-items:center;">
+        <div class="seal" style="background:var(--indigo); flex-shrink:0;">${hex.id}</div>
+        <div class="vstack" style="gap:4px;">
+           <h4 style="margin:0; font-size:1.4rem;">${escapeHtml(hex.hanzi)} · ${escapeHtml(hex.slug)}</h4>
+           <p class="muted serif" style="margin:0;">El destino final de esta mutación.</p>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderPremiumReading(hex) {
+  if (!hex) return "";
+  if (state.entitlements.premium_sections) {
+    const qs = Array.isArray(hex.guiding_questions_es) ? hex.guiding_questions_es : [];
+    return `
+      <div class="divider"></div>
+      <div class="card" style="background:var(--text); color:var(--bg); border:none;">
+        <h3 class="serif" style="color:var(--gold); margin-top:0;">Sabiduría Profunda</h3>
+        <p class="serif" style="opacity:0.9;">${escapeHtml(hex.taoist_reading_es || "—")}</p>
+        
+        <h4 class="serif" style="color:var(--gold); margin-top:30px;">Preguntas de Poder</h4>
+        <ul style="padding-left:20px; opacity:0.8;">
+          ${qs.map(q => `<li>${escapeHtml(q)}</li>`).join("")}
+        </ul>
+        
+        <h4 class="serif" style="color:var(--gold); margin-top:30px;">Micro-Acción Ritual</h4>
+        <div class="callout" style="background:rgba(255,255,255,0.1); padding:20px; border-radius:12px;">
+           ${escapeHtml(hex.micro_action_es || "—")}
+        </div>
+      </div>
+    `;
+  } else {
+    return `
+      <div class="divider"></div>
+      <div class="card" style="text-align:center; padding:60px 40px; border:2px dashed var(--gold);">
+        <h3 class="serif">Contenido Reservado</h3>
+        <p class="muted serif">Accede a las lecturas taoístas y preguntas de poder.</p>
+        <button class="btn btn--primary" style="margin-top:20px;" id="btnUnlockTeaser">Desbloquear Premium</button>
+      </div>
+    `;
+  }
+}
+
+function HistoryView() {
+  const isUnlimited = state.entitlements.unlimited_history;
+  let visibleHistory = state.history;
+  let lockedCount = 0;
+
+  if (!isUnlimited && state.history.length > 1) {
+    visibleHistory = [state.history[0]];
+    lockedCount = state.history.length - 1;
+  }
+
+  const items = visibleHistory.map((s) => {
+    const p = s.hexagrams?.primary;
+    return `
+      <div class="card history-card" data-open="${escapeHtml(s.id)}" style="cursor:pointer; display:flex; align-items:center; gap:20px; padding:20px;">
+        <div class="seal" style="width:40px; height:40px; font-size:16px; flex-shrink:0;">${p?.id || '!!'}</div>
+        <div class="vstack" style="gap:2px; flex:1;">
+          <div style="font-weight:600; font-size:1.1rem;">${escapeHtml(p?.slug || "Consulta")}</div>
+          <div class="muted serif" style="font-size:0.8rem;">${escapeHtml(s.created_at_iso.split("T")[0])}</div>
+        </div>
+        <div class="muted" style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-style:italic;">
+          "${escapeHtml(s.question?.text_es || "—")}"
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <div class="vstack" style="gap:30px;">
+      <div style="text-align:center;">
+        <h2 class="hexTitle">Tu Bitácora de Cambios</h2>
+        <p class="muted serif">Tus consultas anteriores para reflexionar sobre el camino recorrido.</p>
+      </div>
+
+      <div class="vstack" style="gap:16px;">
+        ${state.history.length ? items : `<div class="card muted serif" style="text-align:center;">Aún no has guardado ninguna reflexión.</div>`}
+        
+        ${!isUnlimited && lockedCount > 0 ? `
+          <div class="card" style="text-align:center; border:1px dashed var(--gold);">
+            <p class="muted serif">Y ${lockedCount} consultas más ocultas...</p>
+            <button class="btn btn--ghost" id="historyLocked">Liberar Historial Completo</button>
+          </div>
+        ` : ""}
+      </div>
+
+      <div class="hstack" style="justify-content:center; gap:16px;">
+        <button class="btn btn--primary" id="btnBackHome2">Regresar</button>
+        ${state.history.length ? `<button class="btn btn--ghost" id="btnClearHistory">Limpiar Todo</button>` : ""}
+      </div>
+    </div>
+  `;
+}
+
+function PaywallView() {
+  const products = getProducts();
+  const prod = products?.products?.[0];
+  const copy = products?.paywall_copy_es;
+  const price = prod?.price?.formatted || "Consultar";
+
+  return `
+    <div class="vstack" style="gap:40px; align-items:center; text-align:center;">
+      <div class="seal" style="width:80px; height:80px; font-size:32px; background:var(--gold);">★</div>
+      
+      <div>
+        <h2 class="hexTitle" style="font-size:2.5rem;">${escapeHtml(copy?.title || "Versión Premium")}</h2>
+        <p class="serif" style="font-size:1.2rem; opacity:0.8; max-width:500px;">
+           ${escapeHtml(copy?.body || "Profundiza en tu viaje espiritual con herramientas exclusivas de reflexión.")}
+        </p>
+      </div>
+
+      <div class="card" style="max-width:400px; width:100%; border:2px solid var(--gold);">
+         <div class="vstack" style="gap:24px;">
+            <div style="font-size:2rem; font-weight:700;">${price}</div>
+            <ul class="serif" style="text-align:left; padding-left:20px; display:flex; flex-direction:column; gap:12px;">
+               ${prod?.purchase_notes_es?.map(n => `<li>${escapeHtml(n)}</li>`).join("") || "<li>Funciones premium desbloqueadas</li>"}
+            </ul>
+            <button class="btn btn--primary" id="btnUnlockNow" style="width:100%;">Desbloquear Ahora</button>
+         </div>
+      </div>
+
+      <button class="btn btn--ghost" id="btnPaywallBack">Quizás más tarde</button>
+    </div>
+  `;
+}
+
+function BootErrorView() {
+  return `
+    <div class="vstack" style="align-items:center; text-align:center; gap:30px; padding:60px 0;">
+      <div class="seal" style="background:var(--vermilion); width:64px; height:64px; font-size:32px;">!</div>
+      <h2 class="hexTitle">Error de Conexión</h2>
+      <p class="serif muted" style="max-width:400px;">
+        No pudimos cargar los archivos necesarios para el oráculo. 
+        Por favor, verifica tu conexión a internet.
+      </p>
+      <div class="card" style="background:var(--accent-soft); font-family:monospace; font-size:0.8rem;">
+        ${state.boot.error}
+        ${state.boot.missing.length ? `<br><br>Faltan: ${state.boot.missing.join(", ")}` : ""}
+      </div>
+      <button class="btn btn--primary" onclick="location.reload()">Reintentar Ritual</button>
+    </div>
+  `;
+}
+
+function opt(val, label) {
+  return `<option value="${val}" ${state.draft.question.mode === val ? "selected" : ""}>${label}</option>`;
+}
+
+function renderStageCoins() {
+  const base = `<div class="coin-3d"><div class="coin-face coin-front"></div><div class="coin-face coin-back"></div></div>`;
+  return base + base + base;
+}
+
+// ---------- Domain Logic ----------
 
 function bindShellEvents() {
   document.getElementById("btnOpenBook")?.addEventListener("click", () => {
@@ -340,531 +662,82 @@ function bindShellEvents() {
 }
 
 function initPageEffects() {
-  // Toss View Effects
-  if (state.nav === "toss") {
-    // Sage Typer
-    const msgEl = document.getElementById("zenText");
-    if (msgEl) {
-      // Always recreate to bind to new DOM element
-      sageTyper = new Typewriter(msgEl, { typingSpeed: 30, cursor: true });
+  const zenEl = document.getElementById("zenText");
+  if (zenEl) {
+    sageTyper = new Typewriter(zenEl, { typingSpeed: 40 });
+    const n = state.draft.tosses.length;
+    let msg = "";
+    if (n === 0) msg = "Silencia tus pensamientos... ¿Qué busca saber tu alma hoy? Lanza las monedas cuando sientas calma.";
+    else if (n < 6) msg = `El oráculo escucha... Línea ${n + 1}. Concéntrate en tu pregunta.`;
+    else msg = "El hexagrama está completo. El destino se revela.";
 
-      // Initial text only if start of session
-      if (!state._tossing && state.draft.tosses.length === 0) {
-        sageTyper.type("La respuesta que buscas ya reside en tu interior. Lanza las monedas...");
-      }
-    }
-
-    // Stepper
-    const stepEl = document.getElementById("tossStepper");
-    if (stepEl) {
-      // Calculate current step (1-indexed input for user, 0-indexed info in array)
-      // tosses.length is 0 -> Step 1
-      // tosses.length is 1 -> Step 2
-      const currentLine = state.draft.tosses.length + 1;
-
-      new Stepper(stepEl, {
-        initialStep: currentLine,
-        totalSteps: 6,
-        disableStepIndicators: true, // Non-interactive
-        stepContainerClassName: 'stepper-mini', // Custom override if needed
-        renderStepIndicator: (step, isActive, isCompleted) => {
-          // Custom Ink Dot rendering if needed, or default
-          // Let's use default styles but maybe smaller?
-          // For now default is fine.
-          let classes = "step-dot";
-          if (isActive) classes += " active";
-          if (isCompleted) classes += " completed";
-          // Using chinese numbers or just Roman/Arabic? Arabic is clearer.
-          // Or maybe Yi Jing lines style? Let's stick to numbers for clarity.
-          return `<div class="${classes}" style="width:24px; height:24px; font-size:12px;">${step}</div>`;
-        }
-      });
-    }
-
-  } else if (state.nav === "history") {
-    document.querySelectorAll(".history-card").forEach(el => {
-      new TiltCard(el, { maxTilt: 10, scale: 1.02 });
-    });
-    sageTyper = null;
-
-  } else {
-    sageTyper = null;
+    sageTyper.type(msg);
   }
-}
 
-
-
-// Renamed HomeView to HomeFormView for clarity as it's just the form now
-function HomeFormView() {
-  return `
-    <div style="text-align:center; opacity:0.7;">
-       <div class="seal" style="width:40px; height:40px; margin:0 auto;">IC</div>
-    </div>
-    
-    <div class="label" style="text-align:center; margin-top:20px;">${t("home.label_focus")}</div>
-    <select id="qMode" class="input-field" style="text-align:center;">
-        ${opt("reflexion", t("home.focus_options.reflexion"))}
-        ${opt("decision", t("home.focus_options.decision"))}
-        ${opt("relacion", t("home.focus_options.relacion"))}
-        ${opt("trabajo", t("home.focus_options.trabajo"))}
-        ${opt("salud", t("home.focus_options.salud"))}
-        ${opt("otro", t("home.focus_options.otro"))}
-    </select>
-
-    <div class="label" style="text-align:center; margin-top:20px;">${t("home.label_question")}</div>
-    <textarea id="qText" class="input-field" style="min-height:100px; text-align:center; font-style:italic;" placeholder="${t("home.placeholder_question")}">${escapeHtml(state.draft.question.text_es || "")}</textarea>
-
-    <div class="divider"></div>
-
-    <div class="row" style="justify-content:center; margin-top:20px;">
-      <button class="btn btn--primary" id="btnBegin">${t("home.btn_toss")}</button>
-    </div>
-  `;
-}
-
-function TossView() {
-  const n = state.draft.tosses.length;
-  // Note: inside book, no section wrapper needed, just vstack
-  return `
-      <div class="vstack">
-        
-        <div class="sage-container">
-           <div class="sage-aura"></div>
-           <div class="sage-avatar"></div>
-           <div class="sage-bubble">
-              <span id="zenText"></span>
-           </div>
-        </div>
-
-        <div class="card">
-          <div class="hstack" style="justify-content:space-between;">
-             <div class="hexTitle">${t("toss.title")}</div>
-             <!-- Stepper Container -->
-             <div id="tossStepper" style="flex:1; display:flex; justify-content:flex-end;"></div>
-          </div>
-  
-          <div class="coin-stage" id="coinStage">
-             ${renderStageCoins()}
-          </div>
-  
-          <div class="divider"></div>
-
-          <div class="row" style="justify-content:center;">
-            <button class="btn btn--primary" id="btnToss" ${state._tossing ? "disabled" : ""}>
-              ${n < 6 ? t("toss.btn_toss") : t("toss.btn_finish")}
-            </button>
-            <button class="btn btn--ghost" id="btnBackHome" ${state._tossing ? "disabled" : ""}>${t("toss.btn_cancel")}</button>
-          </div>
-        </div>
-
-        <div class="vstack" style="margin-top:20px;">
-          ${renderTosses(n)}
-        </div>
-      </div>
-  `;
-}
-
-function renderStageCoins() {
-  const base = `
-    <div class="coin-3d"><div class="coin-face coin-front"></div><div class="coin-face coin-back"></div></div>
-  `;
-  return base + base + base;
-}
-
-function renderTosses(n) {
-  if (n === 0) return "";
-  return state.draft.tosses.map((toss, idx) => {
-    const lineNo = idx + 1;
-    const isYang = toss.line_bit === 1;
-
-    // Brush style rendering for history lines
-    return `
-      <div class="brush-border" style="padding:10px; opacity:0.8; background:var(--panel); border-radius:var(--radius); margin-bottom:8px;">
-         <div class="hstack">
-            <span class="muted" style="width:20px;">${lineNo}</span>
-            <div style="flex:1; height:12px; display:flex; gap:16px;">
-               ${isYang
-        ? `<div style="flex:1; background:var(--text); border-radius:2px; opacity:0.85;"></div>`
-        : `<div style="flex:1; background:var(--text); border-radius:2px; opacity:0.85;"></div><div style="flex:1; background:var(--text); border-radius:2px; opacity:0.85;"></div>`
-      }
-            </div>
-            ${toss.is_moving ? `<span class="badge" style="border-color:var(--accent); color:var(--accent);">Mutation</span>` : ""}
-         </div>
-      </div>
-    `;
-  }).reverse().join("");
+  // Cards 3D effect
+  document.querySelectorAll(".card").forEach(el => new TiltCard(el));
 }
 
 async function onTossNextLine() {
-  if (!state.boot.ok) return;
-  if (state.draft.tosses.length >= 6) {
-    finishToss();
-    return;
-  }
-
   if (state._tossing) return;
+  const n = state.draft.tosses.length;
+  if (n >= 6) return finishToss();
+
   state._tossing = true;
   render();
 
-  const zenTexts = [
-    "El universo te escucha...",
-    "Concéntrate en tu pregunta...",
-    "El cambio es la única constante...",
-    "Siente el peso de las monedas...",
-    "Deja fluir tu intención..."
-  ];
-  const msg = zenTexts[Math.floor(Math.random() * zenTexts.length)];
-  if (sageTyper) sageTyper.type(msg);
+  const coins = document.querySelectorAll(".coin-3d");
+  coins.forEach(c => c.classList.add("tossing"));
 
-  const stage = document.getElementById("coinStage");
-  if (stage) {
-    const coins = stage.querySelectorAll(".coin-3d");
-    coins.forEach(c => {
-      c.classList.remove("outcome-heads", "outcome-tails");
-      // Reset animation
-      c.style.animation = 'none';
-      c.offsetHeight; /* trigger reflow */
+  await new Promise(r => setTimeout(r, 1200));
 
-      // Randomize speed and delay for natural feel
-      const duration = 0.6 + Math.random() * 0.4; // 0.6s - 1.0s
-      const delay = Math.random() * 0.1; // 0 - 0.1s offset
-      c.style.animation = `spin ${duration}s infinite linear ${delay}s`;
-    });
-
-    await delay(1200);
-
-    let tossResult;
-    try {
-      tossResult = tossLine();
-    } catch (e) {
-      state._tossing = false;
-      openModal("Error", String(e));
-      render();
-      return;
-    }
-
-    coins.forEach((c, i) => {
-      c.style.animation = 'none'; // Stop spin
-      void c.offsetWidth;
-      const face = tossResult.coins[i];
-      const rotation = face === "heads" ? "outcome-heads" : "outcome-tails";
-      c.classList.add(rotation);
-    });
-
-    await delay(800);
-
-    state.draft.tosses.push(tossResult);
-    state._tossing = false;
-    render();
-
-    const postMsg = tossResult.is_moving
-      ? "¡Una línea mutante se revela!"
-      : "La línea se ha fijado.";
-    if (sageTyper) sageTyper.type(postMsg);
+  try {
+    const result = tossLine();
+    state.draft.tosses.push(result);
+  } catch (e) {
+    openModal("Error", e.message);
   }
+
+  state._tossing = false;
+  render();
 }
 
 function finishToss() {
-  const readingData = buildReading(state.draft.tosses);
-  state.session = {
-    id: cryptoRandomId(),
-    created_at_iso: new Date().toISOString(),
-    question: structuredClone(state.draft.question),
-    tosses: structuredClone(state.draft.tosses),
-    hexagrams: readingData
-  };
-  trackEvent("reading_view");
-  nav("reading");
-}
-
-/* --- Zen Master Utilities --- */
-function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-
-function ReadingView() {
-  if (!state.session) return `<div class="card"><div class="muted">Error de sesión.</div></div>`;
-
-  const { primary, resulting, is_mutating } = state.session.hexagrams;
-  const title = primary ? `${primary.id}. ${primary.hanzi} · ${primary.slug}` : "Unknown";
-
-  const coreSection = `
-    <div class="vstack">
-      <div class="label">${t("reading.label_core")}</div>
-      <div style="font-size:1.1em; font-weight:500;">${escapeHtml(primary?.dynamic_core_es || "—")}</div>
-    </div>
-  `;
-
-  const imageSection = `
-    <div class="vstack">
-      <div class="label">${t("reading.label_image")}</div>
-      <div>${escapeHtml(primary?.image_es || "—")}</div>
-    </div>
-  `;
-
-  const generalSection = `
-    <div class="vstack">
-      <div class="label">${t("reading.label_general")}</div>
-      <div style="line-height:1.6;">${escapeHtml(primary?.general_reading_es || "—")}</div>
-    </div>
-  `;
-
-  const linesSection = (primary?.active_lines_content?.length > 0)
-    ? `
-      <div class="divider"></div>
-      <div class="vstack">
-        <div class="label">${t("reading.label_lines")}</div>
-        ${primary.active_lines_content.map(l => `
-          <div class="card" style="background:transparent; border:none; padding:10px;">
-            <div class="muted" style="margin-bottom:4px;">${t("toss.line")} ${l.position}</div>
-            <div>${escapeHtml(l.text)}</div>
-          </div>
-        `).join("")}
-      </div>
-    `
-    : `<div class="divider"></div><div class="muted">${t("reading.no_mutations")}</div>`;
-
-  const resultingSection = (is_mutating && resulting)
-    ? `
-      <div class="divider"></div>
-      <div class="card" style="background:var(--panel);">
-        <div class="label">${t("reading.label_resulting")}</div>
-        <div class="row" style="margin-top:8px;">
-          ${resulting.symbol_unicode ? `<div class="hexBig" style="font-size:32px;">${escapeHtml(resulting.symbol_unicode)}</div>` : ""}
-          <div class="vstack" style="gap:2px;">
-            <div style="font-weight:600;">${escapeHtml(resulting.id)}. ${escapeHtml(resulting.hanzi)}</div>
-            <div class="muted">${escapeHtml(resulting.slug)}</div>
-          </div>
-        </div>
-      </div>
-    `
-    : "";
-
-  return `
-      <div class="vstack">
-        <div class="card">
-          <div class="hstack" style="justify-content:space-between; align-items:flex-start;">
-            <div class="row">
-              ${primary?.symbol_unicode ? `<div class="hexBig">${escapeHtml(primary.symbol_unicode)}</div>` : ""}
-              <div class="vstack" style="gap:2px;">
-                <h1 class="hexTitle">${escapeHtml(title)}</h1>
-                <div class="muted">${escapeHtml(state.session.created_at_iso.split("T")[0])}</div>
-              </div>
-            </div>
-            <span class="badge">${escapeHtml(state.session.question.mode)}</span>
-          </div>
-
-          <div class="divider"></div>
-          <div class="muted" style="font-style:italic;">“${escapeHtml(state.session.question.text_es)}”</div>
-          <div class="divider"></div>
-
-          ${coreSection}
-          <div class="divider"></div>
-          ${imageSection}
-          <div class="divider"></div>
-          ${generalSection}
-
-          ${linesSection}
-          ${resultingSection}
-
-          <div class="divider"></div>
-          ${renderPremiumSection(primary)}
-
-          <div class="divider"></div>
-
-          <div class="row">
-            <button class="btn btn--ghost" id="btnClose">${t("reading.btn_close")}</button>
-            <button class="btn btn--ghost" id="btnSave">${t("reading.btn_save")}</button>
-            <button class="btn btn--ghost" id="btnPDF">${t("reading.btn_pdf")}</button>
-          </div>
-        </div>
-      </div>
-  `;
-}
-
-function renderPremiumSection(hex) {
-  if (!hex) return "";
-
-  if (state.entitlements.premium_sections) {
-    const qs = Array.isArray(hex.guiding_questions_es) ? hex.guiding_questions_es : [];
-    return `
-      <div class="callout">
-        <div class="callout__title">${t("reading.premium_title")}</div>
-        <div style="margin-bottom:10px;">${escapeHtml(hex.taoist_reading_es || "—")}</div>
-        
-        <div class="divider"></div>
-        <div class="callout__title">${t("reading.premium_questions")}</div>
-        <ul style="padding-left:20px; margin:0;">
-          ${qs.map(q => `<li>${escapeHtml(q)}</li>`).join("")}
-        </ul>
-        
-        <div class="divider"></div>
-        <div class="callout__title">${t("reading.premium_action")}</div>
-        <div>${escapeHtml(hex.micro_action_es || "—")}</div>
-      </div>
-    `;
-  } else {
-    const teaser = (hex.taoist_reading_es || "").split(" ").slice(0, 4).join(" ") + "...";
-    return `
-      <div class="callout" style="cursor:pointer; position:relative;" id="premiumLocked">
-        <div class="callout__title">${t("reading.premium_title")}</div>
-        <div style="position:relative;">
-            <div style="filter:blur(4px); user-select:none; opacity:0.6;">
-                ${t("reading.teaser_blur_text")}
-            </div>
-            <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center;">
-                <span style="background:var(--panel); padding:4px 8px; border-radius:4px; box-shadow:0 2px 4px rgba(0,0,0,0.1); font-weight:bold; font-size:0.9em;">
-                    ${escapeHtml(teaser)}
-                </span>
-                <button class="btn btn--primary btn--sm" style="margin-top:8px;" id="btnUnlockTeaser">${t("reading.teaser_overlay")}</button>
-            </div>
-        </div>
-      </div>
-    `;
+  try {
+    state.session = buildReading(state.draft.tosses);
+    state.session.id = cryptoRandomId();
+    state.session.created_at_iso = new Date().toISOString();
+    state.session.question = { ...state.draft.question };
+    state.nav = "reading";
+    render();
+  } catch (e) {
+    openModal("Error", "No se pudo generar la lectura: " + e.message);
   }
 }
 
-function HistoryView() {
-  const isUnlimited = state.entitlements.unlimited_history;
-
-  let visibleHistory = state.history;
-  let lockedCount = 0;
-
-  if (!isUnlimited && state.history.length > 1) {
-    visibleHistory = [state.history[0]];
-    lockedCount = state.history.length - 1;
-  }
-
-  const rows = visibleHistory.map((s) => {
-    const p = s.hexagrams?.primary;
-    // Use card style
-    return `
-      <div class="history-card" data-open="${escapeHtml(s.id)}">
-        <div class="hex-char">${escapeHtml(p?.symbol_unicode || "??")}</div>
-        <div class="card-title">${escapeHtml(p?.dynamic_core_es || "Sesión")}</div>
-        <div class="card-date">${escapeHtml(s.created_at_iso.split("T")[0])}</div>
-        <div class="card-q">"${escapeHtml(s.question?.text_es || "—")}"</div>
-      </div>
-    `;
-  }).join("");
-
-  let upsell = "";
-  if (!isUnlimited) {
-    upsell = `
-       <div class="history-card" style="justify-content:center; border:1px dashed var(--muted); background:transparent; opacity:0.7;" id="historyLocked">
-          <div class="seal" style="width:40px; height:40px; font-size:20px;">+${lockedCount}</div>
-          <div style="margin-top:10px; font-size:0.9em;">${t("history.locked_banner", { count: lockedCount })}</div>
-       </div>
-     `;
-  }
-
-  return `
-      <div class="vstack">
-        <div class="card" style="overflow:visible;"> <!-- Overflow visible for tilt perspective interaction -->
-          <div class="hstack" style="justify-content:space-between;">
-            <div class="hexTitle">${t("history.title")}</div>
-            <span class="badge">${isUnlimited ? t("history.badge_full") : t("history.badge_limited")}</span>
-          </div>
-          <div class="divider"></div>
-          
-          ${state.history.length ? `<div class="history-grid">${rows}${upsell}</div>` : `<div class="muted">${t("history.empty")}</div>`}
-
-          <div class="divider"></div>
-          <div class="row">
-            <button class="btn btn--ghost" id="btnBackHome2">${t("history.btn_back")}</button>
-            <button class="btn btn--ghost" id="btnClearHistory">${t("history.btn_clear")}</button>
-          </div>
-        </div>
-      </div>
-  `;
-}
-
-function PaywallView() {
-  const products = getProducts();
-  const prod = products?.products?.[0];
-  const copy = products?.paywall_copy_es;
-
-  const title = copy?.title || "Premium";
-  const body = copy?.body || "Desbloquea funciones.";
-  const price = prod?.price?.formatted || "Consultar";
-
-  const benefits = prod?.purchase_notes_es?.map(n => `<li>${escapeHtml(n)}</li>`).join("") || "";
-
-  return `
-      <div class="vstack">
-        <div class="card">
-          <div class="hexTitle">${escapeHtml(title)}</div>
-          <div style="white-space:pre-wrap; line-height:1.5;">${escapeHtml(body)}</div>
-          
-          <div class="divider"></div>
-          
-          <div class="card" style="background:var(--panel2);">
-            <div class="hstack" style="justify-content:space-between;">
-              <div style="font-weight:bold;">${escapeHtml(prod?.title_es || "Acceso Total")}</div>
-              <div class="badge" style="background:var(--accent); color:var(--bg); border:none;">${escapeHtml(price)}</div>
-            </div>
-            <ul style="margin:10px 0 0; padding-left:20px; font-size:13px; color:var(--muted);">
-              ${benefits}
-            </ul>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="row">
-            <button class="btn btn--primary" id="btnUnlockLocal">${t("paywall.btn_simulate")}</button>
-            <button class="btn btn--ghost" id="btnLockLocal">${t("paywall.btn_revoke")}</button>
-            <button class="btn btn--ghost" id="btnBackHome3">${t("paywall.btn_back")}</button>
-          </div>
-          
-          <div class="muted" style="font-size:11px; text-align:center;">
-            ${escapeHtml(copy?.footer_note || "Uso local.")}
-          </div>
-        </div>
-      </div>
-  `;
-}
-
-// ---------- Bind events ----------
 function bindPageEvents(root) {
   if (!root) return;
 
-  // Home Form
-  const btnBegin = root.querySelector("#btnBegin");
-  if (btnBegin) {
-    const qText = root.querySelector("#qText");
-    qText?.addEventListener("input", (e) => state.draft.question.text_es = e.target.value);
-
-    const qMode = root.querySelector("#qMode");
-    qMode?.addEventListener("change", (e) => state.draft.question.mode = e.target.value);
-
-    if (qText) qText.value = state.draft.question.text_es;
-    if (qMode) qMode.value = state.draft.question.mode;
-
-    btnBegin.addEventListener("click", () => {
-      if (!state.draft.question.text_es.trim()) {
-        openModal(t("home.error_empty_question"), `<p>${t("home.error_empty_question_body")}</p>`);
-        return;
-      }
-      beginToss();
-    });
-
-    root.querySelector("#btnHistory")?.addEventListener("click", openHistory);
-    root.querySelector("#btnPremium")?.addEventListener("click", () => openPaywall("home"));
-  }
+  // Home
+  root.querySelector("#btnBegin")?.addEventListener("click", () => {
+    if (!state.draft.question.text_es.trim()) {
+      openModal(t("home.error_empty_question"), `<p>${t("home.error_empty_question_body")}</p>`);
+      return;
+    }
+    beginToss();
+  });
+  root.querySelector("#qText")?.addEventListener("input", e => state.draft.question.text_es = e.target.value);
+  root.querySelector("#qMode")?.addEventListener("change", e => state.draft.question.mode = e.target.value);
 
   // Toss
   root.querySelector("#btnToss")?.addEventListener("click", onTossNextLine);
-  // Back to Home now stays inside book, just nav change
   root.querySelector("#btnBackHome")?.addEventListener("click", startNew);
 
   // Reading
-  root.querySelector("#btnClose")?.addEventListener("click", startNew);
   root.querySelector("#btnSave")?.addEventListener("click", saveSession);
   root.querySelector("#btnPDF")?.addEventListener("click", exportPDF);
-  root.querySelector("#premiumLocked")?.addEventListener("click", () => openPaywall("reading_teaser"));
-  root.querySelector("#btnUnlockTeaser")?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    openPaywall("reading_overlay");
-  });
+  root.querySelector("#btnClose")?.addEventListener("click", startNew);
+  root.querySelector("#btnUnlockTeaser")?.addEventListener("click", () => openPaywall("reading_teaser"));
 
   // History
   root.querySelector("#btnBackHome2")?.addEventListener("click", startNew);
@@ -875,29 +748,19 @@ function bindPageEvents(root) {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-open");
       const sess = state.history.find(s => s.id === id);
-      if (sess) {
-        state.session = sess;
-        nav("reading");
-      }
+      if (sess) { state.session = sess; nav("reading"); }
     });
   });
 
   // Paywall
-  root.querySelector("#btnUnlockLocal")?.addEventListener("click", unlockPremiumLocal);
-  root.querySelector("#btnLockLocal")?.addEventListener("click", lockPremiumLocal);
-  root.querySelector("#btnBackHome3")?.addEventListener("click", startNew);
+  root.querySelector("#btnUnlockNow")?.addEventListener("click", unlockPremiumLocal);
+  root.querySelector("#btnPaywallBack")?.addEventListener("click", () => nav("home"));
 }
 
 // ---------- Helpers ----------
-function cryptoRandomId() {
-  return "sess_" + Math.random().toString(36).substr(2, 9);
-}
 
-function htmlToNode(html) {
-  const tpl = document.createElement("template");
-  tpl.innerHTML = html.trim();
-  return tpl.content; // Returns documentFragment
-}
+const LS_KEY = "iching_sessions_v1";
+const LS_THEME = "iching_theme_v1";
 
 function escapeHtml(unsafe) {
   if (typeof unsafe !== "string") return "";
@@ -909,93 +772,10 @@ function escapeHtml(unsafe) {
     .replace(/'/g, "&#039;");
 }
 
-function t(key, params) {
-  // Simple fallback translation mock
-  const en = {
-    "app.boot_error_title": "Error de carga",
-    "app.boot_error_desc": "No se pudieron cargar archivos esenciales.",
-    "app.unknown_error": "Error desconocido",
-    "app.missing_files": "Archivos faltantes",
-    "app.footer_default": "Uso personal. No sustituye criterio clínico.",
-    "home.title": "I Ching",
-    "home.subtitle": "Reflexión Local",
-    "home.label_focus": "Enfoque",
-    "home.label_question": "Tu Pregunta",
-    "home.placeholder_question": "Escribe aquí tu inquietud...",
-    "home.btn_toss": "Consultar",
-    "home.btn_history": "Historial",
-    "home.btn_unlock": "Desbloquear",
-    "home.btn_your_access": "Tu Acceso",
-    "home.error_empty_question": "Pregunta vacía",
-    "home.error_empty_question_body": "Por favor escribe una pregunta para concentrar tu intención.",
-    "home.focus_options.reflexion": "Reflexión General",
-    "home.focus_options.decision": "Toma de Decisión",
-    "home.focus_options.relacion": "Relaciones",
-    "home.focus_options.trabajo": "Trabajo / Proyectos",
-    "home.focus_options.salud": "Salud / Bienestar",
-    "home.focus_options.otro": "Otro",
-    "toss.title": "Consulta",
-    "toss.btn_toss": "Lanzar Monedas",
-    "toss.btn_finish": "Ver Lectura",
-    "toss.btn_cancel": "Cancelar",
-    "toss.moving": "Mutante",
-    "toss.line": "Línea",
-    "reading.label_core": "Esencia",
-    "reading.label_image": "Imagen",
-    "reading.label_general": "Dictamen",
-    "reading.label_lines": "Líneas Activas",
-    "reading.label_resulting": "Hexagrama Resultante",
-    "reading.no_mutations": "Sin líneas mutantes. La situación es estable.",
-    "reading.btn_close": "Cerrar",
-    "reading.btn_save": "Guardar",
-    "reading.btn_pdf": "PDF",
-    "reading.premium_title": "Lectura Taoísta & Acción",
-    "reading.premium_questions": "Preguntas Guía",
-    "reading.premium_action": "Micro-Acción",
-    "reading.teaser_blur_text": "Contenido Premium Contenido Premium Contenido Premium Contenido Premium",
-    "reading.teaser_overlay": "Desbloquear Lectura Completa",
-    "history.title": "Historial",
-    "history.badge_full": "Ilimitado",
-    "history.badge_limited": "Gratis (Reciente)",
-    "history.btn_view": "Ver",
-    "history.btn_back": "Volver",
-    "history.btn_clear": "Borrar Todo",
-    "history.empty": "No hay consultas guardadas.",
-    "history.locked_banner": "Y {count} sesiones más guardadas...",
-    "history.modal_saved_title": "Sesión Guardada",
-    "history.modal_saved_body": "Tu consulta se ha guardado en el historial.",
-    "history.alert_replaced": "Se ha sobrescrito la sesión anterior (Límite Gratuito).",
-    "history.limit_modal_title": "Límite de Historial",
-    "history.limit_modal_body": "En la versión gratuita, solo se guarda 1 sesión.",
-    "history.limit_modal_question": "¿Deseas desbloquear el historial ilimitado?",
-    "history.limit_modal_warning": "Si no, se sobrescribirá la sesión del {date}.",
-    "history.btn_upgrade_save": "Mejorar y Guardar",
-    "history.btn_overwrite_save": "Sobrescribir",
-    "history.modal_cleared_title": "Historial Borrado",
-    "history.modal_cleared_body": "Se han eliminado todas las sesiones.",
-    "paywall.btn_simulate": "Simular Compra",
-    "paywall.btn_revoke": "Revocar Acceso",
-    "paywall.btn_back": "Volver",
-    "paywall.modal_unlocked": "¡Premium Activado!",
-    "paywall.modal_unlocked_body": "Gracias por tu apoyo. Disfruta de todas las funciones.",
-    "paywall.modal_locked": "Premium Desactivado",
-    "paywall.modal_locked_body": "Has vuelto a la versión gratuita."
-  };
-
-  let val = en[key] || key;
-  if (params) {
-    Object.keys(params).forEach(k => {
-      val = val.replace(`{${k}}`, params[k]);
-    });
-  }
-  return val;
+function cryptoRandomId() {
+  return "sess_" + Math.random().toString(36).substr(2, 9);
 }
 
-function opt(val, label) {
-  return `<option value="${val}">${label}</option>`;
-}
-
-// Global Modal
 function openModal(title, content) {
   const m = document.getElementById("modal");
   const tVal = document.getElementById("modalTitle");
@@ -1006,5 +786,3 @@ function openModal(title, content) {
     m.showModal();
   }
 }
-
-// Removed fallback stubs since we are now importing them directly.

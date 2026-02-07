@@ -523,6 +523,14 @@
               },
               "lower_trigram": {
                 "$ref": "#/$defs/trigram_id"
+              },
+              "pinyin": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name_en_standard": {
+                "type": "string",
+                "minLength": 1
               }
             }
           }

@@ -1,7 +1,7 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "ordering": "king_wen",
-  "notes_es": "Metadatos de navegación. symbol_unicode usa el bloque Unicode Yijing Hexagram Symbols (䷀–䷿).",
+  "notes_es": "Metadatos de navegación en secuencia King Wen. symbol_unicode usa el bloque Unicode Yijing Hexagram Symbols (䷀–䷿). Se agrega pinyin estándar y nombre inglés de referencia para cada hexagrama.",
   "hexagrams": [
     {
       "id": 1,
@@ -10,7 +10,9 @@
       "symbol_unicode": "䷀",
       "pair": 2,
       "upper_trigram": "qian",
-      "lower_trigram": "qian"
+      "lower_trigram": "qian",
+      "pinyin": "qián",
+      "name_en_standard": "The Creative"
     },
     {
       "id": 2,
@@ -19,7 +21,9 @@
       "symbol_unicode": "䷁",
       "pair": 1,
       "upper_trigram": "kun",
-      "lower_trigram": "kun"
+      "lower_trigram": "kun",
+      "pinyin": "kūn",
+      "name_en_standard": "The Receptive"
     },
     {
       "id": 3,
@@ -28,7 +32,9 @@
       "symbol_unicode": "䷂",
       "pair": 4,
       "upper_trigram": "kan",
-      "lower_trigram": "zhen"
+      "lower_trigram": "zhen",
+      "pinyin": "zhūn",
+      "name_en_standard": "Difficulty at the Beginning"
     },
     {
       "id": 4,
@@ -37,7 +43,9 @@
       "symbol_unicode": "䷃",
       "pair": 3,
       "upper_trigram": "gen",
-      "lower_trigram": "kan"
+      "lower_trigram": "kan",
+      "pinyin": "méng",
+      "name_en_standard": "Youthful Folly"
     },
     {
       "id": 5,
@@ -46,7 +54,9 @@
       "symbol_unicode": "䷄",
       "pair": 6,
       "upper_trigram": "kan",
-      "lower_trigram": "qian"
+      "lower_trigram": "qian",
+      "pinyin": "xū",
+      "name_en_standard": "Waiting"
     },
     {
       "id": 6,
@@ -55,7 +65,9 @@
       "symbol_unicode": "䷅",
       "pair": 5,
       "upper_trigram": "qian",
-      "lower_trigram": "kan"
+      "lower_trigram": "kan",
+      "pinyin": "sòng",
+      "name_en_standard": "Conflict"
     },
     {
       "id": 7,
@@ -64,7 +76,9 @@
       "symbol_unicode": "䷆",
       "pair": 8,
       "upper_trigram": "kun",
-      "lower_trigram": "kan"
+      "lower_trigram": "kan",
+      "pinyin": "shī",
+      "name_en_standard": "The Army"
     },
     {
       "id": 8,
@@ -73,7 +87,9 @@
       "symbol_unicode": "䷇",
       "pair": 7,
       "upper_trigram": "kan",
-      "lower_trigram": "kun"
+      "lower_trigram": "kun",
+      "pinyin": "bǐ",
+      "name_en_standard": "Holding Together"
     },
     {
       "id": 9,
@@ -82,7 +98,9 @@
       "symbol_unicode": "䷈",
       "pair": 10,
       "upper_trigram": "xun",
-      "lower_trigram": "qian"
+      "lower_trigram": "qian",
+      "pinyin": "xiǎo chù",
+      "name_en_standard": "Small Taming"
     },
     {
       "id": 10,
@@ -91,7 +109,9 @@
       "symbol_unicode": "䷉",
       "pair": 9,
       "upper_trigram": "qian",
-      "lower_trigram": "dui"
+      "lower_trigram": "dui",
+      "pinyin": "lǚ",
+      "name_en_standard": "Treading"
     },
     {
       "id": 11,
@@ -100,7 +120,9 @@
       "symbol_unicode": "䷊",
       "pair": 12,
       "upper_trigram": "kun",
-      "lower_trigram": "qian"
+      "lower_trigram": "qian",
+      "pinyin": "tài",
+      "name_en_standard": "Peace"
     },
     {
       "id": 12,
@@ -109,7 +131,9 @@
       "symbol_unicode": "䷋",
       "pair": 11,
       "upper_trigram": "qian",
-      "lower_trigram": "kun"
+      "lower_trigram": "kun",
+      "pinyin": "pǐ",
+      "name_en_standard": "Standstill"
     },
     {
       "id": 13,
@@ -118,7 +142,9 @@
       "symbol_unicode": "䷌",
       "pair": 14,
       "upper_trigram": "qian",
-      "lower_trigram": "li"
+      "lower_trigram": "li",
+      "pinyin": "tóng rén",
+      "name_en_standard": "Fellowship"
     },
     {
       "id": 14,
@@ -127,7 +153,9 @@
       "symbol_unicode": "䷍",
       "pair": 13,
       "upper_trigram": "li",
-      "lower_trigram": "qian"
+      "lower_trigram": "qian",
+      "pinyin": "dà yǒu",
+      "name_en_standard": "Great Possession"
     },
     {
       "id": 15,
@@ -136,7 +164,9 @@
       "symbol_unicode": "䷎",
       "pair": 16,
       "upper_trigram": "kun",
-      "lower_trigram": "gen"
+      "lower_trigram": "gen",
+      "pinyin": "qiān",
+      "name_en_standard": "Modesty"
     },
     {
       "id": 16,
@@ -145,7 +175,9 @@
       "symbol_unicode": "䷏",
       "pair": 15,
       "upper_trigram": "zhen",
-      "lower_trigram": "kun"
+      "lower_trigram": "kun",
+      "pinyin": "yù",
+      "name_en_standard": "Enthusiasm"
     },
     {
       "id": 17,
@@ -154,7 +186,9 @@
       "symbol_unicode": "䷐",
       "pair": 18,
       "upper_trigram": "dui",
-      "lower_trigram": "zhen"
+      "lower_trigram": "zhen",
+      "pinyin": "suí",
+      "name_en_standard": "Following"
     },
     {
       "id": 18,
@@ -163,7 +197,9 @@
       "symbol_unicode": "䷑",
       "pair": 17,
       "upper_trigram": "gen",
-      "lower_trigram": "xun"
+      "lower_trigram": "xun",
+      "pinyin": "gǔ",
+      "name_en_standard": "Work on What Has Been Spoiled"
     },
     {
       "id": 19,
@@ -172,7 +208,9 @@
       "symbol_unicode": "䷒",
       "pair": 20,
       "upper_trigram": "kun",
-      "lower_trigram": "dui"
+      "lower_trigram": "dui",
+      "pinyin": "lín",
+      "name_en_standard": "Approach"
     },
     {
       "id": 20,
@@ -181,7 +219,9 @@
       "symbol_unicode": "䷓",
       "pair": 19,
       "upper_trigram": "xun",
-      "lower_trigram": "kun"
+      "lower_trigram": "kun",
+      "pinyin": "guān",
+      "name_en_standard": "Contemplation"
     },
     {
       "id": 21,
@@ -190,7 +230,9 @@
       "symbol_unicode": "䷔",
       "pair": 22,
       "upper_trigram": "li",
-      "lower_trigram": "zhen"
+      "lower_trigram": "zhen",
+      "pinyin": "shì kè",
+      "name_en_standard": "Biting Through"
     },
     {
       "id": 22,
@@ -199,7 +241,9 @@
       "symbol_unicode": "䷕",
       "pair": 21,
       "upper_trigram": "gen",
-      "lower_trigram": "li"
+      "lower_trigram": "li",
+      "pinyin": "bì",
+      "name_en_standard": "Grace"
     },
     {
       "id": 23,
@@ -208,7 +252,9 @@
       "symbol_unicode": "䷖",
       "pair": 24,
       "upper_trigram": "gen",
-      "lower_trigram": "kun"
+      "lower_trigram": "kun",
+      "pinyin": "bō",
+      "name_en_standard": "Splitting Apart"
     },
     {
       "id": 24,
@@ -217,7 +263,9 @@
       "symbol_unicode": "䷗",
       "pair": 23,
       "upper_trigram": "kun",
-      "lower_trigram": "zhen"
+      "lower_trigram": "zhen",
+      "pinyin": "fù",
+      "name_en_standard": "Return"
     },
     {
       "id": 25,
@@ -226,7 +274,9 @@
       "symbol_unicode": "䷘",
       "pair": 26,
       "upper_trigram": "qian",
-      "lower_trigram": "zhen"
+      "lower_trigram": "zhen",
+      "pinyin": "wú wàng",
+      "name_en_standard": "Innocence"
     },
     {
       "id": 26,
@@ -235,7 +285,9 @@
       "symbol_unicode": "䷙",
       "pair": 25,
       "upper_trigram": "gen",
-      "lower_trigram": "qian"
+      "lower_trigram": "qian",
+      "pinyin": "dà chù",
+      "name_en_standard": "Great Taming"
     },
     {
       "id": 27,
@@ -244,7 +296,9 @@
       "symbol_unicode": "䷚",
       "pair": 28,
       "upper_trigram": "gen",
-      "lower_trigram": "zhen"
+      "lower_trigram": "zhen",
+      "pinyin": "yí",
+      "name_en_standard": "Nourishment"
     },
     {
       "id": 28,
@@ -253,7 +307,9 @@
       "symbol_unicode": "䷛",
       "pair": 27,
       "upper_trigram": "dui",
-      "lower_trigram": "xun"
+      "lower_trigram": "xun",
+      "pinyin": "dà guò",
+      "name_en_standard": "Great Exceeding"
     },
     {
       "id": 29,
@@ -262,7 +318,9 @@
       "symbol_unicode": "䷜",
       "pair": 30,
       "upper_trigram": "kan",
-      "lower_trigram": "kan"
+      "lower_trigram": "kan",
+      "pinyin": "kǎn",
+      "name_en_standard": "The Abysmal"
     },
     {
       "id": 30,
@@ -271,7 +329,9 @@
       "symbol_unicode": "䷝",
       "pair": 29,
       "upper_trigram": "li",
-      "lower_trigram": "li"
+      "lower_trigram": "li",
+      "pinyin": "lí",
+      "name_en_standard": "The Clinging"
     },
     {
       "id": 31,
@@ -280,7 +340,9 @@
       "symbol_unicode": "䷞",
       "pair": 32,
       "upper_trigram": "dui",
-      "lower_trigram": "gen"
+      "lower_trigram": "gen",
+      "pinyin": "xián",
+      "name_en_standard": "Influence"
     },
     {
       "id": 32,
@@ -289,7 +351,9 @@
       "symbol_unicode": "䷟",
       "pair": 31,
       "upper_trigram": "zhen",
-      "lower_trigram": "xun"
+      "lower_trigram": "xun",
+      "pinyin": "héng",
+      "name_en_standard": "Duration"
     },
     {
       "id": 33,
@@ -298,7 +362,9 @@
       "symbol_unicode": "䷠",
       "pair": 34,
       "upper_trigram": "qian",
-      "lower_trigram": "gen"
+      "lower_trigram": "gen",
+      "pinyin": "dùn",
+      "name_en_standard": "Retreat"
     },
     {
       "id": 34,
@@ -307,7 +373,9 @@
       "symbol_unicode": "䷡",
       "pair": 33,
       "upper_trigram": "zhen",
-      "lower_trigram": "qian"
+      "lower_trigram": "qian",
+      "pinyin": "dà zhuàng",
+      "name_en_standard": "Great Power"
     },
     {
       "id": 35,
@@ -316,7 +384,9 @@
       "symbol_unicode": "䷢",
       "pair": 36,
       "upper_trigram": "li",
-      "lower_trigram": "kun"
+      "lower_trigram": "kun",
+      "pinyin": "jìn",
+      "name_en_standard": "Progress"
     },
     {
       "id": 36,
@@ -325,7 +395,9 @@
       "symbol_unicode": "䷣",
       "pair": 35,
       "upper_trigram": "kun",
-      "lower_trigram": "li"
+      "lower_trigram": "li",
+      "pinyin": "míng yí",
+      "name_en_standard": "Darkening of the Light"
     },
     {
       "id": 37,
@@ -334,7 +406,9 @@
       "symbol_unicode": "䷤",
       "pair": 38,
       "upper_trigram": "xun",
-      "lower_trigram": "li"
+      "lower_trigram": "li",
+      "pinyin": "jiā rén",
+      "name_en_standard": "The Family"
     },
     {
       "id": 38,
@@ -343,7 +417,9 @@
       "symbol_unicode": "䷥",
       "pair": 37,
       "upper_trigram": "li",
-      "lower_trigram": "dui"
+      "lower_trigram": "dui",
+      "pinyin": "kuí",
+      "name_en_standard": "Opposition"
     },
     {
       "id": 39,
@@ -352,7 +428,9 @@
       "symbol_unicode": "䷦",
       "pair": 40,
       "upper_trigram": "kan",
-      "lower_trigram": "gen"
+      "lower_trigram": "gen",
+      "pinyin": "jiǎn",
+      "name_en_standard": "Obstruction"
     },
     {
       "id": 40,
@@ -361,7 +439,9 @@
       "symbol_unicode": "䷧",
       "pair": 39,
       "upper_trigram": "zhen",
-      "lower_trigram": "kan"
+      "lower_trigram": "kan",
+      "pinyin": "xiè",
+      "name_en_standard": "Deliverance"
     },
     {
       "id": 41,
@@ -370,7 +450,9 @@
       "symbol_unicode": "䷨",
       "pair": 42,
       "upper_trigram": "gen",
-      "lower_trigram": "dui"
+      "lower_trigram": "dui",
+      "pinyin": "sǔn",
+      "name_en_standard": "Decrease"
     },
     {
       "id": 42,
@@ -379,7 +461,9 @@
       "symbol_unicode": "䷩",
       "pair": 41,
       "upper_trigram": "xun",
-      "lower_trigram": "zhen"
+      "lower_trigram": "zhen",
+      "pinyin": "yì",
+      "name_en_standard": "Increase"
     },
     {
       "id": 43,
@@ -388,7 +472,9 @@
       "symbol_unicode": "䷪",
       "pair": 44,
       "upper_trigram": "dui",
-      "lower_trigram": "qian"
+      "lower_trigram": "qian",
+      "pinyin": "guài",
+      "name_en_standard": "Breakthrough"
     },
     {
       "id": 44,
@@ -397,7 +483,9 @@
       "symbol_unicode": "䷫",
       "pair": 43,
       "upper_trigram": "qian",
-      "lower_trigram": "xun"
+      "lower_trigram": "xun",
+      "pinyin": "gòu",
+      "name_en_standard": "Coming to Meet"
     },
     {
       "id": 45,
@@ -406,7 +494,9 @@
       "symbol_unicode": "䷬",
       "pair": 46,
       "upper_trigram": "dui",
-      "lower_trigram": "kun"
+      "lower_trigram": "kun",
+      "pinyin": "cuì",
+      "name_en_standard": "Gathering Together"
     },
     {
       "id": 46,
@@ -415,7 +505,9 @@
       "symbol_unicode": "䷭",
       "pair": 45,
       "upper_trigram": "kun",
-      "lower_trigram": "xun"
+      "lower_trigram": "xun",
+      "pinyin": "shēng",
+      "name_en_standard": "Pushing Upward"
     },
     {
       "id": 47,
@@ -424,7 +516,9 @@
       "symbol_unicode": "䷮",
       "pair": 48,
       "upper_trigram": "dui",
-      "lower_trigram": "kan"
+      "lower_trigram": "kan",
+      "pinyin": "kùn",
+      "name_en_standard": "Oppression"
     },
     {
       "id": 48,
@@ -433,7 +527,9 @@
       "symbol_unicode": "䷯",
       "pair": 47,
       "upper_trigram": "kan",
-      "lower_trigram": "xun"
+      "lower_trigram": "xun",
+      "pinyin": "jǐng",
+      "name_en_standard": "The Well"
     },
     {
       "id": 49,
@@ -442,7 +538,9 @@
       "symbol_unicode": "䷰",
       "pair": 50,
       "upper_trigram": "dui",
-      "lower_trigram": "li"
+      "lower_trigram": "li",
+      "pinyin": "gé",
+      "name_en_standard": "Revolution"
     },
     {
       "id": 50,
@@ -451,7 +549,9 @@
       "symbol_unicode": "䷱",
       "pair": 49,
       "upper_trigram": "li",
-      "lower_trigram": "xun"
+      "lower_trigram": "xun",
+      "pinyin": "dǐng",
+      "name_en_standard": "The Cauldron"
     },
     {
       "id": 51,
@@ -460,7 +560,9 @@
       "symbol_unicode": "䷲",
       "pair": 52,
       "upper_trigram": "zhen",
-      "lower_trigram": "zhen"
+      "lower_trigram": "zhen",
+      "pinyin": "zhèn",
+      "name_en_standard": "The Arousing"
     },
     {
       "id": 52,
@@ -469,7 +571,9 @@
       "symbol_unicode": "䷳",
       "pair": 51,
       "upper_trigram": "gen",
-      "lower_trigram": "gen"
+      "lower_trigram": "gen",
+      "pinyin": "gèn",
+      "name_en_standard": "Keeping Still"
     },
     {
       "id": 53,
@@ -478,7 +582,9 @@
       "symbol_unicode": "䷴",
       "pair": 54,
       "upper_trigram": "xun",
-      "lower_trigram": "gen"
+      "lower_trigram": "gen",
+      "pinyin": "jiàn",
+      "name_en_standard": "Development"
     },
     {
       "id": 54,
@@ -487,7 +593,9 @@
       "symbol_unicode": "䷵",
       "pair": 53,
       "upper_trigram": "zhen",
-      "lower_trigram": "dui"
+      "lower_trigram": "dui",
+      "pinyin": "guī mèi",
+      "name_en_standard": "The Marrying Maiden"
     },
     {
       "id": 55,
@@ -496,7 +604,9 @@
       "symbol_unicode": "䷶",
       "pair": 56,
       "upper_trigram": "zhen",
-      "lower_trigram": "li"
+      "lower_trigram": "li",
+      "pinyin": "fēng",
+      "name_en_standard": "Abundance"
     },
     {
       "id": 56,
@@ -505,7 +615,9 @@
       "symbol_unicode": "䷷",
       "pair": 55,
       "upper_trigram": "li",
-      "lower_trigram": "gen"
+      "lower_trigram": "gen",
+      "pinyin": "lǚ",
+      "name_en_standard": "The Wanderer"
     },
     {
       "id": 57,
@@ -514,7 +626,9 @@
       "symbol_unicode": "䷸",
       "pair": 58,
       "upper_trigram": "xun",
-      "lower_trigram": "xun"
+      "lower_trigram": "xun",
+      "pinyin": "xùn",
+      "name_en_standard": "The Gentle"
     },
     {
       "id": 58,
@@ -523,7 +637,9 @@
       "symbol_unicode": "䷹",
       "pair": 57,
       "upper_trigram": "dui",
-      "lower_trigram": "dui"
+      "lower_trigram": "dui",
+      "pinyin": "duì",
+      "name_en_standard": "The Joyous"
     },
     {
       "id": 59,
@@ -532,7 +648,9 @@
       "symbol_unicode": "䷺",
       "pair": 60,
       "upper_trigram": "xun",
-      "lower_trigram": "kan"
+      "lower_trigram": "kan",
+      "pinyin": "huàn",
+      "name_en_standard": "Dispersion"
     },
     {
       "id": 60,
@@ -541,7 +659,9 @@
       "symbol_unicode": "䷻",
       "pair": 59,
       "upper_trigram": "kan",
-      "lower_trigram": "dui"
+      "lower_trigram": "dui",
+      "pinyin": "jié",
+      "name_en_standard": "Limitation"
     },
     {
       "id": 61,
@@ -550,7 +670,9 @@
       "symbol_unicode": "䷼",
       "pair": 62,
       "upper_trigram": "xun",
-      "lower_trigram": "dui"
+      "lower_trigram": "dui",
+      "pinyin": "zhōng fú",
+      "name_en_standard": "Inner Truth"
     },
     {
       "id": 62,
@@ -559,7 +681,9 @@
       "symbol_unicode": "䷽",
       "pair": 61,
       "upper_trigram": "zhen",
-      "lower_trigram": "gen"
+      "lower_trigram": "gen",
+      "pinyin": "xiǎo guò",
+      "name_en_standard": "Small Exceeding"
     },
     {
       "id": 63,
@@ -568,7 +692,9 @@
       "symbol_unicode": "䷾",
       "pair": 64,
       "upper_trigram": "kan",
-      "lower_trigram": "li"
+      "lower_trigram": "li",
+      "pinyin": "jì jì",
+      "name_en_standard": "After Completion"
     },
     {
       "id": 64,
@@ -577,7 +703,9 @@
       "symbol_unicode": "䷿",
       "pair": 63,
       "upper_trigram": "li",
-      "lower_trigram": "kan"
+      "lower_trigram": "kan",
+      "pinyin": "wèi jì",
+      "name_en_standard": "Before Completion"
     }
   ]
 }

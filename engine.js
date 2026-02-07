@@ -47,7 +47,7 @@ export async function initEngine() {
   const bootResources = store.manifest.resources.filter(r => r.required_for_boot);
 
   const promises = bootResources.map(async (r) => {
-    const path = r.path.startsWith("http") ? r.path : `.${r.path}`;
+    const path = r.path.startsWith("http") ? r.path : (r.path.startsWith("/") ? `.${r.path}` : `./${r.path}`);
     try {
       const res = await fetch(path, { cache: "no-cache" });
       if (!res.ok) return { id: r.id, path, error: `Status ${res.status}` };
@@ -187,7 +187,8 @@ async function loadContent() {
   const resDef = store.manifest.resources.find(r => r.id === "editorial_content_core");
   if (!resDef) return;
 
-  const res = await fetch(`.${resDef.path}`);
+  const path = resDef.path.startsWith("/") ? `.${resDef.path}` : `./${resDef.path}`;
+  const res = await fetch(path);
   if (!res.ok) throw new Error("No se pudo cargar hexagrams_core.json");
   const json = await res.json();
 
