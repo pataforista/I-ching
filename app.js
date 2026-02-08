@@ -1,4 +1,4 @@
-import { BubbleMenu, Typewriter, InkGalaxy, Stepper, TiltCard } from "./ui-lib.js";
+import { BubbleMenu, Typewriter, InkGalaxy, TiltCard } from "./ui-lib.js";
 import {
   initEngine,
   trackEvent,
@@ -378,7 +378,7 @@ function TossView() {
     <div class="vstack" style="gap:30px;">
       <div class="sage-container">
          <div class="sage-avatar">
-            <img src="./assets/sage.png" alt="Sage">
+            ${SageSVG()}
          </div>
          <div class="sage-bubble">
             <span id="zenText"></span>
@@ -424,7 +424,7 @@ function renderHexLines(tosses) {
 function ReadingView() {
   if (!state.session) return `<div class="card"><div class="muted">Sesión no encontrada.</div></div>`;
 
-  const { primary, resulting, is_mutating } = state.session.hexagrams;
+  const { primary, resulting, is_mutating } = state.session;
   const title = primary ? `${primary.id}. ${primary.hanzi} · ${primary.slug}` : "Desconocido";
 
   return `
@@ -648,8 +648,50 @@ function opt(val, label) {
 }
 
 function renderStageCoins() {
-  const base = `<div class="coin-3d"><div class="coin-face coin-front"></div><div class="coin-face coin-back"></div></div>`;
-  return base + base + base;
+  return [1, 2, 3].map(() => `
+    <div class="coin-3d">
+      <div class="coin-face coin-front">${CoinSVG('heads')}</div>
+      <div class="coin-face coin-back">${CoinSVG('tails')}</div>
+    </div>
+  `).join('');
+}
+
+function SageSVG() {
+  return `
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+      <defs>
+        <radialGradient id="sageGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:var(--gold); stop-opacity:0.2" />
+          <stop offset="100%" style="stop-color:var(--gold); stop-opacity:0" />
+        </radialGradient>
+      </defs>
+      <circle cx="50" cy="50" r="45" fill="url(#sageGrad)" />
+      <path d="M50 20 C30 20 20 40 20 60 C20 80 35 85 50 85 C65 85 80 80 80 60 C80 40 70 20 50 20" fill="var(--text)" opacity="0.1" />
+      <path d="M50 25 C35 25 25 35 25 55 C25 75 35 80 50 80 C65 80 75 75 75 55 C75 35 65 25 50 25" fill="none" stroke="var(--text)" stroke-width="1.5" stroke-linecap="round" />
+      <path d="M40 50 Q45 45 50 50 Q55 55 60 50" fill="none" stroke="var(--text)" stroke-width="1" />
+      <circle cx="45" cy="45" r="1.5" fill="var(--text)" />
+      <circle cx="55" cy="45" r="1.5" fill="var(--text)" />
+      <path d="M35 65 Q50 75 65 65" fill="none" stroke="var(--accent)" stroke-width="2" opacity="0.6" />
+    </svg>
+  `;
+}
+
+function CoinSVG(side) {
+  const isHeads = side === 'heads';
+  return `
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+      <circle cx="50" cy="50" r="45" fill="var(--bg)" stroke="var(--gold)" stroke-width="3" />
+      <circle cx="50" cy="50" r="38" fill="none" stroke="var(--gold)" stroke-width="1" stroke-dasharray="2 4" />
+      <rect x="35" y="35" width="30" height="30" rx="4" fill="none" stroke="var(--gold)" stroke-width="2" />
+      <text x="50" y="55" font-family="serif" font-size="20" text-anchor="middle" fill="var(--gold)" style="font-weight:bold;">
+        ${isHeads ? '陽' : '陰'}
+      </text>
+      ${isHeads ?
+      '<path d="M50 15 L55 25 L45 25 Z" fill="var(--gold)" opacity="0.5"/>' :
+      '<circle cx="50" cy="18" r="3" fill="var(--gold)" opacity="0.5"/>'
+    }
+    </svg>
+  `;
 }
 
 // ---------- Domain Logic ----------

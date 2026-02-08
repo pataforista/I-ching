@@ -1,8 +1,8 @@
 {
   "version": "0.1.1",
   "app_principles_es": {
-    "non_predictive": "Esta app no predice eventos futuros ni ofrece certezas. Presenta marcos de reflexión para decisiones en el presente.",
-    "taoist_orientation": "La interpretación prioriza una lectura taoísta y pragmática: atención al proceso, ajuste al contexto y reducción de fricción.",
+    "non_predictive": "Esta app no predice eventos futuros ni ofrece certezas. Evita la adivinación y propone marcos de reflexión para tomar decisiones con mayor claridad en el presente.",
+    "taoist_orientation": "La interpretación prioriza una lectura taoísta y pragmática: atención al proceso, ajuste al contexto y reducción de fricción, sin saltos a conclusiones rápidas.",
     "no_medical_substitution": "No sustituye criterio clínico, legal o profesional. Si la situación es de riesgo o urgente, busca ayuda profesional y servicios de emergencia."
   },
   "privacy_es": {

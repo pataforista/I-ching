@@ -1,6 +1,6 @@
 {
   "version": "0.1.3",
-  "editorial_note_es": "Texto editorial propio inspirado en el Zhouyi y en traducciones históricas de dominio público (James Legge). No es traducción literal ni tiene función predictiva.",
+  "editorial_note_es": "Texto editorial propio inspirado en el Zhouyi y en traducciones históricas de dominio público (James Legge). Reúne los 64 hexagramas con lectura taoísta orientada a la claridad: no es traducción literal, no es adivinación y evita conclusiones apresuradas.",
   "hexagrams": {
     "1": {
       "dynamic_core_es": "Fuerza iniciadora y principio activo. El potencial creativo existe y busca manifestarse, pero requiere dirección, disciplina y coherencia para no dispersarse ni agotarse.",

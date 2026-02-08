@@ -191,6 +191,7 @@ export class InkGalaxy {
         const cx = this.canvas.width / 2;
         const cy = this.canvas.height / 2;
 
+        this.ctx.filter = 'blur(3px)'; // Apply cloud-like effect here instead of per arc
         this.particles.forEach(p => {
             p.angle += p.speed;
 
@@ -199,17 +200,18 @@ export class InkGalaxy {
 
             const dx = tx - this.mouseX;
             const dy = ty - this.mouseY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 300) {
-                const force = (300 - dist) / 300;
-                tx += (dx / dist) * force * 50;
-                ty += (dy / dist) * force * 50;
+            const dist = dx * dx + dy * dy; // Avoid sqrt for distance check
+
+            if (dist < 40000) { // 200^2
+                const d = Math.sqrt(dist);
+                const force = (200 - d) / 200;
+                tx += (dx / d) * force * 30;
+                ty += (dy / d) * force * 30;
             }
 
             this.ctx.beginPath();
             this.ctx.arc(tx, ty, p.size, 0, Math.PI * 2);
             this.ctx.fillStyle = p.color;
-            this.ctx.filter = 'blur(2px)';
             this.ctx.fill();
         });
 
