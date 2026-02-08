@@ -1,56 +1,45 @@
 {
-  "version": "0.1.1",
-  "currency": "MXN",
-  "pricing_model": "one_time_purchase",
+  "version": "0.1.2",
+  "currency_default": "MXN",
   "products": [
     {
-      "product_id": "iching_reflection_plus",
-      "store_sku_ios": "iching.reflection.plus",
-      "store_sku_android": "iching_reflection_plus",
-      "title_es": "I Ching · Trabajo Continuo",
-      "short_description_es": "Guarda, revisa y exporta tus lecturas.",
-      "long_description_es": "Desbloquea el diario personal, la exportación en PDF y el seguimiento de tus lecturas para trabajar con continuidad. Pago único. Sin suscripciones. Uso local.",
-      "price": {
+      "id": "iching_reflection_plus",
+      "type": "one_time_purchase",
+      "name_es": "I Ching · Herramienta Completa",
+      "description_es": "Acceso total al diario personal, exportación en PDF y seguimiento de lecturas con interpretación profunda (James Legge). Pago único para uso local ilimitado.",
+      "entitlements": [
+        "full_access",
+        "journal_mode",
+        "export_tools",
+        "premium_sections",
+        "unlimited_history",
+        "pdf_export"
+      ],
+      "store_ids": {
+        "android": "iching_reflection_plus",
+        "ios": "iching.reflection.plus"
+      },
+      "price_hint": {
         "amount": 129,
         "formatted": "$129 MXN"
-      },
-      "entitlements": {
-        "journal_mode": true,
-        "export_tools": true,
-        "premium_sections": true,
-        "unlimited_history": true,
-        "pdf_export": true
-      },
-      "non_entitlements": {
-        "prediction": false,
-        "medical_advice": false,
-        "guaranteed_outcomes": false
-      },
-      "purchase_notes_es": [
-        "Historial ilimitado: Tu memoria de cambios.",
-        "Estrategia Wu Wei: Profundidad para la acción.",
-        "Exportación PDF: Material de estudio.",
-        "Privacidad Local: Solo tú ves tus datos."
-      ],
-      "refund_policy_es": "Sujeto a las políticas de reembolso de la tienda.",
-      "visibility": {
-        "show_on_paywall": true,
-        "show_on_onboarding": false
       }
     }
   ],
-  "default_free_entitlements": {
-    "journal_mode": false,
-    "export_tools": false,
-    "premium_sections": false,
-    "unlimited_history": false,
-    "pdf_export": false
-  },
-  "paywall_copy_es": {
-    "title": "Cultiva tu claridad",
-    "body": "El I Ching es un compañero para tiempos de cambio. Para comprender verdaderamente tu camino, es útil mirar atrás y ver los pasos que has dado.\n\nEsta versión completa transforma la aplicación en un diario de evolución personal, permitiéndote conservar tu historial, acceder a estrategias de acción profundas y exportar tus reflexiones.",
-    "cta_primary": "Habilitar herramienta completa",
-    "cta_secondary": "Volver a la versión simple",
-    "footer_note": "Pago único de por vida. Sin suscripciones. Tus datos permanecen en tu dispositivo."
+  "entitlement_map": {
+    "journal_mode": {
+      "name_es": "Diario personal"
+    },
+    "export_tools": {
+      "name_es": "Herramientas de exportación"
+    },
+    "premium_sections": {
+      "name_es": "Secciones premium"
+    },
+    "unlimited_history": {
+      "name_es": "Historial ilimitado"
+    },
+    "pdf_export": {
+      "name_es": "Exportación PDF"
+    }
   }
 }

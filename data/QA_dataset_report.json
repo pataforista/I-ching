@@ -1,5 +1,5 @@
 {
     "missing_fields": [],
     "uncertainties": [],
-    "notes": "Trigram aliases de-ambiguados; xun actualizado a 'Viento (Madera)' con keyword madera. Hexagrams_meta: 64 ids únicos y trigram IDs canónicos verificados."
+    "notes": "Dataset v0.1.3 completo. Hexagrams_core verificado (64 hexagramas, 384 líneas). Meta-datos validados (King Wen, simetría de pares). Reglas de monedas y construcción verificadas. Atribución a Legge (1899) añadida a licencias. Modelo de monetización pivotado a Pago Único."
 }
