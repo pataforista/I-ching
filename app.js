@@ -4,11 +4,6 @@ import {
   trackEvent,
   tossLine,
   buildReading,
-  getProducts,
-  purchaseLocal,
-  revokeLocal,
-  isContentLoaded,
-  getLicenses,
   t
 } from "./engine.js";
 
@@ -21,7 +16,7 @@ var state = {
   // Boot status
   boot: { ok: true, missing: [], error: null },
 
-  // Navigation: 'home' | 'toss' | 'reading' | 'history' | 'paywall'
+  // Navigation: 'home' | 'toss' | 'reading' | 'history'
   nav: "home",
 
   // Data
@@ -38,13 +33,11 @@ var state = {
 
   // UI State
   _tossing: false, // animation lock
-  _paywallFeature: null, // "history_limit" | "pdf_export"
-
-  // Mock Entitlements (Local Logic)
+  // Entitlements (Paid app: everything unlocked after purchase)
   entitlements: {
-    unlimited_history: false,
-    premium_sections: false,
-    pdf_export: false
+    unlimited_history: true,
+    premium_sections: true,
+    pdf_export: true
   },
   _bookOpen: false
 };
@@ -86,54 +79,52 @@ var state = {
 })();
 
 function initBubbleMenu() {
-  bubbleMenu = new BubbleMenu([
-    { label: "Inicio", onClick: () => startNew() },
-    { label: "Historial", onClick: () => openHistory() },
-    { label: "Tema", onClick: () => onToggleTheme() },
-    {
-      label: "Acerca de", onClick: () => {
-        openModal("Acerca de", "<p>I Ching - Reflexión Local</p><div class='muted'>Versión Premium Ukiyo-e</div>");
-      }
-    }
-  ]);
+  bubbleMenu = new BubbleMenu({
+    container: document.getElementById("app"),
+    items: [
+      { id: "home", icon: "🏠", label: t("menu.home"), onClick: () => startNew() },
+      { id: "history", icon: "📜", label: t("menu.history"), onClick: () => openHistory() },
+      { id: "theme", icon: "🌗", label: t("menu.theme"), onClick: () => onToggleTheme() },
+    ]
+  });
 }
 
 // ---------- Storage ----------
 function loadLocal() {
   try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed.history)) state.history = parsed.history;
+    const data = localStorage.getItem(LS_KEY);
+    if (data) {
+      const parsed = JSON.parse(data);
+      state.history = parsed.history || [];
     }
-  } catch { }
+    const theme = localStorage.getItem(LS_THEME);
+    if (theme) applyTheme(theme);
+  } catch (e) { console.error("Load fail", e); }
 }
 
 function saveLocal() {
-  localStorage.setItem(LS_KEY, JSON.stringify({ history: state.history }));
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({ history: state.history }));
+  } catch (e) { console.error("Save fail", e); }
 }
 
 // ---------- Theme ----------
 function onToggleTheme() {
-  const cur = document.documentElement.getAttribute("data-theme") || "ink";
-  const next = cur === "paper" ? "ink" : "paper";
+  const current = document.documentElement.getAttribute("data-theme");
+  const next = current === "ink" ? "paper" : "ink";
   applyTheme(next);
 }
 
 function applyTheme(name) {
-  if (name === "paper") document.documentElement.setAttribute("data-theme", "paper");
-  else document.documentElement.setAttribute("data-theme", "ink");
+  document.documentElement.setAttribute("data-theme", name);
   localStorage.setItem(LS_THEME, name);
-
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", name === "ink" ? "#1a1a18" : "#f3efe4");
 }
 
 // ---------- SW ----------
 async function registerSW() {
-  if (!("serviceWorker" in navigator)) return;
+  if (!('serviceWorker' in navigator)) return;
   try {
-    await navigator.serviceWorker.register("./sw.js");
+    await navigator.serviceWorker.register('./sw.js');
   } catch { /* silent */ }
 }
 
@@ -158,38 +149,6 @@ function beginToss() {
 
 function saveSession() {
   if (!state.session) return;
-
-  // Limite de historial (Freemium logic)
-  if (!state.entitlements.unlimited_history && state.history.length > 0) {
-    const modalContent = `
-      <p>${t("history.limit_modal_body")}</p>
-      <div class="callout" style="border-left-color:var(--accent);">
-        <div style="font-weight:bold;">${t("history.limit_modal_question")}</div>
-        <div class="muted" style="font-size:0.9em;">${t("history.limit_modal_warning", { date: state.history[0].created_at_iso.split("T")[0] })}</div>
-      </div>
-      <div class="vstack" style="gap:10px; margin-top:20px;">
-        <button class="btn btn--primary" id="btnUpgradeSave">${t("history.btn_upgrade_save")}</button>
-        <button class="btn btn--danger" id="btnOverwriteSave">${t("history.btn_overwrite_save")}</button>
-      </div>
-    `;
-    openModal(t("history.limit_modal_title"), modalContent);
-    trackEvent("feature_locked", { feature_id: "history_limit" });
-
-    // Bind modal buttons immediately
-    setTimeout(() => {
-      document.getElementById("btnUpgradeSave")?.addEventListener("click", () => {
-        trackEvent("overwrite_decision", { choice: "upgrade" });
-        document.getElementById("modal").close();
-        openPaywall("history_limit_save");
-      });
-      document.getElementById("btnOverwriteSave")?.addEventListener("click", () => {
-        trackEvent("overwrite_decision", { choice: "overwrite" });
-        document.getElementById("modal").close();
-        performSave(true); // overwrite = true
-      });
-    }, 50);
-    return;
-  }
 
   // Normal save
   performSave(false);
@@ -220,39 +179,7 @@ function deleteHistory() {
 }
 
 function exportPDF() {
-  if (!state.entitlements.pdf_export) {
-    trackEvent("feature_locked", { feature_id: "pdf_export" });
-    openPaywall("pdf_export");
-    return;
-  }
   window.print();
-}
-
-function openPaywall(feature) {
-  trackEvent("paywall_viewed", { source: feature });
-  nav("paywall");
-  state._paywallFeature = feature;
-}
-
-function unlockPremiumLocal() {
-  const prods = getProducts();
-  if (prods?.products?.length > 0) {
-    const pid = prods.products[0].product_id;
-    state.entitlements = purchaseLocal(pid);
-    trackEvent("purchase_completed", { product_id: pid });
-    render();
-    openModal(t("paywall.modal_unlocked"), `<p>${t("paywall.modal_unlocked_body")}</p>`);
-  }
-}
-
-function lockPremiumLocal() {
-  const prods = getProducts();
-  if (prods?.products?.length > 0) {
-    const pid = prods.products[0].product_id;
-    state.entitlements = revokeLocal(pid);
-    render();
-    openModal(t("paywall.modal_locked"), `<p>${t("paywall.modal_locked_body")}</p>`);
-  }
 }
 
 // ---------- Render ----------
@@ -292,7 +219,6 @@ function render() {
     case "toss": contentHTML = TossView(); break;
     case "reading": contentHTML = ReadingView(); break;
     case "history": contentHTML = HistoryView(); break;
-    case "paywall": contentHTML = PaywallView(); break;
     default: contentHTML = HomeFormView();
   }
 
@@ -327,7 +253,7 @@ function BookShellHTML() {
                  
                  <div class="divider"></div>
                  <div style="text-align:center;" class="muted serif">
-                    Reflexión Local · v1.1 Premium
+                    Reflexión Local · v1.1
                  </div>
               </div>
            </div>
@@ -378,7 +304,7 @@ function TossView() {
     <div class="vstack" style="gap:30px;">
       <div class="sage-container">
          <div class="sage-avatar">
-            ${SageSVG()}
+            ${SageAvatarHTML()}
          </div>
          <div class="sage-bubble">
             <span id="zenText"></span>
@@ -404,85 +330,86 @@ function TossView() {
         </div>
       </div>
 
-      <div class="hex-visual" style="margin-top:20px;">
-        ${renderHexLines(state.draft.tosses)}
+      <div class="row" style="justify-content:center;">
+          ${renderHexLines(state.draft.tosses)}
       </div>
     </div>
   `;
 }
 
 function renderHexLines(tosses) {
-  if (tosses.length === 0) return `<div class="muted serif">El hexagrama se revelará aquí...</div>`;
-
-  return tosses.map((t, idx) => {
-    const isYang = t.line_bit === 1;
-    const isMoving = t.is_moving;
-    return `<div class="hex-line ${isYang ? 'yang' : 'yin'} ${isMoving ? 'moving' : ''}"></div>`;
-  }).reverse().join('');
+  // Solo mostramos líneas acumuladas
+  if (tosses.length === 0) return "";
+  const items = tosses.map(t => `<div class="hex-line ${t.value % 2 === 0 ? 'yin' : 'yang'}"></div>`).reverse();
+  return `<div class="hex-visual" style="padding:20px; gap:8px;">${items.join("")}</div>`;
 }
 
 function ReadingView() {
-  if (!state.session) return `<div class="card"><div class="muted">Sesión no encontrada.</div></div>`;
+  const s = state.session || buildReading(state.draft);
+  if (!s) return "Error building reading";
 
-  const { primary, resulting, is_mutating } = state.session;
-  const title = primary ? `${primary.id}. ${primary.hanzi} · ${primary.slug}` : "Desconocido";
+  const p = s.hexagrams.primary;
+  const r = s.hexagrams.resulting;
+  const isMutating = !!r;
 
   return `
     <div class="vstack" style="gap:40px;">
-      <div class="vstack" style="align-items:center; text-align:center;">
-        <div class="seal" style="margin-bottom:20px;">${primary?.id || '!!'}</div>
-        <h1 class="hexTitle" style="font-size:2.5rem;">${escapeHtml(title)}</h1>
-        <div class="badge" style="margin-top:10px;">Enfoque: ${escapeHtml(state.session.question.mode)}</div>
+      <section style="text-align:center;">
+        <div class="seal" style="margin:0 auto; width:50px; height:50px;">${p.id}</div>
+        <h2 class="hexTitle" style="margin-top:20px;">${escapeHtml(p.hanzi)} · ${escapeHtml(p.slug)}</h2>
+        <p class="muted serif" style="font-size:1.1rem;">${escapeHtml(p.judgment_es)}</p>
+      </section>
+
+      <div class="card" style="background:var(--accent-soft);">
+        <h3 class="serif" style="margin-top:0;">La Imagen</h3>
+        <p class="serif">${escapeHtml(p.image_es)}</p>
       </div>
 
-      <div class="card" style="background:var(--accent-soft); border:none;">
-        <p class="serif" style="font-style:italic; font-size:1.2rem; text-align:center; color:var(--text);">
-          “${escapeHtml(state.session.question.text_es)}”
-        </p>
-      </div>
+      <section>
+         <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Estructura Trigramática</h3>
+         <div class="row" style="gap:20px; margin-top:15px;">
+            <div class="card" style="flex:1; padding:20px; text-align:center;">
+               <div class="muted serif" style="font-size:0.7rem;">SUPERIOR</div>
+               <div style="font-weight:600;">${escapeHtml(p.trigrams.upper.slug_es)}</div>
+            </div>
+            <div class="card" style="flex:1; padding:20px; text-align:center;">
+               <div class="muted serif" style="font-size:0.7rem;">INFERIOR</div>
+               <div style="font-weight:600;">${escapeHtml(p.trigrams.lower.slug_es)}</div>
+            </div>
+         </div>
+      </section>
 
-      <div class="vstack" style="gap:40px;">
-        <section>
-          <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">El Dictamen</h3>
-          <p style="font-size:1.15rem; font-weight:500;">${escapeHtml(primary?.dynamic_core_es || "—")}</p>
-        </section>
+      ${renderLinesDetail(s)}
+      ${renderResultingSection(isMutating, r)}
+      ${renderPremiumReading(p)}
 
-        <section>
-          <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">La Imagen</h3>
-          <p>${escapeHtml(primary?.image_es || "—")}</p>
-        </section>
+      <div class="divider"></div>
 
-        <section>
-          <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Interpretación General</h3>
-          <p class="serif" style="white-space:pre-wrap;">${escapeHtml(primary?.general_reading_es || "—")}</p>
-        </section>
-
-        ${renderLinesDetail(primary)}
-        ${renderResultingSection(is_mutating, resulting)}
-        ${renderPremiumReading(primary)}
-      </div>
-
-      <div class="hstack" style="justify-content:center; gap:16px; margin-top:40px;">
-        <button class="btn btn--primary" id="btnSave">Guardar en mi Memoria</button>
-        <button class="btn btn--ghost" id="btnPDF">Exportar PDF</button>
-        <button class="btn btn--ghost" id="btnClose">Nueva Consulta</button>
+      <div class="vstack" style="gap:15px;">
+        <button class="btn btn--primary" id="btnSave" style="width:100%;">Guardar Reflexión</button>
+        <div class="row" style="gap:15px;">
+           <button class="btn btn--ghost" id="btnPDF" style="flex:1;">Exportar PDF</button>
+           <button class="btn btn--ghost" id="btnClose" style="flex:1;">Nueva Consulta</button>
+        </div>
       </div>
     </div>
   `;
 }
 
-function renderLinesDetail(hex) {
-  if (!hex?.active_lines_content?.length) return "";
+function renderLinesDetail(sess) {
+  const lines = sess.lines || [];
+  const moving = lines.filter(l => l.isMoving);
+  if (moving.length === 0) return "";
 
   return `
     <div class="divider"></div>
     <section>
       <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Líneas en Movimiento</h3>
       <div class="vstack" style="gap:20px; margin-top:20px;">
-        ${hex.active_lines_content.map(l => `
-          <div class="card" style="padding:24px; border-style:dashed;">
-            <div class="muted serif" style="margin-bottom:8px;">Línea ${l.position}</div>
-            <p class="serif">${escapeHtml(l.text)}</p>
+        ${moving.map(l => `
+          <div class="card" style="padding:24px; border-left:4px solid var(--accent);">
+            <div style="font-weight:600; margin-bottom:8px;">Línea ${l.pos} — ${l.value === 6 ? 'Seis' : 'Nueve'}</div>
+            <p class="serif" style="margin:0; opacity:0.9;">${escapeHtml(l.text_es)}</p>
           </div>
         `).join("")}
       </div>
@@ -510,48 +437,28 @@ function renderResultingSection(isMutating, hex) {
 
 function renderPremiumReading(hex) {
   if (!hex) return "";
-  if (state.entitlements.premium_sections) {
-    const qs = Array.isArray(hex.guiding_questions_es) ? hex.guiding_questions_es : [];
-    return `
-      <div class="divider"></div>
-      <div class="card" style="background:var(--text); color:var(--bg); border:none;">
-        <h3 class="serif" style="color:var(--gold); margin-top:0;">Sabiduría Profunda</h3>
-        <p class="serif" style="opacity:0.9;">${escapeHtml(hex.taoist_reading_es || "—")}</p>
-        
-        <h4 class="serif" style="color:var(--gold); margin-top:30px;">Preguntas de Poder</h4>
-        <ul style="padding-left:20px; opacity:0.8;">
-          ${qs.map(q => `<li>${escapeHtml(q)}</li>`).join("")}
-        </ul>
-        
-        <h4 class="serif" style="color:var(--gold); margin-top:30px;">Micro-Acción Ritual</h4>
-        <div class="callout" style="background:rgba(255,255,255,0.1); padding:20px; border-radius:12px;">
-           ${escapeHtml(hex.micro_action_es || "—")}
-        </div>
+  const qs = Array.isArray(hex.guiding_questions_es) ? hex.guiding_questions_es : [];
+  return `
+    <div class="divider"></div>
+    <div class="card" style="background:var(--text); color:var(--bg); border:none;">
+      <h3 class="serif" style="color:var(--gold); margin-top:0;">Sabiduría Profunda</h3>
+      <p class="serif" style="opacity:0.9;">${escapeHtml(hex.taoist_reading_es || "—")}</p>
+      
+      <h4 class="serif" style="color:var(--gold); margin-top:30px;">Preguntas de Poder</h4>
+      <ul style="padding-left:20px; opacity:0.8;">
+        ${qs.map(q => `<li>${escapeHtml(q)}</li>`).join("")}
+      </ul>
+      
+      <h4 class="serif" style="color:var(--gold); margin-top:30px;">Micro-Acción Ritual</h4>
+      <div class="callout" style="background:rgba(255,255,255,0.1); padding:20px; border-radius:12px;">
+         ${escapeHtml(hex.micro_action_es || "—")}
       </div>
-    `;
-  } else {
-    return `
-      <div class="divider"></div>
-      <div class="card" style="text-align:center; padding:60px 40px; border:2px dashed var(--gold);">
-        <h3 class="serif">Contenido Reservado</h3>
-        <p class="muted serif">Accede a las lecturas taoístas y preguntas de poder.</p>
-        <button class="btn btn--primary" style="margin-top:20px;" id="btnUnlockTeaser">Desbloquear Premium</button>
-      </div>
-    `;
-  }
+    </div>
+  `;
 }
 
 function HistoryView() {
-  const isUnlimited = state.entitlements.unlimited_history;
-  let visibleHistory = state.history;
-  let lockedCount = 0;
-
-  if (!isUnlimited && state.history.length > 1) {
-    visibleHistory = [state.history[0]];
-    lockedCount = state.history.length - 1;
-  }
-
-  const items = visibleHistory.map((s) => {
+  const items = state.history.map((s) => {
     const p = s.hexagrams?.primary;
     return `
       <div class="card history-card" data-open="${escapeHtml(s.id)}" style="cursor:pointer; display:flex; align-items:center; gap:20px; padding:20px;">
@@ -576,51 +483,12 @@ function HistoryView() {
 
       <div class="vstack" style="gap:16px;">
         ${state.history.length ? items : `<div class="card muted serif" style="text-align:center;">Aún no has guardado ninguna reflexión.</div>`}
-        
-        ${!isUnlimited && lockedCount > 0 ? `
-          <div class="card" style="text-align:center; border:1px dashed var(--gold);">
-            <p class="muted serif">Y ${lockedCount} consultas más ocultas...</p>
-            <button class="btn btn--ghost" id="historyLocked">Liberar Historial Completo</button>
-          </div>
-        ` : ""}
       </div>
 
       <div class="hstack" style="justify-content:center; gap:16px;">
         <button class="btn btn--primary" id="btnBackHome2">Regresar</button>
         ${state.history.length ? `<button class="btn btn--ghost" id="btnClearHistory">Limpiar Todo</button>` : ""}
       </div>
-    </div>
-  `;
-}
-
-function PaywallView() {
-  const products = getProducts();
-  const prod = products?.products?.[0];
-  const copy = products?.paywall_copy_es;
-  const price = prod?.price?.formatted || "Consultar";
-
-  return `
-    <div class="vstack" style="gap:40px; align-items:center; text-align:center;">
-      <div class="seal" style="width:80px; height:80px; font-size:32px; background:var(--gold);">★</div>
-      
-      <div>
-        <h2 class="hexTitle" style="font-size:2.5rem;">${escapeHtml(copy?.title || "Versión Premium")}</h2>
-        <p class="serif" style="font-size:1.2rem; opacity:0.8; max-width:500px;">
-           ${escapeHtml(copy?.body || "Profundiza en tu viaje espiritual con herramientas exclusivas de reflexión.")}
-        </p>
-      </div>
-
-      <div class="card" style="max-width:400px; width:100%; border:2px solid var(--gold);">
-         <div class="vstack" style="gap:24px;">
-            <div style="font-size:2rem; font-weight:700;">${price}</div>
-            <ul class="serif" style="text-align:left; padding-left:20px; display:flex; flex-direction:column; gap:12px;">
-               ${prod?.purchase_notes_es?.map(n => `<li>${escapeHtml(n)}</li>`).join("") || "<li>Funciones premium desbloqueadas</li>"}
-            </ul>
-            <button class="btn btn--primary" id="btnUnlockNow" style="width:100%;">Desbloquear Ahora</button>
-         </div>
-      </div>
-
-      <button class="btn btn--ghost" id="btnPaywallBack">Quizás más tarde</button>
     </div>
   `;
 }
@@ -650,47 +518,19 @@ function opt(val, label) {
 function renderStageCoins() {
   return [1, 2, 3].map(() => `
     <div class="coin-3d">
-      <div class="coin-face coin-front">${CoinSVG('heads')}</div>
-      <div class="coin-face coin-back">${CoinSVG('tails')}</div>
+      <div class="coin-face coin-front">
+        <img src="./assets/coin_yang.png" alt="Moneda Yang" decoding="async" loading="lazy">
+      </div>
+      <div class="coin-face coin-back">
+        <img src="./assets/coin_yin.png" alt="Moneda Yin" decoding="async" loading="lazy">
+      </div>
     </div>
   `).join('');
 }
 
-function SageSVG() {
+function SageAvatarHTML() {
   return `
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
-      <defs>
-        <radialGradient id="sageGrad" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" style="stop-color:var(--gold); stop-opacity:0.2" />
-          <stop offset="100%" style="stop-color:var(--gold); stop-opacity:0" />
-        </radialGradient>
-      </defs>
-      <circle cx="50" cy="50" r="45" fill="url(#sageGrad)" />
-      <path d="M50 20 C30 20 20 40 20 60 C20 80 35 85 50 85 C65 85 80 80 80 60 C80 40 70 20 50 20" fill="var(--text)" opacity="0.1" />
-      <path d="M50 25 C35 25 25 35 25 55 C25 75 35 80 50 80 C65 80 75 75 75 55 C75 35 65 25 50 25" fill="none" stroke="var(--text)" stroke-width="1.5" stroke-linecap="round" />
-      <path d="M40 50 Q45 45 50 50 Q55 55 60 50" fill="none" stroke="var(--text)" stroke-width="1" />
-      <circle cx="45" cy="45" r="1.5" fill="var(--text)" />
-      <circle cx="55" cy="45" r="1.5" fill="var(--text)" />
-      <path d="M35 65 Q50 75 65 65" fill="none" stroke="var(--accent)" stroke-width="2" opacity="0.6" />
-    </svg>
-  `;
-}
-
-function CoinSVG(side) {
-  const isHeads = side === 'heads';
-  return `
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
-      <circle cx="50" cy="50" r="45" fill="var(--bg)" stroke="var(--gold)" stroke-width="3" />
-      <circle cx="50" cy="50" r="38" fill="none" stroke="var(--gold)" stroke-width="1" stroke-dasharray="2 4" />
-      <rect x="35" y="35" width="30" height="30" rx="4" fill="none" stroke="var(--gold)" stroke-width="2" />
-      <text x="50" y="55" font-family="serif" font-size="20" text-anchor="middle" fill="var(--gold)" style="font-weight:bold;">
-        ${isHeads ? '陽' : '陰'}
-      </text>
-      ${isHeads ?
-      '<path d="M50 15 L55 25 L45 25 Z" fill="var(--gold)" opacity="0.5"/>' :
-      '<circle cx="50" cy="18" r="3" fill="var(--gold)" opacity="0.5"/>'
-    }
-    </svg>
+    <img src="./assets/sage.png" alt="Avatar del sabio" decoding="async" loading="lazy" />
   `;
 }
 
@@ -716,44 +556,58 @@ function initPageEffects() {
     sageTyper.type(msg);
   }
 
-  // Cards 3D effect
-  document.querySelectorAll(".card").forEach(el => new TiltCard(el));
+  // Tilt if cards present
+  document.querySelectorAll(".card").forEach(c => new TiltCard(c));
 }
 
-async function onTossNextLine() {
+function onTossNextLine() {
   if (state._tossing) return;
   const n = state.draft.tosses.length;
-  if (n >= 6) return finishToss();
+  if (n >= 6) {
+    finishToss();
+    return;
+  }
 
   state._tossing = true;
   render();
 
-  const coins = document.querySelectorAll(".coin-3d");
-  coins.forEach(c => c.classList.add("tossing"));
+  // Animation delay
+  setTimeout(() => {
+    const coinEls = document.querySelectorAll(".coin-3d");
+    coinEls.forEach(el => el.classList.add("tossing"));
 
-  await new Promise(r => setTimeout(r, 1200));
+    setTimeout(() => {
+      coinEls.forEach(el => el.classList.remove("tossing"));
 
-  try {
-    const result = tossLine();
-    state.draft.tosses.push(result);
-  } catch (e) {
-    openModal("Error", e.message);
-  }
+      // Math
+      const line = tossLine(); // returns { coins: [], value: 6..9, isMoving: bool }
+      state.draft.tosses.push(line);
 
-  state._tossing = false;
-  render();
+      // Orientation randomizer
+      coinEls.forEach((el, idx) => {
+        const isHeads = line.coins[idx] === 'heads';
+        el.style.transform = isHeads ? `rotateY(0deg)` : `rotateY(180deg)`;
+      });
+
+      state._tossing = false;
+      render();
+
+      if (state.draft.tosses.length === 6) {
+        document.getElementById("btnToss").innerText = t("toss.btn_finish");
+      }
+    }, 800);
+  }, 50);
 }
 
 function finishToss() {
   try {
-    state.session = buildReading(state.draft.tosses);
+    const sess = buildReading(state.draft);
+    state.session = sess;
     state.session.id = cryptoRandomId();
-    state.session.created_at_iso = new Date().toISOString();
-    state.session.question = { ...state.draft.question };
-    state.nav = "reading";
-    render();
+    nav("reading");
+    trackEvent("reading_viewed", { hex_id: sess.hexagrams.primary.id });
   } catch (e) {
-    openModal("Error", "No se pudo generar la lectura: " + e.message);
+    console.error("Finish toss fail", e);
   }
 }
 
@@ -779,12 +633,9 @@ function bindPageEvents(root) {
   root.querySelector("#btnSave")?.addEventListener("click", saveSession);
   root.querySelector("#btnPDF")?.addEventListener("click", exportPDF);
   root.querySelector("#btnClose")?.addEventListener("click", startNew);
-  root.querySelector("#btnUnlockTeaser")?.addEventListener("click", () => openPaywall("reading_teaser"));
-
   // History
   root.querySelector("#btnBackHome2")?.addEventListener("click", startNew);
   root.querySelector("#btnClearHistory")?.addEventListener("click", deleteHistory);
-  root.querySelector("#historyLocked")?.addEventListener("click", () => openPaywall("history_list"));
 
   root.querySelectorAll("[data-open]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -794,9 +645,6 @@ function bindPageEvents(root) {
     });
   });
 
-  // Paywall
-  root.querySelector("#btnUnlockNow")?.addEventListener("click", unlockPremiumLocal);
-  root.querySelector("#btnPaywallBack")?.addEventListener("click", () => nav("home"));
 }
 
 // ---------- Helpers ----------
@@ -822,8 +670,9 @@ function openModal(title, content) {
   const m = document.getElementById("modal");
   const tVal = document.getElementById("modalTitle");
   const bVal = document.getElementById("modalBody");
+
   if (m && tVal && bVal) {
-    tVal.textContent = title;
+    tVal.innerText = title;
     bVal.innerHTML = content;
     m.showModal();
   }
