@@ -278,3 +278,225 @@ export class TiltCard {
         if (this.glareEl) this.glareEl.style.opacity = '0';
     }
 }
+
+export class EnsoLoader {
+    constructor(container) {
+        this.container = typeof container === 'string' ? document.querySelector(container) : container;
+    }
+
+    show() {
+        if (!this.container) return;
+        this.container.innerHTML = `
+            <div class="enso-container">
+                <svg class="enso-svg" viewBox="0 0 100 100">
+                    <circle class="enso-circle" cx="50" cy="50" r="45" />
+                </svg>
+                <div class="muted serif" style="margin-top:10px; opacity:0.6;">Consultando al Oráculo...</div>
+            </div>
+        `;
+    }
+}
+
+export class DynamicHexagram {
+    constructor(lines, options = {}) {
+        this.lines = lines; // [L1, L2, L3, L4, L5, L6] (bottom to top)
+        this.options = {
+            width: 200,
+            height: 140,
+            strokeWidth: 8,
+            gap: 12,
+            movingLineColor: 'var(--accent)',
+            ...options
+        };
+    }
+
+    render(targetEl) {
+        const el = typeof targetEl === 'string' ? document.querySelector(targetEl) : targetEl;
+        if (!el) return;
+
+        const { width, height, strokeWidth, gap } = this.options;
+        const lineH = (height - (gap * 5)) / 6;
+
+        let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="filter: var(--sumi-filter);" role="img" aria-label="Hexagrama del I Ching con líneas ${this.lines.join(', ')}">`;
+
+        this.lines.forEach((val, i) => {
+            const y = height - (i + 1) * (lineH + gap) + gap;
+            const isYang = val === 7 || val === 9;
+            const isMoving = val === 6 || val === 9;
+            const color = isMoving ? this.options.movingLineColor : 'var(--text)';
+
+            if (isYang) {
+                svg += `<rect x="10" y="${y}" width="${width - 20}" height="${lineH}" fill="${color}" rx="4" />`;
+            } else {
+                const partW = (width - 40) / 2;
+                svg += `<rect x="10" y="${y}" width="${partW}" height="${lineH}" fill="${color}" rx="4" />`;
+                svg += `<rect x="${width - 10 - partW}" y="${y}" width="${partW}" height="${lineH}" fill="${color}" rx="4" />`;
+            }
+
+            if (isMoving) {
+                // Add a small mark or glow for moving lines
+                svg += `<circle cx="${width / 2}" cy="${y + lineH / 2}" r="3" fill="var(--bg)" opacity="0.6" />`;
+            }
+        });
+
+        svg += `</svg>`;
+        el.innerHTML = svg;
+    }
+}
+
+export function drawHanzi(target, char, size = 100) {
+    if (!window.HanziWriter) return;
+    const writer = HanziWriter.create(target, char, {
+        width: size,
+        height: size,
+        padding: 5,
+        strokeColor: 'var(--text)',
+        outlineColor: 'var(--panel-border)',
+        drawingColor: 'var(--accent)',
+        showOutline: true,
+        strokeAnimationSpeed: 1,
+        delayBetweenStrokes: 200
+    });
+    writer.animateCharacter();
+    return writer;
+}
+
+export class InteractiveBook {
+    constructor(container, options = {}) {
+        this.container = typeof container === 'string' ? document.querySelector(container) : container;
+        this.options = {
+            width: 550, // base page width
+            height: 733, // base page height
+            size: "stretch",
+            minWidth: 315,
+            maxWidth: 1000,
+            minHeight: 420,
+            maxHeight: 1350,
+            maxShadowOpacity: 0.5,
+            showCover: false,
+            mobileScrollSupport: true,
+            ...options
+        };
+        this.pages = [];
+        this.pageFlip = null;
+    }
+
+    addPage(contentHTML, pageClass = "") {
+        this.pages.push({ html: contentHTML, className: pageClass });
+    }
+
+    render() {
+        if (!this.container) return;
+
+        // Clear and build structure
+        this.container.innerHTML = `<div id="bookFlipRoot" class="book-container"></div>`;
+        const root = document.getElementById("bookFlipRoot");
+
+        this.pages.forEach((p, idx) => {
+            const pageEl = document.createElement("div");
+            pageEl.className = `book-page ${p.className}`;
+            pageEl.innerHTML = `
+                <div class="page-content">${p.html}</div>
+                <div class="page-footer">${idx + 1} de ${this.pages.length}</div>
+            `;
+            root.appendChild(pageEl);
+        });
+
+        // Init Library
+        if (window.St && window.St.PageFlip) {
+            this.pageFlip = new St.PageFlip(root, this.options);
+            this.pageFlip.loadFromHTML(document.querySelectorAll(".book-page"));
+
+            this._resizeHandler = () => {
+                if (window.innerWidth <= 600) {
+                    if (this.pageFlip) this.pageFlip.destroy();
+                }
+            };
+            window.addEventListener("resize", this._resizeHandler);
+        }
+    }
+
+    destroy() {
+        if (this.pageFlip) {
+            this.pageFlip.destroy();
+            this.pageFlip = null;
+        }
+        if (this._resizeHandler) {
+            window.removeEventListener("resize", this._resizeHandler);
+        }
+        if (this.container) this.container.innerHTML = "";
+    }
+
+    turnToPage(idx) {
+        if (this.pageFlip) this.pageFlip.turnToPage(idx);
+    }
+}
+
+export class DynamicAvatar {
+    constructor(imgSrc, containerSelector) {
+        this.imgSrc = imgSrc;
+        this.container = typeof containerSelector === 'string' ? document.querySelector(containerSelector) : containerSelector;
+        this.tiltX = 0;
+        this.tiltY = 0;
+    }
+
+    render() {
+        if (!this.container) return;
+
+        this.container.innerHTML = `
+            <div class="sage-avatar dynamic-avatar">
+                <img src="${this.imgSrc}" alt="El Sabio" class="sage-img">
+            </div>
+        `;
+
+        this.el = this.container.querySelector('.sage-avatar');
+        this.initParallax();
+    }
+
+    initParallax() {
+        if (window.innerWidth < 850) return; // Skip on mobile
+
+        this._mouseHandler = (e) => {
+            if (!this.el || !document.contains(this.el)) return; // Check if still in DOM
+
+            const { clientX, clientY } = e;
+            const { innerWidth, innerHeight } = window;
+
+            const x = (clientX / innerWidth - 0.5) * 2;
+            const y = (clientY / innerHeight - 0.5) * 2;
+
+            this.tiltX = x * 15;
+            this.tiltY = y * -15;
+
+            this.el.style.transform = `perspective(1000px) rotateY(${this.tiltX}deg) rotateX(${this.tiltY}deg)`;
+        };
+
+        this._gyroHandler = (e) => {
+            if (!this.el || !document.contains(this.el)) return;
+            if (!e.gamma || !e.beta) return;
+
+            const x = e.gamma / 45;
+            const y = e.beta / 45;
+
+            this.tiltX = x * 10;
+            this.tiltY = y * -10;
+
+            this.el.style.transform = `perspective(1000px) rotateY(${this.tiltX}deg) rotateX(${this.tiltY}deg)`;
+        };
+
+        document.addEventListener('mousemove', this._mouseHandler);
+        window.addEventListener('deviceorientation', this._gyroHandler);
+    }
+
+    destroy() {
+        if (this._mouseHandler) document.removeEventListener('mousemove', this._mouseHandler);
+        if (this._gyroHandler) window.removeEventListener('deviceorientation', this._gyroHandler);
+        if (this.container) this.container.innerHTML = "";
+        this.el = null;
+    }
+
+    setBubbleText(text) {
+        const bubble = document.querySelector('.sage-bubble');
+        if (bubble) bubble.textContent = text;
+    }
+}

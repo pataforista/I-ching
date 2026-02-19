@@ -163,7 +163,7 @@ export function trackEvent(name, data = {}) {
   }
 
   // Debug log for verification
-  console.log(`[Telemetry] ${name}`, data);
+  // console.log(`[Telemetry] ${name}`, data);
   saveEngineState();
 }
 

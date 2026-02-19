@@ -35,6 +35,9 @@
   --radius-md: 16px;
 
   --page-max-w: 900px;
+
+  /* Sumi-e specific */
+  --sumi-filter: url(#sumi-e-brush);
 }
 
 :root[data-theme="ink"] {
@@ -212,6 +215,8 @@ h4,
   border: 1px solid var(--panel-border);
   box-shadow: var(--panel-shadow);
   overflow: hidden;
+  transition: transform 0.1s ease-out;
+  /* For mouse tilt */
 }
 
 .sage-avatar img {
@@ -220,7 +225,49 @@ h4,
   object-fit: cover;
   border-radius: 50%;
   display: block;
-  filter: saturate(1.05) contrast(1.05);
+  filter: saturate(1.05) contrast(1.05) var(--sumi-filter);
+  animation: sage-breathing 5s ease-in-out infinite;
+}
+
+/* breathing effect */
+@keyframes sage-breathing {
+
+  0%,
+  100% {
+    transform: scale(1.0);
+    filter: saturate(1.05) contrast(1.05) var(--sumi-filter) brightness(1);
+  }
+
+  50% {
+    transform: scale(1.04);
+    filter: saturate(1.1) contrast(1.1) var(--sumi-filter) brightness(1.05);
+  }
+}
+
+/* Ink pulse distortion */
+.sage-avatar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+  animation: ink-pulse 8s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes ink-pulse {
+  0% {
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+  }
+
+  50% {
+    box-shadow: inset 0 0 30px var(--accent-soft);
+  }
+
+  100% {
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+  }
 }
 
 .sage-bubble {
@@ -293,8 +340,16 @@ h4,
     transform: rotateY(0) rotateX(0) translateY(0);
   }
 
+  25% {
+    transform: rotateY(360deg) rotateX(45deg) translateY(-80px);
+  }
+
   50% {
-    transform: rotateY(720deg) rotateX(180deg) translateY(-50px);
+    transform: rotateY(720deg) rotateX(180deg) translateY(-100px);
+  }
+
+  75% {
+    transform: rotateY(1080deg) rotateX(270deg) translateY(-50px);
   }
 
   100% {
@@ -303,7 +358,31 @@ h4,
 }
 
 .tossing {
-  animation: spin 0.8s ease-in-out;
+  animation: spin 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* --- Ink Transition --- */
+.ink-transition-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--text);
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 0;
+  clip-path: circle(0% at 50% 50%);
+  transition: clip-path 0.8s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.3s;
+}
+
+.ink-transition-overlay.active {
+  opacity: 1;
+  clip-path: circle(150% at 50% 50%);
+  pointer-events: all;
+}
+
+.ink-transition-overlay.fade-out {
+  opacity: 0;
+  clip-path: circle(150% at 50% 50%);
+  transition: opacity 0.6s ease-out;
 }
 
 /* --- The Book --- */
@@ -395,6 +474,89 @@ h4,
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* --- Enso Loader --- */
+.enso-container {
+  display: grid;
+  place-items: center;
+  margin: 40px auto;
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.enso-svg {
+  width: 100%;
+  height: 100%;
+  filter: var(--sumi-filter);
+  transform: rotate(-90deg);
+}
+
+.enso-circle {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 283;
+  /* 2 * PI * 45 (approx) */
+  stroke-dashoffset: 283;
+  animation: enso-draw 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes enso-draw {
+  0% {
+    stroke-dashoffset: 283;
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: 40;
+    opacity: 0.9;
+  }
+
+  /* Leave it incomplete for Zen feel */
+}
+
+/* --- Vertical Text (Rolls) --- */
+.zen-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  max-height: 70vh;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 20px;
+  line-height: 2;
+  letter-spacing: 0.2em;
+  font-family: var(--font-serif);
+  border-right: 1px solid var(--panel-border);
+  scrollbar-width: thin;
+  scrollbar-color: var(--panel-border) transparent;
+}
+
+.zen-vertical::-webkit-scrollbar {
+  height: 4px;
+}
+
+.zen-vertical::-webkit-scrollbar-thumb {
+  background: var(--panel-border);
+  border-radius: 10px;
+}
+
+/* --- Paper Texture --- */
+#grained-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.05;
+}
+
 /* --- Utils --- */
 .vstack {
   display: flex;
@@ -421,10 +583,85 @@ h4,
   box-shadow: 6px 6px 0 var(--text-muted);
 }
 
-.divider {
-  height: 2px;
-  background: linear-gradient(to right, transparent, var(--panel-border), transparent);
-  margin: clamp(20px, 5vw, 40px) 0;
+/* --- Interactive Book Flip --- */
+.book-container {
+  width: 100%;
+  height: clamp(500px, 75vh, 850px);
+  margin: 0 auto;
+  position: relative;
+  background: var(--bg);
+}
+
+.book-page {
+  background-color: var(--bg);
+  padding: 30px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--panel-border);
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.02);
+}
+
+.book-page.--left {
+  border-right: 0;
+  border-radius: 12px 0 0 12px;
+}
+
+.book-page.--right {
+  border-left: 0;
+  border-radius: 0 12px 12px 0;
+}
+
+/* Page Texture inside book */
+.book-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  position: relative;
+  z-index: 1;
+}
+
+.page-content::-webkit-scrollbar {
+  display: none;
+}
+
+.page-footer {
+  text-align: center;
+  font-size: 11px;
+  opacity: 0.3;
+  margin-top: 15px;
+  font-family: var(--font-serif);
+}
+
+/* Mobile Book adjustments */
+@media (max-width: 850px) {
+  .book-container {
+    height: auto !important;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .book-page {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    border-radius: var(--radius-md) !important;
+    border: 1px solid var(--panel-border) !important;
+    box-shadow: var(--panel-shadow);
+  }
 }
 
 /* Mobile Adjustments */
