@@ -454,5 +454,46 @@ h4,
     padding: 15px;
     border: none;
     background: transparent;
+    padding: 15px;
+    border: none;
   }
+}
+
+/* Visualizer */
+.shaoYongContainer {
+  width: 100%;
+  max-width: 500px;
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
+}
+
+.shaoYongCircle {
+  width: 100%;
+  height: auto;
+  max-height: 500px;
+}
+
+/* Reading Modes Themes */
+[data-mode="zen"] {
+  --bg: #1a1a1a;
+  --text: #d4d4d4;
+  --accent: #4a90e2;
+  --accent-soft: rgba(74, 144, 226, 0.1);
+}
+
+[data-mode="oracle"] {
+  --bg: #1e1b18;
+  --text: #e0d5c1;
+  --accent: #c0392b;
+  --accent-soft: rgba(192, 57, 43, 0.1);
+}
+
+[data-mode="study"] {
+  --bg: #fdf6e3;
+  --text: #657b83;
+  --accent: #268bd2;
+  --accent-soft: rgba(38, 139, 210, 0.1);
 }

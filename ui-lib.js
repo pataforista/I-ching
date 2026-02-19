@@ -278,3 +278,82 @@ export class TiltCard {
         if (this.glareEl) this.glareEl.style.opacity = '0';
     }
 }
+
+export class ShaoYongCircle {
+    constructor(container, hexagrams, options = {}) {
+        this.container = typeof container === 'string' ? document.querySelector(container) : container;
+        this.hexagrams = hexagrams; // Array of 64 hexagrams
+        this.options = {
+            radius: 200,
+            onHexClick: null,
+            ...options
+        };
+        this.init();
+    }
+
+    init() {
+        if (!this.container) return;
+        this.render();
+    }
+
+    render() {
+        const { radius } = this.options;
+        const centerX = radius + 50;
+        const centerY = radius + 50;
+        const size = (radius + 50) * 2;
+
+        let html = `<svg viewBox="0 0 ${size} ${size}" class="shaoYongCircle">`;
+
+        // Background circle
+        html += `<circle cx="${centerX}" cy="${centerY}" r="${radius + 20}" fill="none" stroke="var(--accent-soft)" stroke-width="1" opacity="0.3"/>`;
+
+        this.hexagrams.forEach((hex, i) => {
+            // Sequence logic: typically Shao Yong uses a binary sequence for the circle
+            // But for now we use the index to distribute them evenly
+            const angle = (i / 64) * Math.PI * 2 - Math.PI / 2;
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY + radius * Math.sin(angle);
+
+            // Small hexagram representation (6 lines)
+            const hexSize = 12;
+            const lineSpacing = 2;
+
+            html += `<g class="hex-node" transform="translate(${x - hexSize / 2}, ${y - (hexSize + lineSpacing * 5) / 2})" data-id="${hex.id}" style="cursor:pointer;">`;
+
+            // Draw 6 lines
+            // In the circle, we usually draw them simply
+            const binary = hex.binary || "000000"; // Fallback
+            for (let l = 0; l < 6; l++) {
+                const isYang = binary[5 - l] === '1';
+                const ly = l * (2 + lineSpacing);
+                if (isYang) {
+                    html += `<line x1="0" y1="${ly}" x2="${hexSize}" y2="${ly}" stroke="var(--text)" stroke-width="1.5" />`;
+                } else {
+                    html += `<line x1="0" y1="${ly}" x2="${hexSize / 2.5}" y2="${ly}" stroke="var(--text)" stroke-width="1.5" />`;
+                    html += `<line x1="${hexSize - hexSize / 2.5}" y1="${ly}" x2="${hexSize}" y2="${ly}" stroke="var(--text)" stroke-width="1.5" />`;
+                }
+            }
+
+            html += `<rect x="-2" y="-2" width="${hexSize + 4}" height="${(2 + lineSpacing) * 6}" fill="transparent" />`;
+            html += `</g>`;
+        });
+
+        html += `</svg>`;
+        this.container.innerHTML = html;
+
+        // Add events
+        this.container.querySelectorAll('.hex-node').forEach(node => {
+            node.addEventListener('click', (e) => {
+                const id = node.getAttribute('data-id');
+                if (this.options.onHexClick) this.options.onHexClick(id);
+            });
+
+            node.addEventListener('mouseenter', () => {
+                node.style.filter = "drop-shadow(0 0 5px var(--gold))";
+            });
+            node.addEventListener('mouseleave', () => {
+                node.style.filter = "none";
+            });
+        });
+    }
+}

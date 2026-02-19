@@ -24,26 +24,40 @@ const store = {
     conversions: 0,
     overwrite_decisions: { overwrite: 0, upgrade: 0 }
   },
-  locales: {}
+  locales: {},
+  settings: {
+    method: "three_coins" // "three_coins" | "yarrow_stalks"
+  }
 };
+
+async function loadJSON(path) {
+  try {
+    const res = await fetch(path, { cache: "no-cache" });
+    if (!res.ok) throw new Error(`Status ${res.status}`);
+    return await res.json();
+  } catch (e) {
+    throw new Error(`Error cargando ${path}: ${e.message}`);
+  }
+}
 
 export async function initEngine() {
   // Cargar manifest
-  let manifestRes;
   try {
-    manifestRes = await fetch(`${DATA_ROOT}/dataset_manifest.json`, { cache: "no-cache" });
+    store.manifest = await loadJSON(`${DATA_ROOT}/dataset_manifest.json`);
+    store.rules.coins = await loadJSON(`${DATA_ROOT}/rules/coins_rules.json`);
+    store.rules.build = await loadJSON(`${DATA_ROOT}/rules/hexagram_build_rules.json`);
+    store.meta = await loadJSON(`${DATA_ROOT}/content/hexagrams_meta.json`);
+    store.trigrams = await loadJSON(`${DATA_ROOT}/content/trigrams_core.json`);
+    store.content = await loadJSON(`${DATA_ROOT}/content/hexagrams_hybrid_es.json`);
   } catch (e) {
-    throw new Error("Error de red cargando dataset_manifest.json");
+    throw new Error(`Faltan recursos esenciales: ${e.message}`);
   }
-
-  if (!manifestRes.ok) throw new Error("No se pudo cargar dataset_manifest.json (404)");
-  store.manifest = await manifestRes.json();
 
   // Load Locales (Parallel to boot resources)
   const LOCALE = "es"; // Fixed for now, can be dynamic later
   const localePromise = fetch(`${DATA_ROOT}/locales/${LOCALE}.json`).then(r => r.json()).catch(() => ({}));
 
-  // Cargar recursos required_for_boot
+  // Cargar recursos required_for_boot (products and licenses)
   const bootResources = store.manifest.resources.filter(r => r.required_for_boot);
 
   const promises = bootResources.map(async (r) => {
@@ -215,6 +229,38 @@ export function tossLine() {
   return { coins, sum, ...outcome };
 }
 
+export function tossYarrowLine() {
+  if (!store.ready) throw new Error("Engine not ready");
+
+  // Probabilidades Varillas de Milenrama (Dayan):
+  // 6 (Viejo Yin): 1/16  (6.25%)
+  // 7 (Joven Yang): 5/16 (31.25%)
+  // 8 (Joven Yin): 7/16  (43.75%)
+  // 9 (Viejo Yang): 3/16 (18.75%)
+
+  const r = Math.random();
+  let value, sum;
+
+  if (r < 1 / 16) { value = 6; sum = 6; }
+  else if (r < 6 / 16) { value = 7; sum = 7; }
+  else if (r < 13 / 16) { value = 8; sum = 8; }
+  else { value = 9; sum = 9; }
+
+  const rules = store.rules.coins;
+  const outcome = rules.sum_outcomes[String(value)];
+
+  return {
+    coins: value % 2 === 0 ? ['tails', 'tails', 'tails'] : ['heads', 'heads', 'heads'], // Simulated "visual" coins
+    sum,
+    ...outcome
+  };
+}
+
+export function setMethod(method) {
+  if (method !== "three_coins" && method !== "yarrow_stalks") return;
+  store.settings.method = method;
+}
+
 function randCoin() {
   return Math.random() < 0.5 ? "heads" : "tails";
 }
@@ -270,7 +316,9 @@ function hydrateHexagram(metaHex, tosses = null) {
   const safe = content || {
     dynamic_core_es: "Cargando contenido...",
     image_es: "—",
-    general_reading_es: "Texto no disponible. Revise su conexión o la carpeta /data.",
+    general_reading_es: "Texto no disponible.",
+    wilhelm_essence_es: "—",
+    legge_commentary_es: "—",
     lines_es: {},
     taoist_reading_es: "—",
     guiding_questions_es: [],
@@ -283,9 +331,14 @@ function hydrateHexagram(metaHex, tosses = null) {
     tosses.forEach((t, idx) => {
       if (t.is_moving) {
         const pos = idx + 1;
+        // Check for hybrid lines or legacy lines
+        const lineText = (safe.lines_hybrid_es && safe.lines_hybrid_es[String(pos)])
+          ? safe.lines_hybrid_es[String(pos)]
+          : (safe.lines_es[String(pos)] || "—");
+
         activeLines.push({
           position: pos,
-          text: safe.lines_es[String(pos)] || "—"
+          text: lineText
         });
       }
     });

@@ -1,8 +1,10 @@
-import { BubbleMenu, Typewriter, InkGalaxy, TiltCard } from "./ui-lib.js";
+import { BubbleMenu, Typewriter, InkGalaxy, TiltCard, ShaoYongCircle } from "./ui-lib.js";
 import {
   initEngine,
   trackEvent,
   tossLine,
+  tossYarrowLine,
+  setMethod,
   buildReading,
   t
 } from "./engine.js";
@@ -39,7 +41,9 @@ var state = {
     premium_sections: true,
     pdf_export: true
   },
-  _bookOpen: false
+  _bookOpen: false,
+  readingMode: "zen", // "zen" | "oracle" | "study"
+  divinationMethod: "three_coins" // "three_coins" | "yarrow_stalks"
 };
 
 // ---------- Init ----------
@@ -110,14 +114,44 @@ function saveLocal() {
 
 // ---------- Theme ----------
 function onToggleTheme() {
-  const current = document.documentElement.getAttribute("data-theme");
-  const next = current === "ink" ? "paper" : "ink";
-  applyTheme(next);
+  const current = document.documentElement.getAttribute("data-theme") || "paper";
+  const next = current === "paper" ? "dark" : "paper";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem(LS_THEME, next);
 }
 
-function applyTheme(name) {
-  document.documentElement.setAttribute("data-theme", name);
-  localStorage.setItem(LS_THEME, name);
+function setReadingMode(mode) {
+  state.readingMode = mode;
+  document.documentElement.setAttribute("data-mode", mode);
+  render();
+}
+
+function onMethodToggle() {
+  const next = state.divinationMethod === "three_coins" ? "yarrow_stalks" : "three_coins";
+  state.divinationMethod = next;
+  setMethod(next);
+  render();
+}
+
+window.setReadingMode = setReadingMode;
+window.onMethodToggle = onMethodToggle;
+window.openHexagramDetail = openHexagramDetail;
+
+function renderStudyReading(hex) {
+  if (!hex) return "";
+  return `
+    <div class="divider"></div>
+    <section class="vstack" style="gap:20px;">
+      <div class="card" style="border-top:4px solid var(--gold);">
+         <h4 class="serif" style="margin-top:0;">Perspectiva de Wilhelm</h4>
+         <p class="serif" style="font-size:0.95rem; opacity:0.9;">${escapeHtml(hex.wilhelm_essence_es || "Cargando esencia...")}</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--accent);">
+         <h4 class="serif" style="margin-top:0;">Comentario de Legge (Estructura)</h4>
+         <p class="serif" style="font-size:0.95rem; opacity:0.9;">${escapeHtml(hex.legge_commentary_es || "Analizando estructura...")}</p>
+      </div>
+    </section>
+  `;
 }
 
 // ---------- SW ----------
@@ -215,11 +249,11 @@ function render() {
 
   let contentHTML = "";
   switch (state.nav) {
-    case "home": contentHTML = HomeFormView(); break;
+    case "home": contentHTML = renderHome(); break;
     case "toss": contentHTML = TossView(); break;
-    case "reading": contentHTML = ReadingView(); break;
+    case "reading": contentHTML = renderReading(); break;
     case "history": contentHTML = HistoryView(); break;
-    default: contentHTML = HomeFormView();
+    default: contentHTML = renderHome();
   }
 
   pageContainer.innerHTML = `<div class="fade-in">${contentHTML}</div>`;
@@ -263,39 +297,62 @@ function BookShellHTML() {
   `;
 }
 
-function HomeFormView() {
-  return `
-    <div class="vstack" style="gap:40px;">
-      <div style="text-align:center;">
-         <div class="seal" style="width:50px; height:50px; margin:0 auto; background:var(--indigo);">IC</div>
-         <h2 class="hexTitle" style="margin-top:20px;">Nueva Consulta</h2>
-         <p class="muted serif">Silencia tu mente y formula tu pregunta con claridad.</p>
-      </div>
+function renderHome() {
+  const container = document.getElementById("app");
+
+  container.innerHTML = `
+    <div class="vstack" style="text-align:center;">
+      <h1 class="hexTitle" style="font-size:3rem; margin-bottom:10px;">I Ching</h1>
+      <p class="muted serif" style="font-style:italic;">"${t("home.tagline")}"</p>
       
-      <div class="vstack" style="gap:30px;">
-        <div class="vstack" style="gap:8px;">
-          <label class="muted serif">${t("home.label_focus")}</label>
-          <select id="qMode" class="input-field">
-              ${opt("reflexion", t("home.focus_options.reflexion"))}
-              ${opt("decision", t("home.focus_options.decision"))}
-              ${opt("relacion", t("home.focus_options.relacion"))}
-              ${opt("trabajo", t("home.focus_options.trabajo"))}
-              ${opt("salud", t("home.focus_options.salud"))}
-              ${opt("otro", t("home.focus_options.otro"))}
-          </select>
-        </div>
+      <div id="shao-yong-box" class="shaoYongContainer"></div>
 
-        <div class="vstack" style="gap:8px;">
-          <label class="muted serif">${t("home.label_question")}</label>
-          <textarea id="qText" class="input-field" style="min-height:120px; resize:none;" placeholder="${t("home.placeholder_question")}">${escapeHtml(state.draft.question.text_es || "")}</textarea>
-        </div>
-      </div>
-
-      <div class="row" style="justify-content:center; margin-top:20px;">
-        <button class="btn btn--primary" id="btnBegin" style="width:100%; max-width:300px;">Iniciar Ritual</button>
+      <div class="card vstack" style="gap:20px; background:var(--accent-soft); padding:30px;">
+         <p class="serif" style="margin:0;">¿Qué buscas comprender hoy?</p>
+         <div class="row" style="gap:10px; justify-content:center;">
+            <button class="btn btn--ghost ${state.readingMode === 'zen' ? 'active' : ''}" onclick="setReadingMode('zen')">Zen</button>
+            <button class="btn btn--ghost ${state.readingMode === 'oracle' ? 'active' : ''}" onclick="setReadingMode('oracle')">Oráculo</button>
+            <button class="btn btn--ghost ${state.readingMode === 'study' ? 'active' : ''}" onclick="setReadingMode('study')">Estudio</button>
+         </div>
+         <button class="btn btn--primary" id="btnStart" style="width:100%;">${t("home.cta")}</button>
+         
+         <div class="muted serif" style="font-size:0.8rem; cursor:pointer;" onclick="onMethodToggle()">
+            Método: <b>${state.divinationMethod === 'three_coins' ? 'Tres Monedas' : 'Varillas (Dayan)'}</b>
+            <span style="display:block; font-size:0.7rem; opacity:0.7;">(Haz clic para cambiar)</span>
+         </div>
       </div>
     </div>
   `;
+
+  // Initialize Visualizer
+  const visualizerBox = document.getElementById("shao-yong-box");
+  const hexData = Object.values(store.content.hexagrams); // Using hybrid data which has 'binary'
+  new ShaoYongCircle(visualizerBox, hexData, {
+    radius: 120,
+    onHexClick: (id) => openHexagramDetail(id)
+  });
+
+  const btnStart = document.getElementById("btnStart");
+  if (btnStart) {
+    btnStart.onclick = () => {
+      state.nav = "toss";
+      state.draft.tosses = [];
+      render();
+    };
+  }
+}
+
+function openHexagramDetail(id) {
+  // Functional mock for browsing the 64 hexagrams
+  const hex = buildReading([id])[0];
+  state.session = {
+    id: Date.now(),
+    date: new Date().toISOString(),
+    hexagrams: { primary: hex },
+    lines: []
+  };
+  state.nav = "reading";
+  render();
 }
 
 function TossView() {
@@ -344,7 +401,7 @@ function renderHexLines(tosses) {
   return `<div class="hex-visual" style="padding:20px; gap:8px;">${items.join("")}</div>`;
 }
 
-function ReadingView() {
+function renderReading() {
   const s = state.session || buildReading(state.draft);
   if (!s) return "Error building reading";
 
@@ -381,7 +438,8 @@ function ReadingView() {
 
       ${renderLinesDetail(s)}
       ${renderResultingSection(isMutating, r)}
-      ${renderPremiumReading(p)}
+      ${state.readingMode !== 'zen' ? renderPremiumReading(p) : ''}
+      ${state.readingMode === 'study' ? renderStudyReading(p) : ''}
 
       <div class="divider"></div>
 
@@ -580,7 +638,7 @@ function onTossNextLine() {
       coinEls.forEach(el => el.classList.remove("tossing"));
 
       // Math
-      const line = tossLine(); // returns { coins: [], value: 6..9, isMoving: bool }
+      const line = (state.divinationMethod === 'yarrow_stalks') ? tossYarrowLine() : tossLine();
       state.draft.tosses.push(line);
 
       // Orientation randomizer
