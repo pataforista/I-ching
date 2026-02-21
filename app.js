@@ -1,10 +1,8 @@
-import { BubbleMenu, Typewriter, InkGalaxy, TiltCard, ShaoYongCircle } from "./ui-lib.js";
+import { BubbleMenu, Typewriter, InkGalaxy, TiltCard, EnsoLoader, DynamicHexagram, drawHanzi, InteractiveBook } from "./ui-lib.js";
 import {
   initEngine,
   trackEvent,
   tossLine,
-  tossYarrowLine,
-  setMethod,
   buildReading,
   t
 } from "./engine.js";
@@ -13,6 +11,9 @@ import {
 let sageTyper = null;
 let bubbleMenu = null;
 let galaxy = null;
+let homeAvatar = null;
+let tossAvatar = null;
+let interactiveBookInstance = null;
 
 var state = {
   // Boot status
@@ -41,9 +42,7 @@ var state = {
     premium_sections: true,
     pdf_export: true
   },
-  _bookOpen: false,
-  readingMode: "zen", // "zen" | "oracle" | "study"
-  divinationMethod: "three_coins" // "three_coins" | "yarrow_stalks"
+  _bookOpen: false
 };
 
 // ---------- Init ----------
@@ -56,6 +55,42 @@ var state = {
 
   // Init Menu
   initBubbleMenu();
+
+  // Init Smooth Scroll (Lenis)
+  if (window.Lenis) {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      smoothTouch: false,
+      touchMultiplier: 2,
+      infinite: false,
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+  }
+
+  // Init Grain (Paper Texture)
+  if (window.grained) {
+    grained("body", {
+      animate: true,
+      patternWidth: 100,
+      patternHeight: 100,
+      grainOpacity: 0.04,
+      grainDensity: 1.2,
+      grainWidth: 1.5,
+      grainHeight: 1.5,
+      grainChaos: 0.5,
+      grainSpeed: 20
+    });
+  }
 
   // Init Ink Galaxy Background
   galaxy = new InkGalaxy({ count: 180 });
@@ -114,44 +149,14 @@ function saveLocal() {
 
 // ---------- Theme ----------
 function onToggleTheme() {
-  const current = document.documentElement.getAttribute("data-theme") || "paper";
-  const next = current === "paper" ? "dark" : "paper";
-  document.documentElement.setAttribute("data-theme", next);
-  localStorage.setItem(LS_THEME, next);
+  const current = document.documentElement.getAttribute("data-theme");
+  const next = current === "ink" ? "paper" : "ink";
+  applyTheme(next);
 }
 
-function setReadingMode(mode) {
-  state.readingMode = mode;
-  document.documentElement.setAttribute("data-mode", mode);
-  render();
-}
-
-function onMethodToggle() {
-  const next = state.divinationMethod === "three_coins" ? "yarrow_stalks" : "three_coins";
-  state.divinationMethod = next;
-  setMethod(next);
-  render();
-}
-
-window.setReadingMode = setReadingMode;
-window.onMethodToggle = onMethodToggle;
-window.openHexagramDetail = openHexagramDetail;
-
-function renderStudyReading(hex) {
-  if (!hex) return "";
-  return `
-    <div class="divider"></div>
-    <section class="vstack" style="gap:20px;">
-      <div class="card" style="border-top:4px solid var(--gold);">
-         <h4 class="serif" style="margin-top:0;">Perspectiva de Wilhelm</h4>
-         <p class="serif" style="font-size:0.95rem; opacity:0.9;">${escapeHtml(hex.wilhelm_essence_es || "Cargando esencia...")}</p>
-      </div>
-      <div class="card" style="border-top:4px solid var(--accent);">
-         <h4 class="serif" style="margin-top:0;">Comentario de Legge (Estructura)</h4>
-         <p class="serif" style="font-size:0.95rem; opacity:0.9;">${escapeHtml(hex.legge_commentary_es || "Analizando estructura...")}</p>
-      </div>
-    </section>
-  `;
+function applyTheme(name) {
+  document.documentElement.setAttribute("data-theme", name);
+  localStorage.setItem(LS_THEME, name);
 }
 
 // ---------- SW ----------
@@ -163,9 +168,24 @@ async function registerSW() {
 }
 
 // ---------- Navigation ----------
-function nav(to) {
+async function nav(to) {
+  const overlay = document.createElement("div");
+  overlay.className = "ink-transition-overlay";
+  document.body.appendChild(overlay);
+
+  // Trigger ink blot
+  requestAnimationFrame(() => overlay.classList.add("active"));
+
+  await new Promise(r => setTimeout(r, 800));
+
   state.nav = to;
   render();
+
+  // Fade out
+  overlay.classList.remove("active");
+  overlay.classList.add("fade-out");
+
+  setTimeout(() => overlay.remove(), 600);
 }
 
 // ---------- Actions ----------
@@ -249,11 +269,11 @@ function render() {
 
   let contentHTML = "";
   switch (state.nav) {
-    case "home": contentHTML = renderHome(); break;
+    case "home": contentHTML = HomeFormView(); break;
     case "toss": contentHTML = TossView(); break;
-    case "reading": contentHTML = renderReading(); break;
+    case "reading": contentHTML = ReadingView(); break;
     case "history": contentHTML = HistoryView(); break;
-    default: contentHTML = renderHome();
+    default: contentHTML = HomeFormView();
   }
 
   pageContainer.innerHTML = `<div class="fade-in">${contentHTML}</div>`;
@@ -261,6 +281,186 @@ function render() {
   // 4. Post-Render logic
   bindPageEvents(pageContainer);
   initPageEffects();
+  renderDynamicVisuals();
+}
+
+function renderDynamicVisuals() {
+  const s = state.session;
+
+  // Home Avatar cleanup & init
+  const homeTarget = document.getElementById("homeAvatarTarget");
+  if (homeTarget) {
+    if (homeAvatar) homeAvatar.destroy();
+    homeAvatar = new DynamicAvatar("./assets/sage.png", homeTarget);
+    homeAvatar.render();
+  } else if (homeAvatar) {
+    homeAvatar.destroy();
+    homeAvatar = null;
+  }
+
+  // Toss Avatar cleanup & init
+  const tossTarget = document.getElementById("tossAvatarTarget");
+  if (tossTarget) {
+    if (tossAvatar) tossAvatar.destroy();
+    tossAvatar = new DynamicAvatar("./assets/sage.png", tossTarget);
+    tossAvatar.render();
+  } else if (tossAvatar) {
+    tossAvatar.destroy();
+    tossAvatar = null;
+  }
+
+  if (state.nav === "reading" && s) {
+    initInteractiveBook(s);
+  } else if (interactiveBookInstance) {
+    interactiveBookInstance.destroy();
+    interactiveBookInstance = null;
+  }
+}
+
+function initInteractiveBook(sess) {
+  const container = document.getElementById("bookFlipContainer");
+  if (!container) return;
+
+  if (interactiveBookInstance) interactiveBookInstance.destroy();
+  interactiveBookInstance = new InteractiveBook(container);
+
+  const book = interactiveBookInstance;
+  const p = sess.hexagrams.primary;
+  const r = sess.hexagrams.resulting;
+  const isMutating = !!r;
+
+  // Page 1: Revelation
+  book.addPage(`
+    <div class="vstack" style="align-items:center; text-align:center;">
+        <div id="hanziAnimation" style="min-height:130px; display:grid; place-items:center;"></div>
+        <div id="primaryHexSVG" style="margin: 20px auto; display:grid; place-items:center;"></div>
+        <h2 class="hexTitle" style="margin-top:10px;">${escapeHtml(p.slug)}</h2>
+        <div class="zen-vertical" style="margin: 20px auto; font-size:1.4rem;">
+            ${escapeHtml(p.judgment_es)}
+        </div>
+    </div>
+  `, "--left");
+
+  // Page 2: Structure & Image
+  book.addPage(`
+    <div class="vstack">
+        <div class="card" style="background:var(--accent-soft); border-left: 8px solid var(--accent); padding:20px;">
+            <h3 class="serif" style="margin-top:0;">La Imagen</h3>
+            <p class="serif" style="font-size:1.1rem; opacity:0.9;">${escapeHtml(p.image_es)}</p>
+        </div>
+        <section style="margin-top:20px;">
+             <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Estructura Trigramática</h3>
+             <div class="row" style="gap:20px; margin-top:15px;">
+                <div class="card" style="flex:1; padding:15px; text-align:center;">
+                   <div class="muted serif" style="font-size:0.7rem;">SUPERIOR</div>
+                   <div style="font-weight:600;">${escapeHtml(p.trigrams.upper.slug_es)}</div>
+                </div>
+                <div class="card" style="flex:1; padding:15px; text-align:center;">
+                   <div class="muted serif" style="font-size:0.7rem;">INFERIOR</div>
+                   <div style="font-weight:600;">${escapeHtml(p.trigrams.lower.slug_es)}</div>
+                </div>
+             </div>
+        </section>
+    </div>
+  `, "--right");
+
+  // Page 3: Moving Lines (if any)
+  if (sess.lines && sess.lines.some(l => l.isMoving)) {
+    const moving = sess.lines.filter(l => l.isMoving);
+    book.addPage(`
+        <div class="vstack">
+           <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Líneas en Movimiento</h3>
+           <div class="vstack" style="gap:15px; margin-top:10px;">
+             ${moving.map(l => `
+               <div class="card" style="padding:15px; border-left:4px solid var(--accent);">
+                 <div style="font-weight:600; margin-bottom:5px;">Línea ${l.pos} — ${l.value === 6 ? 'Seis' : 'Nueve'}</div>
+                 <p class="serif" style="margin:0; opacity:0.9; font-size:0.9rem;">${escapeHtml(l.text_es)}</p>
+               </div>
+             `).join("")}
+           </div>
+        </div>
+      `, "--left");
+  }
+
+  // Page 4: Resulting or Questions
+  if (isMutating) {
+    book.addPage(`
+        <div class="vstack">
+          <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Transformación</h3>
+          <div class="card" style="margin-top:10px; display:flex; gap:20px; align-items:center; padding:20px;">
+            <div id="resultingHexSVG" style="flex-shrink:0;"></div>
+            <div class="vstack" style="gap:4px;">
+               <h4 style="margin:0; font-size:1.2rem;">${escapeHtml(r.hanzi)} · ${escapeHtml(r.slug)}</h4>
+               <p class="muted serif" style="margin:0; font-size:0.8rem;">El destino final de esta mutación.</p>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <h4 class="serif" style="color:var(--accent); margin-top:10px;">Preguntas de Poder</h4>
+          <ul style="padding-left:20px; opacity:0.8; font-size:0.9rem;">
+            ${(p.guiding_questions_es || []).map(q => `<li>${escapeHtml(q)}</li>`).join("")}
+          </ul>
+        </div>
+      `, isMutating ? "--right" : "--left");
+  } else {
+    book.addPage(`
+        <div class="vstack">
+          <h4 class="serif" style="color:var(--accent); margin-top:0;">Preguntas de Poder</h4>
+          <ul style="padding-left:20px; opacity:0.8;">
+            ${(p.guiding_questions_es || []).map(q => `<li>${escapeHtml(q)}</li>`).join("")}
+          </ul>
+        </div>
+      `, "--right");
+  }
+
+  // Page 5: Deep Wisdom
+  book.addPage(`
+    <div class="vstack">
+        <h3 class="serif" style="color:var(--accent); margin-top:0;">Sabiduría Profunda</h3>
+        <p class="serif" style="opacity:0.9;">${escapeHtml(p.taoist_reading_es || "—")}</p>
+        
+        <h4 class="serif" style="color:var(--accent); margin-top:20px;">Micro-Acción Ritual</h4>
+        <div class="callout" style="background:var(--accent-soft); padding:15px; border-radius:12px; font-size:0.95rem; border-left:4px solid var(--accent);">
+           ${escapeHtml(p.micro_action_es || "—")}
+        </div>
+        
+        <div class="divider"></div>
+        <div class="vstack" style="gap:10px;">
+            <button class="btn btn--primary" id="btnSave" style="width:100%;">Guardar Reflexión</button>
+            <div class="row" style="gap:10px;">
+               <button class="btn btn--ghost" id="btnPDF" style="flex:1; font-size:0.8rem;">PDF</button>
+               <button class="btn btn--ghost" id="btnClose" style="flex:1; font-size:0.8rem;">Cerrar</button>
+            </div>
+        </div>
+    </div>
+  `, book.pages.length % 2 === 0 ? "--left" : "--right");
+
+  book.render();
+
+  // Re-run visual render for IDs inside pages
+  // Note: Hanzi and SVG need to be rendered AFTER PageFlip loads them into its own DOM structure if they rely on IDs
+  // Actually, let's render them manually after book.render()
+
+  // Render Primary Hexagram SVG
+  const hexContainer = document.getElementById("primaryHexSVG");
+  if (hexContainer && p) {
+    new DynamicHexagram(p.lines).render(hexContainer);
+  }
+
+  // Render Hanzi Animation
+  const hanziContainer = document.getElementById("hanziAnimation");
+  if (hanziContainer && p.hanzi) {
+    drawHanzi(hanziContainer, p.hanzi, 120);
+  }
+
+  // Render Resulting Hexagram SVG
+  const resContainer = document.getElementById("resultingHexSVG");
+  if (resContainer && r) {
+    new DynamicHexagram(r.lines).render(resContainer);
+  }
+
+  // Re-bind buttons because they were re-rendered inside the book
+  const root = document.getElementById("bookFlipContainer");
+  bindPageEvents(root);
 }
 
 function BookShellHTML() {
@@ -297,62 +497,46 @@ function BookShellHTML() {
   `;
 }
 
-function renderHome() {
-  const container = document.getElementById("app");
+function HomeFormView() {
+  return `
+    <div class="vstack" style="gap:40px;">
+      <div class="sage-container">
+         <div id="homeAvatarTarget"></div>
+         <div class="sage-bubble">
+            ${t("home.subtitle")}
+         </div>
+      </div>
 
-  container.innerHTML = `
-    <div class="vstack" style="text-align:center;">
-      <h1 class="hexTitle" style="font-size:3rem; margin-bottom:10px;">I Ching</h1>
-      <p class="muted serif" style="font-style:italic;">"${t("home.tagline")}"</p>
+      <div style="text-align:center;">
+         <div class="seal" style="width:50px; height:50px; margin:0 auto; background:var(--indigo);">IC</div>
+         <h2 class="hexTitle" style="margin-top:20px;">${t("home.title")}</h2>
+         <p class="muted serif">${t("home.subtitle")}</p>
+      </div>
       
-      <div id="shao-yong-box" class="shaoYongContainer"></div>
+      <div class="vstack" style="gap:30px;">
+        <div class="vstack" style="gap:8px;">
+          <label class="muted serif">${t("home.label_focus")}</label>
+          <select id="qMode" class="input-field">
+              ${opt("reflexion", t("home.focus_options.reflexion"))}
+              ${opt("decision", t("home.focus_options.decision"))}
+              ${opt("relacion", t("home.focus_options.relacion"))}
+              ${opt("trabajo", t("home.focus_options.trabajo"))}
+              ${opt("salud", t("home.focus_options.salud"))}
+              ${opt("otro", t("home.focus_options.otro"))}
+          </select>
+        </div>
 
-      <div class="card vstack" style="gap:20px; background:var(--accent-soft); padding:30px;">
-         <p class="serif" style="margin:0;">¿Qué buscas comprender hoy?</p>
-         <div class="row" style="gap:10px; justify-content:center;">
-            <button class="btn btn--ghost ${state.readingMode === 'zen' ? 'active' : ''}" onclick="setReadingMode('zen')">Zen</button>
-            <button class="btn btn--ghost ${state.readingMode === 'oracle' ? 'active' : ''}" onclick="setReadingMode('oracle')">Oráculo</button>
-            <button class="btn btn--ghost ${state.readingMode === 'study' ? 'active' : ''}" onclick="setReadingMode('study')">Estudio</button>
-         </div>
-         <button class="btn btn--primary" id="btnStart" style="width:100%;">${t("home.cta")}</button>
-         
-         <div class="muted serif" style="font-size:0.8rem; cursor:pointer;" onclick="onMethodToggle()">
-            Método: <b>${state.divinationMethod === 'three_coins' ? 'Tres Monedas' : 'Varillas (Dayan)'}</b>
-            <span style="display:block; font-size:0.7rem; opacity:0.7;">(Haz clic para cambiar)</span>
-         </div>
+        <div class="vstack" style="gap:8px;">
+          <label class="muted serif">${t("home.label_question")}</label>
+          <textarea id="qText" class="input-field" style="min-height:120px; resize:none;" placeholder="${t("home.placeholder_question")}">${escapeHtml(state.draft.question.text_es || "")}</textarea>
+        </div>
+      </div>
+
+      <div class="row" style="justify-content:center; margin-top:20px;">
+        <button class="btn btn--primary" id="btnBegin" style="width:100%; max-width:300px;">${t("home.btn_toss")}</button>
       </div>
     </div>
   `;
-
-  // Initialize Visualizer
-  const visualizerBox = document.getElementById("shao-yong-box");
-  const hexData = Object.values(store.content.hexagrams); // Using hybrid data which has 'binary'
-  new ShaoYongCircle(visualizerBox, hexData, {
-    radius: 120,
-    onHexClick: (id) => openHexagramDetail(id)
-  });
-
-  const btnStart = document.getElementById("btnStart");
-  if (btnStart) {
-    btnStart.onclick = () => {
-      state.nav = "toss";
-      state.draft.tosses = [];
-      render();
-    };
-  }
-}
-
-function openHexagramDetail(id) {
-  // Functional mock for browsing the 64 hexagrams
-  const hex = buildReading([id])[0];
-  state.session = {
-    id: Date.now(),
-    date: new Date().toISOString(),
-    hexagrams: { primary: hex },
-    lines: []
-  };
-  state.nav = "reading";
-  render();
 }
 
 function TossView() {
@@ -360,9 +544,7 @@ function TossView() {
   return `
     <div class="vstack" style="gap:30px;">
       <div class="sage-container">
-         <div class="sage-avatar">
-            ${SageAvatarHTML()}
-         </div>
+         <div id="tossAvatarTarget"></div>
          <div class="sage-bubble">
             <span id="zenText"></span>
          </div>
@@ -376,6 +558,8 @@ function TossView() {
         <div class="coin-stage" id="coinStage">
            ${renderStageCoins()}
         </div>
+
+        <div id="ensoTarget"></div>
 
         <div class="divider"></div>
 
@@ -401,56 +585,12 @@ function renderHexLines(tosses) {
   return `<div class="hex-visual" style="padding:20px; gap:8px;">${items.join("")}</div>`;
 }
 
-function renderReading() {
+function ReadingView() {
   const s = state.session || buildReading(state.draft);
   if (!s) return "Error building reading";
 
-  const p = s.hexagrams.primary;
-  const r = s.hexagrams.resulting;
-  const isMutating = !!r;
-
   return `
-    <div class="vstack" style="gap:40px;">
-      <section style="text-align:center;">
-        <div class="seal" style="margin:0 auto; width:50px; height:50px;">${p.id}</div>
-        <h2 class="hexTitle" style="margin-top:20px;">${escapeHtml(p.hanzi)} · ${escapeHtml(p.slug)}</h2>
-        <p class="muted serif" style="font-size:1.1rem;">${escapeHtml(p.judgment_es)}</p>
-      </section>
-
-      <div class="card" style="background:var(--accent-soft);">
-        <h3 class="serif" style="margin-top:0;">La Imagen</h3>
-        <p class="serif">${escapeHtml(p.image_es)}</p>
-      </div>
-
-      <section>
-         <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Estructura Trigramática</h3>
-         <div class="row" style="gap:20px; margin-top:15px;">
-            <div class="card" style="flex:1; padding:20px; text-align:center;">
-               <div class="muted serif" style="font-size:0.7rem;">SUPERIOR</div>
-               <div style="font-weight:600;">${escapeHtml(p.trigrams.upper.slug_es)}</div>
-            </div>
-            <div class="card" style="flex:1; padding:20px; text-align:center;">
-               <div class="muted serif" style="font-size:0.7rem;">INFERIOR</div>
-               <div style="font-weight:600;">${escapeHtml(p.trigrams.lower.slug_es)}</div>
-            </div>
-         </div>
-      </section>
-
-      ${renderLinesDetail(s)}
-      ${renderResultingSection(isMutating, r)}
-      ${state.readingMode !== 'zen' ? renderPremiumReading(p) : ''}
-      ${state.readingMode === 'study' ? renderStudyReading(p) : ''}
-
-      <div class="divider"></div>
-
-      <div class="vstack" style="gap:15px;">
-        <button class="btn btn--primary" id="btnSave" style="width:100%;">Guardar Reflexión</button>
-        <div class="row" style="gap:15px;">
-           <button class="btn btn--ghost" id="btnPDF" style="flex:1;">Exportar PDF</button>
-           <button class="btn btn--ghost" id="btnClose" style="flex:1;">Nueva Consulta</button>
-        </div>
-      </div>
-    </div>
+    <div id="bookFlipContainer"></div>
   `;
 }
 
@@ -483,7 +623,7 @@ function renderResultingSection(isMutating, hex) {
     <section>
       <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Hexagrama de Transformación</h3>
       <div class="card" style="margin-top:20px; display:flex; gap:30px; align-items:center;">
-        <div class="seal" style="background:var(--indigo); flex-shrink:0;">${hex.id}</div>
+        <div id="resultingHexSVG" style="flex-shrink:0;"></div>
         <div class="vstack" style="gap:4px;">
            <h4 style="margin:0; font-size:1.4rem;">${escapeHtml(hex.hanzi)} · ${escapeHtml(hex.slug)}</h4>
            <p class="muted serif" style="margin:0;">El destino final de esta mutación.</p>
@@ -586,11 +726,6 @@ function renderStageCoins() {
   `).join('');
 }
 
-function SageAvatarHTML() {
-  return `
-    <img src="./assets/sage.png" alt="Avatar del sabio" decoding="async" loading="lazy" />
-  `;
-}
 
 // ---------- Domain Logic ----------
 
@@ -629,6 +764,9 @@ function onTossNextLine() {
   state._tossing = true;
   render();
 
+  const ensoEl = document.getElementById("ensoTarget");
+  if (ensoEl) new EnsoLoader(ensoEl).show();
+
   // Animation delay
   setTimeout(() => {
     const coinEls = document.querySelectorAll(".coin-3d");
@@ -638,7 +776,7 @@ function onTossNextLine() {
       coinEls.forEach(el => el.classList.remove("tossing"));
 
       // Math
-      const line = (state.divinationMethod === 'yarrow_stalks') ? tossYarrowLine() : tossLine();
+      const line = tossLine(); // returns { coins: [], value: 6..9, isMoving: bool }
       state.draft.tosses.push(line);
 
       // Orientation randomizer
@@ -653,7 +791,7 @@ function onTossNextLine() {
       if (state.draft.tosses.length === 6) {
         document.getElementById("btnToss").innerText = t("toss.btn_finish");
       }
-    }, 800);
+    }, 1250); // Matches CSS animation + small buffer
   }, 50);
 }
 

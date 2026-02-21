@@ -1,13 +1,17 @@
 {
   "name": "I Ching · Guía Taoísta (local)",
   "short_name": "IChing Tao",
+  "description": "Tu oráculo personal del I Ching con estética Zen y Sumi-e. Privacidad local completa para tu reflexión diaria.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#1a1a18",
-  "theme_color": "#1a1a18",
+  "background_color": "#f5f2e9",
+  "theme_color": "#f5f2e9",
   "icons": [
-    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "./assets/sage.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }

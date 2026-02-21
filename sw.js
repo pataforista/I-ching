@@ -7,7 +7,14 @@ const SHELL = [
   "./styles.css",
   "./app.js",
   "./engine.js",
-  "./manifest.webmanifest"
+  "./ui-lib.js",
+  "./manifest.webmanifest",
+  "https://unpkg.com/lenis@1.1.20/dist/lenis.min.js",
+  "https://cdn.jsdelivr.net/gh/sarathsaleem/grained@master/grained.js",
+  "https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js",
+  "./assets/sage.png",
+  "./assets/coin_yang.png",
+  "./assets/coin_yin.png"
 ];
 
 self.addEventListener("install", (event) => {
@@ -32,8 +39,7 @@ self.addEventListener("fetch", (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // solo same-origin
-  if (url.origin !== location.origin) return;
+  // Handle requests
 
   // data: stale-while-revalidate
   if (url.pathname.includes("/data/")) {
