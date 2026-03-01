@@ -1,0 +1,128 @@
+{
+  "_comment": "Datos de consultas de prueba. Usar para diseñar y testear el historial sin necesidad de Firebase.",
+  "_usage": "Cargar con: const mock = await fetch('./data/mock_sessions.json').then(r => r.json()); state.history = mock.sessions;",
+  "sessions": [
+    {
+      "id": "mock_sess_001",
+      "question": {
+        "text_es": "¿Qué actitud debo cultivar frente al cambio que se aproxima en mi vida?",
+        "mode": "reflexion"
+      },
+      "created_at_iso": "2026-02-20T09:15:00.000Z",
+      "method": "three_coins",
+      "is_mutating": false,
+      "hexagrams": {
+        "primary": {
+          "id": 1,
+          "hanzi": "乾",
+          "slug": "qian",
+          "name_en_standard": "The Creative",
+          "dynamic_core_es": "La fuerza creadora que no cesa. El cielo se mueve con vigor constante. El superior se fortalece sin descanso."
+        },
+        "resulting": null
+      },
+      "lines": [
+        { "pos": 1, "value": 7, "isMoving": false, "text_es": null },
+        { "pos": 2, "value": 7, "isMoving": false, "text_es": null },
+        { "pos": 3, "value": 7, "isMoving": false, "text_es": null },
+        { "pos": 4, "value": 7, "isMoving": false, "text_es": null },
+        { "pos": 5, "value": 7, "isMoving": false, "text_es": null },
+        { "pos": 6, "value": 7, "isMoving": false, "text_es": null }
+      ]
+    },
+    {
+      "id": "mock_sess_002",
+      "question": {
+        "text_es": "¿Cómo navegar la tensión en esta relación sin perder mi centro?",
+        "mode": "relacion"
+      },
+      "created_at_iso": "2026-02-14T18:42:00.000Z",
+      "method": "three_coins",
+      "is_mutating": true,
+      "hexagrams": {
+        "primary": {
+          "id": 11,
+          "hanzi": "泰",
+          "slug": "tai",
+          "name_en_standard": "Peace",
+          "dynamic_core_es": "El cielo y la tierra se comunican. Lo pequeño parte, lo grande viene. Buena fortuna y prosperidad."
+        },
+        "resulting": {
+          "id": 12,
+          "hanzi": "否",
+          "slug": "pi",
+          "name_en_standard": "Standstill"
+        }
+      },
+      "lines": [
+        { "pos": 1, "value": 9, "isMoving": true, "text_es": "Arranca la hierba junto con su raíz. La empresa trae buena fortuna." },
+        { "pos": 2, "value": 8, "isMoving": false, "text_es": null },
+        { "pos": 3, "value": 7, "isMoving": false, "text_es": null },
+        { "pos": 4, "value": 8, "isMoving": false, "text_es": null },
+        { "pos": 5, "value": 8, "isMoving": false, "text_es": null },
+        { "pos": 6, "value": 7, "isMoving": false, "text_es": null }
+      ]
+    },
+    {
+      "id": "mock_sess_003",
+      "question": {
+        "text_es": "¿Qué revela el I Ching sobre la decisión que debo tomar en mi trabajo?",
+        "mode": "decision"
+      },
+      "created_at_iso": "2026-02-07T07:30:00.000Z",
+      "method": "three_coins",
+      "is_mutating": false,
+      "hexagrams": {
+        "primary": {
+          "id": 48,
+          "hanzi": "井",
+          "slug": "jing",
+          "name_en_standard": "The Well",
+          "dynamic_core_es": "El pozo nutre pero no se mueve. Las ciudades cambian pero el pozo permanece. No hay pérdida ni ganancia."
+        },
+        "resulting": null
+      },
+      "lines": [
+        { "pos": 1, "value": 8, "isMoving": false, "text_es": null },
+        { "pos": 2, "value": 7, "isMoving": false, "text_es": null },
+        { "pos": 3, "value": 8, "isMoving": false, "text_es": null },
+        { "pos": 4, "value": 7, "isMoving": false, "text_es": null },
+        { "pos": 5, "value": 8, "isMoving": false, "text_es": null },
+        { "pos": 6, "value": 7, "isMoving": false, "text_es": null }
+      ]
+    },
+    {
+      "id": "mock_sess_004",
+      "question": {
+        "text_es": "¿Cómo recuperar el equilibrio interior después de un período de agotamiento?",
+        "mode": "salud"
+      },
+      "created_at_iso": "2026-01-28T21:05:00.000Z",
+      "method": "three_coins",
+      "is_mutating": true,
+      "hexagrams": {
+        "primary": {
+          "id": 52,
+          "hanzi": "艮",
+          "slug": "gen",
+          "name_en_standard": "Keeping Still",
+          "dynamic_core_es": "Quietud de la espalda: no siente su cuerpo. Va por el patio y no ve a las personas. Sin culpa."
+        },
+        "resulting": {
+          "id": 53,
+          "hanzi": "漸",
+          "slug": "jian",
+          "name_en_standard": "Development"
+        }
+      },
+      "lines": [
+        { "pos": 1, "value": 8, "isMoving": false, "text_es": null },
+        { "pos": 2, "value": 7, "isMoving": false, "text_es": null },
+        { "pos": 3, "value": 8, "isMoving": false, "text_es": null },
+        { "pos": 4, "value": 8, "isMoving": false, "text_es": null },
+        { "pos": 5, "value": 9, "isMoving": true, "text_es": "Quietud de las quijadas. Las palabras tienen orden. El arrepentimiento desaparece." },
+        { "pos": 6, "value": 7, "isMoving": false, "text_es": null }
+      ]
+    }
+  ]
+}

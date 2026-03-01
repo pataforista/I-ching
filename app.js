@@ -1,13 +1,17 @@
-import { BubbleMenu, Typewriter, InkGalaxy, TiltCard, EnsoLoader, DynamicHexagram, drawHanzi, InteractiveBook, DynamicAvatar } from "./ui-lib.js";
-import {
-  initEngine,
-  trackEvent,
-  tossLine,
-  buildReading,
-  t
-} from "./engine.js";
+// app.js
+// Cerebro de la aplicación. Gestiona estado, navegación y eventos.
+// Las vistas HTML están en views.js. La lógica del I Ching está en engine.js.
+// La autenticación y el estado del usuario están en auth.js.
 
-// Global UI Instances
+import { BubbleMenu, Typewriter, InkGalaxy, TiltCard, EnsoLoader, DynamicHexagram, drawHanzi, InteractiveBook, DynamicAvatar } from "./ui-lib.js";
+import { initEngine, trackEvent, tossLine, buildReading, t } from "./engine.js";
+import { currentUser, initAuth, startCheckout } from "./auth.js";
+import {
+  escapeHtml,
+  BookShellHTML, HomeFormView, TossView, ReadingView, HistoryView, BootErrorView
+} from "./views.js";
+
+// ─── Instancias de UI ─────────────────────────────────────────────────────────
 let sageTyper = null;
 let bubbleMenu = null;
 let galaxy = null;
@@ -15,30 +19,33 @@ let homeAvatar = null;
 let tossAvatar = null;
 let interactiveBookInstance = null;
 
+// ─── Estado Global ────────────────────────────────────────────────────────────
+
 var state = {
   // Boot status
   boot: { ok: true, missing: [], error: null },
 
-  // Navigation: 'home' | 'toss' | 'reading' | 'history'
+  // Navegación: 'home' | 'toss' | 'reading' | 'history'
   nav: "home",
 
-  // Data
+  // Historial local (localStorage)
   history: [],
 
-  // Current Session Draft
+  // Borrador de la consulta actual
   draft: {
     question: { text_es: "", mode: "reflexion" },
     tosses: []
   },
 
-  // Active Session (Displaying Reading)
+  // Sesión activa (lectura en pantalla)
   session: null,
 
-  // UI State
+  // Estado de la UI
   _tossing: false,
   _bookOpen: false,
 
-  // Entitlements: app is fully paid — all features unlocked
+  // Entitlements locales — todos activos en la versión local.
+  // Cuando Firebase Auth esté integrado, estos se derivarán de currentUser.isPremium.
   entitlements: {
     unlimited_history: true,
     premium_sections: true,
@@ -49,14 +56,18 @@ var state = {
   }
 };
 
-// ---------- Init ----------
+// ─── Constantes ───────────────────────────────────────────────────────────────
+const LS_KEY = "iching_sessions_v1";
+const LS_THEME = "iching_theme_v1";
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
 (async function init() {
   loadLocal();
   if (!state.history) state.history = [];
 
   initBubbleMenu();
 
-  // Init Smooth Scroll (Lenis)
+  // Smooth Scroll (Lenis)
   if (window.Lenis) {
     const lenis = new Lenis({
       duration: 1.2,
@@ -69,31 +80,24 @@ var state = {
       touchMultiplier: 2,
       infinite: false,
     });
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
   }
 
-  // Init Grain (Paper Texture)
+  // Grain (Paper Texture)
   if (window.grained) {
     grained("body", {
-      animate: true,
-      patternWidth: 100,
-      patternHeight: 100,
-      grainOpacity: 0.04,
-      grainDensity: 1.2,
-      grainWidth: 1.5,
-      grainHeight: 1.5,
-      grainChaos: 0.5,
-      grainSpeed: 20
+      animate: true, patternWidth: 100, patternHeight: 100,
+      grainOpacity: 0.04, grainDensity: 1.2,
+      grainWidth: 1.5, grainHeight: 1.5,
+      grainChaos: 0.5, grainSpeed: 20
     });
   }
 
-  // Init Ink Galaxy Background
+  // Ink Galaxy Background
   galaxy = new InkGalaxy({ count: 160 });
 
+  // Inicializar motor del I Ching
   try {
     await initEngine();
     state.boot.ok = true;
@@ -101,10 +105,11 @@ var state = {
   } catch (e) {
     state.boot.ok = false;
     state.boot.error = String(e?.message || e);
-    if (e.missing && Array.isArray(e.missing)) {
-      state.boot.missing = e.missing;
-    }
+    if (e.missing && Array.isArray(e.missing)) state.boot.missing = e.missing;
   }
+
+  // Inicializar Auth (placeholder — cuando Firebase esté listo, poblará currentUser)
+  await initAuth();
 
   registerSW();
   render();
@@ -120,7 +125,8 @@ function initBubbleMenu() {
   });
 }
 
-// ---------- Storage ----------
+// ─── Storage ──────────────────────────────────────────────────────────────────
+
 function loadLocal() {
   try {
     const data = localStorage.getItem(LS_KEY);
@@ -139,11 +145,11 @@ function saveLocal() {
   } catch (e) { console.error("Save fail", e); }
 }
 
-// ---------- Theme ----------
+// ─── Theme ────────────────────────────────────────────────────────────────────
+
 function onToggleTheme() {
   const current = document.documentElement.getAttribute("data-theme");
-  const next = current === "ink" ? "paper" : "ink";
-  applyTheme(next);
+  applyTheme(current === "ink" ? "paper" : "ink");
 }
 
 function applyTheme(name) {
@@ -151,15 +157,15 @@ function applyTheme(name) {
   localStorage.setItem(LS_THEME, name);
 }
 
-// ---------- SW ----------
+// ─── Service Worker ───────────────────────────────────────────────────────────
+
 async function registerSW() {
   if (!('serviceWorker' in navigator)) return;
-  try {
-    await navigator.serviceWorker.register('./sw.js');
-  } catch { /* silent */ }
+  try { await navigator.serviceWorker.register('./sw.js'); } catch { /* silent */ }
 }
 
-// ---------- Navigation ----------
+// ─── Navegación ───────────────────────────────────────────────────────────────
+
 async function nav(to) {
   const overlay = document.createElement("div");
   overlay.className = "ink-transition-overlay";
@@ -176,7 +182,8 @@ async function nav(to) {
   setTimeout(() => overlay.remove(), 600);
 }
 
-// ---------- Actions ----------
+// ─── Acciones ─────────────────────────────────────────────────────────────────
+
 function startNew() {
   state.draft = { question: { text_es: "", mode: "reflexion" }, tosses: [] };
   state.session = null;
@@ -199,9 +206,7 @@ function saveSession() {
   render();
 }
 
-function openHistory() {
-  nav("history");
-}
+function openHistory() { nav("history"); }
 
 function deleteHistory() {
   state.history = [];
@@ -210,11 +215,10 @@ function deleteHistory() {
   render();
 }
 
-function exportPDF() {
-  window.print();
-}
+function exportPDF() { window.print(); }
 
-// ---------- Render ----------
+// ─── Render ───────────────────────────────────────────────────────────────────
+
 function render() {
   const root = document.getElementById("app");
   if (!root) return;
@@ -237,17 +241,17 @@ function render() {
   if (!pageContainer) return;
 
   if (!state.boot.ok) {
-    pageContainer.innerHTML = BootErrorView();
+    pageContainer.innerHTML = BootErrorView(state);
     return;
   }
 
   let contentHTML = "";
   switch (state.nav) {
-    case "home": contentHTML = HomeFormView(); break;
-    case "toss": contentHTML = TossView(); break;
-    case "reading": contentHTML = ReadingView(); break;
-    case "history": contentHTML = HistoryView(); break;
-    default: contentHTML = HomeFormView();
+    case "home":    contentHTML = HomeFormView(state); break;
+    case "toss":    contentHTML = TossView(state); break;
+    case "reading": contentHTML = ReadingView(state); break;
+    case "history": contentHTML = HistoryView(state, currentUser); break;
+    default:        contentHTML = HomeFormView(state);
   }
 
   pageContainer.innerHTML = `<div class="fade-in">${contentHTML}</div>`;
@@ -258,7 +262,6 @@ function render() {
 }
 
 function renderDynamicVisuals() {
-  // Home Avatar
   const homeTarget = document.getElementById("homeAvatarTarget");
   if (homeTarget) {
     if (homeAvatar) homeAvatar.destroy();
@@ -269,7 +272,6 @@ function renderDynamicVisuals() {
     homeAvatar = null;
   }
 
-  // Toss Avatar
   const tossTarget = document.getElementById("tossAvatarTarget");
   if (tossTarget) {
     if (tossAvatar) tossAvatar.destroy();
@@ -287,6 +289,10 @@ function renderDynamicVisuals() {
     interactiveBookInstance = null;
   }
 }
+
+// ─── Libro Interactivo ────────────────────────────────────────────────────────
+// Construye las páginas del libro con la lectura actual.
+// Se mantiene aquí porque gestiona instancias de UI (InteractiveBook, DynamicHexagram).
 
 function initInteractiveBook(sess) {
   const container = document.getElementById("bookFlipContainer");
@@ -306,11 +312,9 @@ function initInteractiveBook(sess) {
 
   const isMutating = !!r;
   const movingLines = (sess.lines || []).filter(l => l.isMoving);
-
-  // Helper: format hexagram title
   const hexTitle = (hex) => `${hex.hanzi} · ${hex.slug.charAt(0).toUpperCase() + hex.slug.slice(1)}`;
 
-  // --- Page 1: Revelación ---
+  // Página 1: Revelación
   const primaryJudgment = p.dynamic_core_es || "—";
   book.addPage(`
     <div class="vstack" style="align-items:center; text-align:center; gap:20px;">
@@ -331,7 +335,7 @@ function initInteractiveBook(sess) {
     </div>
   `, "--left");
 
-  // --- Page 2: Imagen y Estructura ---
+  // Página 2: Imagen y Estructura
   book.addPage(`
     <div class="vstack" style="gap:20px;">
         <div class="callout">
@@ -362,7 +366,7 @@ function initInteractiveBook(sess) {
     </div>
   `, "--right");
 
-  // --- Page 3: Líneas en Movimiento (si las hay) ---
+  // Página 3: Líneas en Movimiento (si las hay)
   if (movingLines.length > 0) {
     book.addPage(`
         <div class="vstack" style="gap:16px;">
@@ -385,7 +389,7 @@ function initInteractiveBook(sess) {
       `, "--left");
   }
 
-  // --- Page 4: Transformación o Preguntas de Poder ---
+  // Página 4: Transformación o Preguntas de Poder
   if (isMutating && r) {
     book.addPage(`
         <div class="vstack" style="gap:18px;">
@@ -422,7 +426,7 @@ function initInteractiveBook(sess) {
       `, "--right");
   }
 
-  // --- Page 5: Sabiduría Profunda y Acciones ---
+  // Página 5: Sabiduría Profunda y Acciones
   book.addPage(`
     <div class="vstack" style="gap:18px;">
         <div>
@@ -454,255 +458,22 @@ function initInteractiveBook(sess) {
 
   book.render();
 
-  // Render visual components after book DOM is created
+  // Renderizar componentes visuales tras la creación del DOM del libro
   const hexContainer = document.getElementById("primaryHexSVG");
-  if (hexContainer && p.lines) {
-    new DynamicHexagram(p.lines).render(hexContainer);
-  }
+  if (hexContainer && p.lines) new DynamicHexagram(p.lines).render(hexContainer);
 
   const hanziContainer = document.getElementById("hanziAnimation");
-  if (hanziContainer && p.hanzi) {
-    drawHanzi(hanziContainer, p.hanzi, 110);
-  }
+  if (hanziContainer && p.hanzi) drawHanzi(hanziContainer, p.hanzi, 110);
 
   const resContainer = document.getElementById("resultingHexSVG");
-  if (resContainer && r?.lines) {
-    new DynamicHexagram(r.lines).render(resContainer);
-  }
+  if (resContainer && r?.lines) new DynamicHexagram(r.lines).render(resContainer);
 
-  // Re-bind page events (buttons inside book pages)
+  // Re-bind page events (botones dentro de las páginas del libro)
   const bookRoot = document.getElementById("bookFlipContainer");
   bindPageEvents(bookRoot);
 }
 
-function BookShellHTML() {
-  return `
-    <div class="app-container">
-      <div class="content-wrapper">
-        <div class="book-scene">
-           <div class="book" id="theBook">
-              <!-- Cover -->
-              <div class="book-face book-front">
-                 <div class="vstack" style="align-items:center; gap:32px;">
-                    <div class="book-cover-seal">易</div>
-                    <div style="text-align:center;">
-                       <h1 class="book-cover-title">I CHING</h1>
-                       <p class="serif" style="font-style:italic; opacity:0.7; margin:8px 0 0; font-size:1rem; letter-spacing:0.05em;">El Libro de las Mutaciones</p>
-                    </div>
-                    <div class="book-cover-divider"></div>
-                    <button class="btn book-cover-btn" id="btnOpenBook">Consultar el Oráculo</button>
-                    <p class="serif" style="opacity:0.4; font-size:0.72rem; margin:0; letter-spacing:0.08em; text-transform:uppercase;">Sabiduría Taoísta · Reflexión Local</p>
-                 </div>
-              </div>
-
-              <!-- Inside (Pages) -->
-              <div class="book-face book-inside">
-                 <div id="bookPageContent" class="vstack" style="flex:1;"></div>
-                 <div class="divider"></div>
-                 <div style="text-align:center;" class="muted serif" style="font-size:0.75rem; opacity:0.5;">
-                    I Ching · Reflexión Local · v1.1
-                 </div>
-              </div>
-           </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function HomeFormView() {
-  return `
-    <div class="vstack" style="gap:32px;">
-      <div class="sage-container">
-         <div id="homeAvatarTarget"></div>
-         <div class="sage-bubble">
-            El Tao que puede nombrarse no es el Tao eterno.<br>
-            Presenta tu pregunta con sinceridad y deja que el Libro hable.
-         </div>
-      </div>
-
-      <div style="text-align:center;">
-         <div class="seal" style="width:48px; height:48px; margin:0 auto; background:var(--indigo); font-size:22px;">易</div>
-         <h2 class="hexTitle" style="margin-top:16px;">${t("home.title") || "Nueva Consulta"}</h2>
-         <p class="muted serif">${t("home.subtitle") || "Plantea una pregunta abierta para iniciar."}</p>
-      </div>
-
-      <div class="vstack" style="gap:20px;">
-        <div class="vstack" style="gap:8px;">
-          <label class="muted serif" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.06em;">${t("home.label_focus") || "Foco / Ámbito"}</label>
-          <select id="qMode" class="input-field">
-              ${opt("reflexion", t("home.focus_options.reflexion") || "Reflexión general")}
-              ${opt("decision", t("home.focus_options.decision") || "Toma de decisión")}
-              ${opt("relacion", t("home.focus_options.relacion") || "Vínculos y relaciones")}
-              ${opt("trabajo", t("home.focus_options.trabajo") || "Trabajo y proyectos")}
-              ${opt("salud", t("home.focus_options.salud") || "Bienestar y salud")}
-              ${opt("otro", t("home.focus_options.otro") || "Otro")}
-          </select>
-        </div>
-
-        <div class="vstack" style="gap:8px;">
-          <label class="muted serif" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.06em;">${t("home.label_question") || "Pregunta"}</label>
-          <textarea id="qText" class="input-field" style="min-height:120px; resize:none;" placeholder="${t("home.placeholder_question") || "¿Qué actitud conviene sostener ante esta situación?"}">${escapeHtml(state.draft.question.text_es || "")}</textarea>
-        </div>
-      </div>
-
-      <div style="display:flex; justify-content:center; margin-top:8px;">
-        <button class="btn btn--primary" id="btnBegin" style="width:100%; max-width:320px; padding:20px 40px; font-size:1.05rem;">${t("home.btn_toss") || "Tirar Monedas"}</button>
-      </div>
-
-      ${state.history.length > 0 ? `
-      <div style="text-align:center; margin-top:-10px;">
-        <button class="btn btn--ghost" id="btnHistoryShortcut" style="font-size:0.85rem; padding:12px 24px;">Ver historial (${state.history.length})</button>
-      </div>
-      ` : ''}
-    </div>
-  `;
-}
-
-function TossView() {
-  const n = state.draft.tosses.length;
-  const isComplete = n >= 6;
-
-  return `
-    <div class="vstack" style="gap:24px;">
-      <div class="sage-container">
-         <div id="tossAvatarTarget"></div>
-         <div class="sage-bubble">
-            <span id="zenText"></span>
-         </div>
-      </div>
-
-      <div class="card" style="text-align:center; padding:clamp(20px, 5vw, 40px);">
-        <div style="margin-bottom:16px;">
-           <span class="muted serif" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em;">
-             ${isComplete ? 'Hexagrama completo' : `Línea ${n + 1} de 6`}
-           </span>
-        </div>
-
-        <div class="coin-stage" id="coinStage">
-           ${renderStageCoins()}
-        </div>
-
-        <div id="ensoTarget" style="min-height:20px;"></div>
-
-        <div class="divider"></div>
-
-        <div class="hstack" style="justify-content:center; gap:16px; flex-wrap:wrap;">
-          <button class="btn btn--primary" id="btnToss" ${state._tossing ? "disabled" : ""} style="min-width:160px;">
-            ${isComplete ? (t("toss.btn_finish") || "Ver Lectura") : (t("toss.btn_toss") || "Tirar")}
-          </button>
-          <button class="btn btn--ghost" id="btnBackHome" ${state._tossing ? "disabled" : ""} style="font-size:0.9rem;">Abandonar</button>
-        </div>
-      </div>
-
-      ${n > 0 ? `
-      <div style="display:flex; justify-content:center;">
-          <div class="hex-accumulator">
-            <div class="muted serif" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px; text-align:center;">Hexagrama acumulado</div>
-            ${renderHexLines(state.draft.tosses)}
-          </div>
-      </div>
-      ` : ''}
-    </div>
-  `;
-}
-
-function renderHexLines(tosses) {
-  if (tosses.length === 0) return "";
-  const items = tosses.map(toss => {
-    const val = toss.value || toss.sum || 7;
-    const isYin = val % 2 === 0; // 6, 8 = yin; 7, 9 = yang
-    const isMoving = toss.is_moving;
-    return `<div class="hex-line ${isYin ? 'yin' : 'yang'}${isMoving ? ' moving' : ''}"></div>`;
-  }).reverse();
-  return `<div class="hex-visual" style="padding:16px 24px; gap:8px;">${items.join("")}</div>`;
-}
-
-function ReadingView() {
-  if (!state.session) {
-    return `<div style="text-align:center; padding:40px 0;"><p class="serif muted">Sin sesión activa. Inicia una nueva consulta.</p></div>`;
-  }
-  return `<div id="bookFlipContainer"></div>`;
-}
-
-function HistoryView() {
-  const items = state.history.map((s) => {
-    const p = s.hexagrams?.primary;
-    const dateStr = s.created_at_iso ? s.created_at_iso.split("T")[0] : "—";
-    const hexTitle = p ? `${p.hanzi || ''} ${p.slug ? p.slug.charAt(0).toUpperCase() + p.slug.slice(1) : 'Consulta'}` : 'Consulta';
-    return `
-      <div class="card history-card" data-open="${escapeHtml(s.id)}" style="cursor:pointer; display:flex; align-items:center; gap:16px; padding:18px 24px;">
-        <div class="seal" style="width:36px; height:36px; font-size:13px; flex-shrink:0;">${p?.id || '?'}</div>
-        <div class="vstack" style="gap:2px; flex:1; min-width:0;">
-          <div style="font-weight:600; font-size:1rem;">${escapeHtml(hexTitle)}</div>
-          <div class="muted serif" style="font-size:0.78rem;">${dateStr} · ${escapeHtml(s.question?.mode || 'reflexion')}</div>
-        </div>
-        <div class="muted" style="max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-style:italic; font-size:0.85rem; flex-shrink:0;">
-          ${escapeHtml(s.question?.text_es || "—")}
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  return `
-    <div class="vstack" style="gap:24px;">
-      <div style="text-align:center;">
-        <div class="seal" style="width:44px; height:44px; margin:0 auto; background:var(--indigo); font-size:20px;">◉</div>
-        <h2 class="hexTitle" style="margin-top:16px;">Tu Bitácora de Cambios</h2>
-        <p class="muted serif">Reflexiones anteriores para contemplar el camino.</p>
-      </div>
-
-      <div class="vstack" style="gap:12px;">
-        ${state.history.length
-          ? items
-          : `<div class="card muted serif" style="text-align:center; padding:40px;">Aún no has guardado ninguna reflexión.</div>`
-        }
-      </div>
-
-      <div class="hstack" style="justify-content:center; gap:16px; flex-wrap:wrap;">
-        <button class="btn btn--primary" id="btnBackHome2">Regresar</button>
-        ${state.history.length ? `<button class="btn btn--ghost" id="btnClearHistory">Limpiar todo</button>` : ""}
-      </div>
-    </div>
-  `;
-}
-
-function BootErrorView() {
-  return `
-    <div class="vstack" style="align-items:center; text-align:center; gap:24px; padding:40px 0;">
-      <div class="seal" style="background:var(--vermilion); width:56px; height:56px; font-size:24px;">!</div>
-      <h2 class="hexTitle">Error de Arranque</h2>
-      <p class="serif muted" style="max-width:400px;">
-        No se pudieron cargar los archivos necesarios para el oráculo.
-        Por favor, verifica tu conexión a internet.
-      </p>
-      <div class="card" style="background:var(--accent-soft); font-family:monospace; font-size:0.78rem; text-align:left; max-width:500px; width:100%;">
-        <strong>Error:</strong> ${escapeHtml(state.boot.error || "Desconocido")}
-        ${state.boot.missing.length ? `<br><br><strong>Faltan:</strong> ${state.boot.missing.join(", ")}` : ""}
-      </div>
-      <button class="btn btn--primary" onclick="location.reload()">Reintentar</button>
-    </div>
-  `;
-}
-
-function opt(val, label) {
-  return `<option value="${val}" ${state.draft.question.mode === val ? "selected" : ""}>${label}</option>`;
-}
-
-function renderStageCoins() {
-  return [1, 2, 3].map(() => `
-    <div class="coin-3d">
-      <div class="coin-face coin-front">
-        <img src="./assets/coin_yang.png" alt="Yang" decoding="async" loading="lazy">
-      </div>
-      <div class="coin-face coin-back">
-        <img src="./assets/coin_yin.png" alt="Yin" decoding="async" loading="lazy">
-      </div>
-    </div>
-  `).join('');
-}
-
-// ---------- Shell Events ----------
+// ─── Shell Events ─────────────────────────────────────────────────────────────
 
 function bindShellEvents() {
   document.getElementById("btnOpenBook")?.addEventListener("click", () => {
@@ -724,19 +495,15 @@ function initPageEffects() {
     sageTyper.type(msg);
   }
 
-  // Tilt effect on cards
   document.querySelectorAll(".card:not([data-no-tilt])").forEach(c => new TiltCard(c));
 }
 
-// ---------- Toss Logic ----------
+// ─── Lógica de Tirada ─────────────────────────────────────────────────────────
 
 function onTossNextLine() {
   if (state._tossing) return;
   const n = state.draft.tosses.length;
-  if (n >= 6) {
-    finishToss();
-    return;
-  }
+  if (n >= 6) { finishToss(); return; }
 
   state._tossing = true;
   render();
@@ -754,13 +521,11 @@ function onTossNextLine() {
       const line = tossLine();
       state.draft.tosses.push(line);
 
-      // Show coin result orientation
       coinEls.forEach((el, idx) => {
         const isHeads = line.coins[idx] === 'heads';
         el.style.transform = isHeads ? `rotateY(0deg)` : `rotateY(180deg)`;
       });
 
-      // Brief pause to show result, then re-render
       setTimeout(() => {
         state._tossing = false;
         render();
@@ -792,17 +557,19 @@ function finishToss() {
   }
 }
 
-// ---------- Page Events ----------
+// ─── Page Events ──────────────────────────────────────────────────────────────
 
 function bindPageEvents(root) {
   if (!root) return;
 
-  // Home
-  root.querySelector("#btnBegin")?.addEventListener("click", () => {
+  // Home — `id="btn-consultar"` es el punto de entrada principal a la consulta
+  root.querySelector("#btn-consultar")?.addEventListener("click", () => {
     const q = state.draft.question.text_es.trim();
     if (!q) {
-      openModal(t("home.error_empty_question") || "Falta pregunta",
-        `<p class="serif">${t("home.error_empty_question_body") || "Por favor escribe algo para reflexionar."}</p>`);
+      openModal(
+        t("home.error_empty_question") || "Falta pregunta",
+        `<p class="serif">${t("home.error_empty_question_body") || "Por favor escribe algo para reflexionar."}</p>`
+      );
       return;
     }
     beginToss();
@@ -828,32 +595,31 @@ function bindPageEvents(root) {
   root.querySelector("#btnBackHome2")?.addEventListener("click", startNew);
   root.querySelector("#btnClearHistory")?.addEventListener("click", deleteHistory);
 
+  // Premium — `id="btn-checkout"` será el punto de entrada a Stripe Checkout
+  root.querySelector("#btn-checkout")?.addEventListener("click", async () => {
+    try {
+      // TODO: obtener priceId desde data/products.json o variable de entorno
+      await startCheckout("price_placeholder");
+    } catch {
+      openModal(
+        "Premium — Próximamente",
+        `<p class="serif" style="line-height:1.7;">La suscripción Premium estará disponible pronto.<br>
+        Cuando Firebase y Stripe estén configurados, este botón abrirá el checkout.</p>`
+      );
+    }
+  });
+
+  // History card: abrir sesión guardada
   root.querySelectorAll("[data-open]").forEach(btn => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-open");
       const sess = state.history.find(s => s.id === id);
-      if (sess) {
-        state.session = sess;
-        nav("reading");
-      }
+      if (sess) { state.session = sess; nav("reading"); }
     });
   });
 }
 
-// ---------- Helpers ----------
-
-const LS_KEY = "iching_sessions_v1";
-const LS_THEME = "iching_theme_v1";
-
-function escapeHtml(unsafe) {
-  if (typeof unsafe !== "string") return "";
-  return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function cryptoRandomId() {
   const arr = new Uint32Array(3);

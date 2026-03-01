@@ -921,3 +921,52 @@ dialog.modal .hexTitle {
     backdrop-filter: none;
   }
 }
+
+/* ─── Premium Gate ────────────────────────────────────────────────────────────
+   Controla la visibilidad de las funciones de pago.
+   .premium-locked   → aplica desenfoque al contenido bloqueado
+   .premium-gate     → overlay de llamada a la acción sobre el contenido bloqueado
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Aplica un desenfoque visual al contenido cuando el usuario no tiene Premium.
+ * El contenido es visible en código pero ilegible en pantalla — no lo elimina.
+ * Cuando currentUser.isPremium === true (Firebase), este class no se aplica.
+ */
+.premium-locked {
+  filter: blur(5px);
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
+  transition: filter 0.4s ease, opacity 0.4s ease;
+}
+
+/**
+ * Overlay de paywall. Se posiciona sobre .premium-locked para mostrar
+ * el CTA de suscripción. Contiene el botón #btn-checkout → Stripe.
+ */
+.premium-gate {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: all;
+  padding: 20px;
+}
+
+.premium-gate__content {
+  background: var(--panel-bg);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--panel-shadow),
+              0 0 0 1px hsla(40, 48%, 56%, 0.15);
+  padding: clamp(24px, 5vw, 48px) clamp(24px, 6vw, 56px);
+  text-align: center;
+  max-width: 340px;
+  width: 100%;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
