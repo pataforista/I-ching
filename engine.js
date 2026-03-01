@@ -18,8 +18,7 @@ const store = {
     sessions: 0,
     readings: 0,
     last_active: null,
-    // New metrics
-    feature_locks: {}, // { "history_limit": 5, "pdf": 2 ... }
+    feature_locks: {},
     paywall_views: 0,
     conversions: 0,
     overwrite_decisions: { overwrite: 0, upgrade: 0 }
@@ -41,23 +40,25 @@ async function loadJSON(path) {
 }
 
 export async function initEngine() {
-  // Cargar manifest
   try {
+    // Load manifest and core rules (correct paths)
     store.manifest = await loadJSON(`${DATA_ROOT}/dataset_manifest.json`);
     store.rules.coins = await loadJSON(`${DATA_ROOT}/rules/coins_rules.json`);
     store.rules.build = await loadJSON(`${DATA_ROOT}/rules/hexagram_build_rules.json`);
-    store.meta = await loadJSON(`${DATA_ROOT}/content/hexagrams_meta.json`);
-    store.trigrams = await loadJSON(`${DATA_ROOT}/content/trigrams_core.json`);
+    // Fixed paths: hexagrams_meta and trigrams are in data root, not data/content
+    store.meta = await loadJSON(`${DATA_ROOT}/hexagrams_meta.json`);
+    store.trigrams = await loadJSON(`${DATA_ROOT}/trigrams.json`);
+    // Load hybrid content (richer line texts) eagerly
     store.content = await loadJSON(`${DATA_ROOT}/content/hexagrams_hybrid_es.json`);
   } catch (e) {
     throw new Error(`Faltan recursos esenciales: ${e.message}`);
   }
 
-  // Load Locales (Parallel to boot resources)
-  const LOCALE = "es"; // Fixed for now, can be dynamic later
+  // Load Locales
+  const LOCALE = "es";
   const localePromise = fetch(`${DATA_ROOT}/locales/${LOCALE}.json`).then(r => r.json()).catch(() => ({}));
 
-  // Cargar recursos required_for_boot (products and licenses)
+  // Load additional boot resources from manifest (products, licenses, etc.)
   const bootResources = store.manifest.resources.filter(r => r.required_for_boot);
 
   const promises = bootResources.map(async (r) => {
@@ -74,14 +75,15 @@ export async function initEngine() {
   const [results, locales] = await Promise.all([Promise.all(promises), localePromise]);
   store.locales = locales;
 
+  // Warn about non-critical boot failures but don't throw
   const failures = results.filter(r => r.error);
   if (failures.length > 0) {
-    const err = new Error("Faltan recursos esenciales");
-    err.missing = failures.map(f => `${f.id} (${f.path})`);
-    throw err;
+    console.warn("Algunos recursos de arranque no cargaron:", failures.map(f => f.id));
   }
 
+  // Apply manifest-loaded resources (overrides direct loads if successful)
   results.forEach(({ id, data }) => {
+    if (!data) return;
     if (id === "coins_rules") store.rules.coins = data;
     if (id === "hexagram_build_rules") store.rules.build = data;
     if (id === "hexagrams_meta") store.meta = data;
@@ -96,13 +98,14 @@ export async function initEngine() {
     if (saved) {
       const p = JSON.parse(saved);
       if (Array.isArray(p.purchases)) store.purchases = new Set(p.purchases);
-      if (p.telemetry) store.telemetry = p.telemetry;
+      if (p.telemetry) store.telemetry = { ...store.telemetry, ...p.telemetry };
     }
   } catch { }
 
+  // Lazily merge core content on top of hybrid content
   loadContent().catch(() => { });
   store.ready = true;
-  trackEvent("engine_init", "ok");
+  trackEvent("session_start");
   return true;
 }
 
@@ -115,9 +118,17 @@ export function getEntitlements() {
 
   if (store.products?.products) {
     store.products.products.forEach(prod => {
-      if (store.purchases.has(prod.product_id)) {
-        for (const [key, val] of Object.entries(prod.entitlements || {})) {
-          if (val === true) ent[key] = true;
+      const productId = prod.id || prod.product_id;
+      if (store.purchases.has(productId)) {
+        const entitlements = prod.entitlements || [];
+        if (Array.isArray(entitlements)) {
+          // Array format: ["full_access", "journal_mode", ...]
+          entitlements.forEach(key => { ent[key] = true; });
+        } else {
+          // Object format: { "full_access": true, ... }
+          for (const [key, val] of Object.entries(entitlements)) {
+            if (val === true) ent[key] = true;
+          }
         }
       }
     });
@@ -128,56 +139,55 @@ export function getEntitlements() {
 export function purchaseLocal(productId) {
   store.purchases.add(productId);
   saveEngineState();
-  trackEvent("purchase_simulated", productId);
+  trackEvent("purchase_completed");
   return getEntitlements();
 }
 
 export function revokeLocal(productId) {
   store.purchases.delete(productId);
   saveEngineState();
-  trackEvent("purchase_revoked", productId);
   return getEntitlements();
 }
 
-
-
 function saveEngineState() {
-  localStorage.setItem("iching_engine_v0", JSON.stringify({
-    purchases: Array.from(store.purchases),
-    telemetry: store.telemetry
-  }));
+  try {
+    localStorage.setItem("iching_engine_v0", JSON.stringify({
+      purchases: Array.from(store.purchases),
+      telemetry: store.telemetry
+    }));
+  } catch { }
 }
 
 // --- Telemetry ---
 export function trackEvent(name, data = {}) {
-  const t = store.telemetry;
-  t.last_active = new Date().toISOString();
+  const tel = store.telemetry;
+  tel.last_active = new Date().toISOString();
 
   switch (name) {
     case "session_start":
-      t.sessions++;
+      tel.sessions++;
       break;
-    case "reading_view": // mapped to reading_completed in schema
-      t.readings++;
+    case "reading_viewed":  // Fixed: was "reading_view"
+      tel.readings++;
       break;
-    case "feature_locked":
+    case "feature_locked": {
       const fid = data.feature_id || "unknown";
-      t.feature_locks[fid] = (t.feature_locks[fid] || 0) + 1;
+      tel.feature_locks[fid] = (tel.feature_locks[fid] || 0) + 1;
       break;
+    }
     case "paywall_viewed":
-      t.paywall_views++;
+      tel.paywall_views++;
       break;
     case "purchase_completed":
-      t.conversions++;
+      tel.conversions++;
       break;
-    case "overwrite_decision":
+    case "overwrite_decision": {
       const choice = data.choice; // "overwrite" | "upgrade"
-      if (choice) t.overwrite_decisions[choice] = (t.overwrite_decisions[choice] || 0) + 1;
+      if (choice) tel.overwrite_decisions[choice] = (tel.overwrite_decisions[choice] || 0) + 1;
       break;
+    }
   }
 
-  // Debug log for verification
-  // console.log(`[Telemetry] ${name}`, data);
   saveEngineState();
 }
 
@@ -191,14 +201,13 @@ export function t(key, params = {}) {
   for (const p of parts) {
     val = val?.[p];
   }
-  if (!val) return key; // fallback
+  if (!val) return key;
 
-  // Replace params {{name}}
   return val.replace(/{{(\w+)}}/g, (_, k) => params[k] !== undefined ? params[k] : `{{${k}}}`);
 }
 
 async function loadContent() {
-  const resDef = store.manifest.resources.find(r => r.id === "editorial_content_core");
+  const resDef = store.manifest?.resources?.find(r => r.id === "editorial_content_core");
   if (!resDef) return;
 
   const path = resDef.path.startsWith("/") ? `.${resDef.path}` : `./${resDef.path}`;
@@ -206,15 +215,24 @@ async function loadContent() {
   if (!res.ok) throw new Error("No se pudo cargar hexagrams_core.json");
   const json = await res.json();
 
-  // Acepta 2 formatos:
-  // A) { "hexagrams": { "1": {...}, ... } }
-  // B) { "1": {...}, "2": {...} }
-  store.content = json.hexagrams ? json : { hexagrams: json };
+  const coreHexagrams = json.hexagrams ? json.hexagrams : json;
+  const existingHexagrams = store.content?.hexagrams || {};
+
+  // Merge: hybrid content takes priority (has richer lines_hybrid_es)
+  const merged = {};
+  const allIds = new Set([...Object.keys(existingHexagrams), ...Object.keys(coreHexagrams)]);
+  allIds.forEach(id => {
+    merged[id] = { ...(coreHexagrams[id] || {}), ...(existingHexagrams[id] || {}) };
+  });
+
+  store.content = { hexagrams: merged };
 }
 
 export function isContentLoaded() {
   return !!store.content;
 }
+
+// --- Toss Logic ---
 
 export function tossLine() {
   if (!store.ready) throw new Error("Engine not ready");
@@ -226,7 +244,8 @@ export function tossLine() {
   const outcome = rules.sum_outcomes[String(sum)];
   if (!outcome) throw new Error("coins_rules: sum_outcomes incompleto");
 
-  return { coins, sum, ...outcome };
+  // Include sum as 'value' for UI display (6=Viejo Yin, 7=Joven Yang, 8=Joven Yin, 9=Viejo Yang)
+  return { coins, sum, value: sum, ...outcome };
 }
 
 export function tossYarrowLine() {
@@ -237,21 +256,21 @@ export function tossYarrowLine() {
   // 7 (Joven Yang): 5/16 (31.25%)
   // 8 (Joven Yin): 7/16  (43.75%)
   // 9 (Viejo Yang): 3/16 (18.75%)
-
   const r = Math.random();
-  let value, sum;
+  let value;
 
-  if (r < 1 / 16) { value = 6; sum = 6; }
-  else if (r < 6 / 16) { value = 7; sum = 7; }
-  else if (r < 13 / 16) { value = 8; sum = 8; }
-  else { value = 9; sum = 9; }
+  if (r < 1 / 16) value = 6;
+  else if (r < 6 / 16) value = 7;
+  else if (r < 13 / 16) value = 8;
+  else value = 9;
 
   const rules = store.rules.coins;
   const outcome = rules.sum_outcomes[String(value)];
 
   return {
-    coins: value % 2 === 0 ? ['tails', 'tails', 'tails'] : ['heads', 'heads', 'heads'], // Simulated "visual" coins
-    sum,
+    coins: value % 2 === 0 ? ['tails', 'tails', 'tails'] : ['heads', 'heads', 'heads'],
+    sum: value,
+    value,
     ...outcome
   };
 }
@@ -265,27 +284,48 @@ function randCoin() {
   return Math.random() < 0.5 ? "heads" : "tails";
 }
 
+// --- Reading Assembly ---
+
 export function buildReading(tosses) {
   if (!store.meta) throw new Error("Meta no cargado");
-  // Graceful degradation: ya no lanzamos error si falta content
-  // if (!store.content) throw new Error("Contenido editorial no cargado (aún)");
 
   if (!Array.isArray(tosses) || tosses.length !== 6) {
-    throw new Error("Se requieren 6 líneas");
+    throw new Error(`Se requieren 6 líneas, recibidas: ${Array.isArray(tosses) ? tosses.length : typeof tosses}`);
   }
 
-  // bottom_to_top: tosses[0] = línea 1 (abajo)
   const primaryBits = tosses.map(t => t.line_bit);
   const resultBits = tosses.map(t => t.transforms_to_bit);
 
-  const primaryHex = findHexagram(primaryBits);
+  const primaryMeta = findHexagram(primaryBits);
+  if (!primaryMeta) throw new Error("No se pudo encontrar el hexagrama primario. Revisa los datos de trigramas.");
+
   const hasMoving = tosses.some(t => t.is_moving);
-  const resultingHex = hasMoving ? findHexagram(resultBits) : null;
+  const resultingMeta = hasMoving ? findHexagram(resultBits) : null;
+
+  const primary = hydrateHexagram(primaryMeta, tosses);
+  const resulting = resultingMeta ? hydrateHexagram(resultingMeta, null) : null;
+
+  // Build lines array for reading display
+  const lines = tosses.map((toss, idx) => {
+    const pos = idx + 1;
+    let text_es = null;
+    if (toss.is_moving && primary) {
+      text_es = (primary.lines_hybrid_es && primary.lines_hybrid_es[String(pos)])
+        ? primary.lines_hybrid_es[String(pos)]
+        : (primary.lines_es && primary.lines_es[String(pos)]) || "—";
+    }
+    return {
+      pos,
+      value: toss.value || toss.sum,
+      isMoving: toss.is_moving,
+      text_es
+    };
+  });
 
   return {
-    primary: hydrateHexagram(primaryHex, tosses),
-    resulting: resultingHex ? hydrateHexagram(resultingHex, null) : null,
-    is_mutating: hasMoving
+    hexagrams: { primary, resulting },
+    is_mutating: hasMoving,
+    lines
   };
 }
 
@@ -293,10 +333,22 @@ function findHexagram(bits) {
   const lowerBits = bits.slice(0, 3);
   const upperBits = bits.slice(3, 6);
 
-  const trigramMap = {
-    "1,1,1": "qian", "0,0,0": "kun", "1,0,0": "zhen", "0,1,0": "kan",
-    "0,0,1": "gen", "0,1,1": "xun", "1,0,1": "li", "1,1,0": "dui"
-  };
+  // Build trigram map from loaded trigrams data (with hardcoded fallback)
+  const trigramsData = store.trigrams?.trigrams || [];
+  const trigramMap = {};
+
+  if (trigramsData.length > 0) {
+    trigramsData.forEach(tg => {
+      const key = tg.binary_lines_bottom_to_top.join(",");
+      trigramMap[key] = tg.id;
+    });
+  } else {
+    // Hardcoded fallback
+    Object.assign(trigramMap, {
+      "1,1,1": "qian", "0,0,0": "kun", "1,0,0": "zhen", "0,1,0": "kan",
+      "0,0,1": "gen", "0,1,1": "xun", "1,0,1": "li", "1,1,0": "dui"
+    });
+  }
 
   const lowerId = trigramMap[lowerBits.join(",")];
   const upperId = trigramMap[upperBits.join(",")];
@@ -306,13 +358,26 @@ function findHexagram(bits) {
   return h || null;
 }
 
+function buildLinesBits(metaHex, content) {
+  // Use binary string from content if available
+  if (content?.binary) {
+    return content.binary.split('').map(Number);
+  }
+  // Derive from trigrams data
+  const trigramsData = store.trigrams?.trigrams || [];
+  const lower = trigramsData.find(t => t.id === metaHex.lower_trigram);
+  const upper = trigramsData.find(t => t.id === metaHex.upper_trigram);
+  if (lower && upper) {
+    return [...lower.binary_lines_bottom_to_top, ...upper.binary_lines_bottom_to_top];
+  }
+  return [0, 0, 0, 0, 0, 0];
+}
+
 function hydrateHexagram(metaHex, tosses = null) {
   if (!metaHex) return null;
 
-  // Acceso seguro: store.content puede ser null
   const content = store.content ? store.content.hexagrams[String(metaHex.id)] : null;
 
-  // Permite dataset parcial o nulo
   const safe = content || {
     dynamic_core_es: "Cargando contenido...",
     image_es: "—",
@@ -320,26 +385,31 @@ function hydrateHexagram(metaHex, tosses = null) {
     wilhelm_essence_es: "—",
     legge_commentary_es: "—",
     lines_es: {},
+    lines_hybrid_es: {},
     taoist_reading_es: "—",
     guiding_questions_es: [],
     micro_action_es: "—",
     ethics_note_es: "Sin datos editoriales."
   };
 
-  let activeLines = [];
-  if (tosses && safe.lines_es) {
-    tosses.forEach((t, idx) => {
-      if (t.is_moving) {
+  // Trigram enrichment: add full trigram data objects
+  const trigramsData = store.trigrams?.trigrams || [];
+  const getTrigramData = (id) =>
+    trigramsData.find(t => t.id === id) || { id, name_es: id, keywords_es: [], symbol_unicode: '' };
+
+  // Lines bits array for hexagram SVG rendering
+  const linesArray = buildLinesBits(metaHex, safe);
+
+  // Build active lines content (moving lines only)
+  let active_lines_content = [];
+  if (tosses) {
+    tosses.forEach((toss, idx) => {
+      if (toss.is_moving) {
         const pos = idx + 1;
-        // Check for hybrid lines or legacy lines
         const lineText = (safe.lines_hybrid_es && safe.lines_hybrid_es[String(pos)])
           ? safe.lines_hybrid_es[String(pos)]
-          : (safe.lines_es[String(pos)] || "—");
-
-        activeLines.push({
-          position: pos,
-          text: lineText
-        });
+          : (safe.lines_es && safe.lines_es[String(pos)]) || "—";
+        active_lines_content.push({ position: pos, text: lineText });
       }
     });
   }
@@ -347,6 +417,11 @@ function hydrateHexagram(metaHex, tosses = null) {
   return {
     ...metaHex,
     ...safe,
-    active_lines_content: activeLines
+    trigrams: {
+      upper: getTrigramData(metaHex.upper_trigram),
+      lower: getTrigramData(metaHex.lower_trigram)
+    },
+    lines: linesArray,
+    active_lines_content
   };
 }

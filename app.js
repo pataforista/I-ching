@@ -1,4 +1,4 @@
-import { BubbleMenu, Typewriter, InkGalaxy, TiltCard, EnsoLoader, DynamicHexagram, drawHanzi, InteractiveBook } from "./ui-lib.js";
+import { BubbleMenu, Typewriter, InkGalaxy, TiltCard, EnsoLoader, DynamicHexagram, drawHanzi, InteractiveBook, DynamicAvatar } from "./ui-lib.js";
 import {
   initEngine,
   trackEvent,
@@ -23,37 +23,37 @@ var state = {
   nav: "home",
 
   // Data
-  history: [], // Array of sessions
+  history: [],
 
   // Current Session Draft
   draft: {
-    question: { text_es: "", mode: "reflexion" }, // modos: reflexion, decision, relacion, trabajo, salud
-    tosses: [] // Array of { coins: ['heads','tails','heads'], value: 7/8/6/9, ... }
+    question: { text_es: "", mode: "reflexion" },
+    tosses: []
   },
 
   // Active Session (Displaying Reading)
   session: null,
 
   // UI State
-  _tossing: false, // animation lock
-  // Entitlements (Paid app: everything unlocked after purchase)
+  _tossing: false,
+  _bookOpen: false,
+
+  // Entitlements: app is fully paid — all features unlocked
   entitlements: {
     unlimited_history: true,
     premium_sections: true,
-    pdf_export: true
-  },
-  _bookOpen: false
+    pdf_export: true,
+    full_access: true,
+    journal_mode: true,
+    export_tools: true
+  }
 };
 
 // ---------- Init ----------
-// Se ejecuta al cargar el script (module)
 (async function init() {
   loadLocal();
-
-  // Handle URL params or redirects if needed
   if (!state.history) state.history = [];
 
-  // Init Menu
   initBubbleMenu();
 
   // Init Smooth Scroll (Lenis)
@@ -69,7 +69,6 @@ var state = {
       touchMultiplier: 2,
       infinite: false,
     });
-
     function raf(time) {
       lenis.raf(time);
       requestAnimationFrame(raf);
@@ -93,16 +92,12 @@ var state = {
   }
 
   // Init Ink Galaxy Background
-  galaxy = new InkGalaxy({ count: 180 });
+  galaxy = new InkGalaxy({ count: 160 });
 
   try {
-    // Attempt boot checks
     await initEngine();
     state.boot.ok = true;
-
-    // Telemetry
     trackEvent("session_start");
-
   } catch (e) {
     state.boot.ok = false;
     state.boot.error = String(e?.message || e);
@@ -111,19 +106,16 @@ var state = {
     }
   }
 
-  // SW register
   registerSW();
-
   render();
 })();
 
 function initBubbleMenu() {
   bubbleMenu = new BubbleMenu({
-    container: document.getElementById("app"),
     items: [
-      { id: "home", icon: "🏠", label: t("menu.home"), onClick: () => startNew() },
-      { id: "history", icon: "📜", label: t("menu.history"), onClick: () => openHistory() },
-      { id: "theme", icon: "🌗", label: t("menu.theme"), onClick: () => onToggleTheme() },
+      { id: "home", icon: "⊕", label: t("menu.home") || "Nueva consulta", onClick: () => startNew() },
+      { id: "history", icon: "◉", label: t("menu.history") || "Historial", onClick: () => openHistory() },
+      { id: "theme", icon: "◐", label: t("menu.theme") || "Tema", onClick: () => onToggleTheme() },
     ]
   });
 }
@@ -173,18 +165,14 @@ async function nav(to) {
   overlay.className = "ink-transition-overlay";
   document.body.appendChild(overlay);
 
-  // Trigger ink blot
   requestAnimationFrame(() => overlay.classList.add("active"));
-
   await new Promise(r => setTimeout(r, 800));
 
   state.nav = to;
   render();
 
-  // Fade out
   overlay.classList.remove("active");
   overlay.classList.add("fade-out");
-
   setTimeout(() => overlay.remove(), 600);
 }
 
@@ -203,22 +191,11 @@ function beginToss() {
 
 function saveSession() {
   if (!state.session) return;
-
-  // Normal save
-  performSave(false);
-}
-
-function performSave(overwrite) {
-  trackEvent("session_saved", { overwrite: overwrite });
-  if (overwrite) {
-    state.history = [state.session];
-    openModal(t("history.modal_saved_title"), `<p>${t("history.alert_replaced")}</p>`);
-  } else {
-    state.history.unshift(state.session);
-    state.history = state.history.slice(0, 200);
-    openModal(t("history.modal_saved_title"), `<p>${t("history.modal_saved_body")}</p>`);
-  }
+  trackEvent("session_saved");
+  state.history.unshift(state.session);
+  state.history = state.history.slice(0, 200);
   saveLocal();
+  openModal("Guardado", `<p style="font-family:var(--font-serif);">Tu reflexión ha sido guardada en el diario.</p>`);
   render();
 }
 
@@ -229,7 +206,8 @@ function openHistory() {
 function deleteHistory() {
   state.history = [];
   saveLocal();
-  openModal(t("history.modal_cleared_title"), `<p>${t("history.modal_cleared_body")}</p>`);
+  openModal("Historial borrado", `<p style="font-family:var(--font-serif);">No queda nada guardado en este dispositivo.</p>`);
+  render();
 }
 
 function exportPDF() {
@@ -241,13 +219,11 @@ function render() {
   const root = document.getElementById("app");
   if (!root) return;
 
-  // 1. Ensure Shell (Book structure) exists
   if (!document.getElementById("theBook")) {
     root.innerHTML = BookShellHTML();
     bindShellEvents();
   }
 
-  // 2. Update Shell State (Open/Closed)
   const book = document.getElementById("theBook");
   if (state._bookOpen) {
     book.classList.add("open");
@@ -257,11 +233,9 @@ function render() {
     document.body.classList.remove("book-is-open");
   }
 
-  // 3. Render Page Content inside the Book
   const pageContainer = document.getElementById("bookPageContent");
   if (!pageContainer) return;
 
-  // If boot error, override
   if (!state.boot.ok) {
     pageContainer.innerHTML = BootErrorView();
     return;
@@ -278,16 +252,13 @@ function render() {
 
   pageContainer.innerHTML = `<div class="fade-in">${contentHTML}</div>`;
 
-  // 4. Post-Render logic
   bindPageEvents(pageContainer);
   initPageEffects();
   renderDynamicVisuals();
 }
 
 function renderDynamicVisuals() {
-  const s = state.session;
-
-  // Home Avatar cleanup & init
+  // Home Avatar
   const homeTarget = document.getElementById("homeAvatarTarget");
   if (homeTarget) {
     if (homeAvatar) homeAvatar.destroy();
@@ -298,7 +269,7 @@ function renderDynamicVisuals() {
     homeAvatar = null;
   }
 
-  // Toss Avatar cleanup & init
+  // Toss Avatar
   const tossTarget = document.getElementById("tossAvatarTarget");
   if (tossTarget) {
     if (tossAvatar) tossAvatar.destroy();
@@ -309,8 +280,8 @@ function renderDynamicVisuals() {
     tossAvatar = null;
   }
 
-  if (state.nav === "reading" && s) {
-    initInteractiveBook(s);
+  if (state.nav === "reading" && state.session) {
+    initInteractiveBook(state.session);
   } else if (interactiveBookInstance) {
     interactiveBookInstance.destroy();
     interactiveBookInstance = null;
@@ -325,142 +296,183 @@ function initInteractiveBook(sess) {
   interactiveBookInstance = new InteractiveBook(container);
 
   const book = interactiveBookInstance;
-  const p = sess.hexagrams.primary;
-  const r = sess.hexagrams.resulting;
-  const isMutating = !!r;
+  const p = sess.hexagrams?.primary;
+  const r = sess.hexagrams?.resulting;
 
-  // Page 1: Revelation
+  if (!p) {
+    container.innerHTML = `<div class="card" style="text-align:center; padding:40px;"><p class="serif muted">Error al cargar la lectura. Intenta una nueva consulta.</p></div>`;
+    return;
+  }
+
+  const isMutating = !!r;
+  const movingLines = (sess.lines || []).filter(l => l.isMoving);
+
+  // Helper: format hexagram title
+  const hexTitle = (hex) => `${hex.hanzi} · ${hex.slug.charAt(0).toUpperCase() + hex.slug.slice(1)}`;
+
+  // --- Page 1: Revelación ---
+  const primaryJudgment = p.dynamic_core_es || "—";
   book.addPage(`
-    <div class="vstack" style="align-items:center; text-align:center;">
-        <div id="hanziAnimation" style="min-height:130px; display:grid; place-items:center;"></div>
-        <div id="primaryHexSVG" style="margin: 20px auto; display:grid; place-items:center;"></div>
-        <h2 class="hexTitle" style="margin-top:10px;">${escapeHtml(p.slug)}</h2>
-        <div class="zen-vertical" style="margin: 20px auto; font-size:1.4rem;">
-            ${escapeHtml(p.judgment_es)}
+    <div class="vstack" style="align-items:center; text-align:center; gap:20px;">
+        <div class="reading-meta">
+          <span class="seal" style="width:32px; height:32px; font-size:12px; display:inline-grid;">${p.id}</span>
+          <span class="muted serif" style="font-size:0.75rem; margin-left:10px; text-transform:uppercase; letter-spacing:0.1em;">${p.name_en_standard || ''}</span>
         </div>
+        <div id="hanziAnimation" style="min-height:120px; display:grid; place-items:center;"></div>
+        <div id="primaryHexSVG" style="margin: 8px auto; display:grid; place-items:center; color:var(--text);"></div>
+        <h2 class="hexTitle" style="margin:0;">${escapeHtml(hexTitle(p))}</h2>
+        <div class="reading-judgment">
+            <p class="serif" style="font-size:1.05rem; line-height:1.7; opacity:0.85; max-width:480px; margin:0 auto;">${escapeHtml(primaryJudgment)}</p>
+        </div>
+        ${sess.question?.text_es ? `
+        <div class="reading-question-echo">
+          <span class="muted serif" style="font-size:0.8rem; font-style:italic;">"${escapeHtml(sess.question.text_es)}"</span>
+        </div>` : ''}
     </div>
   `, "--left");
 
-  // Page 2: Structure & Image
+  // --- Page 2: Imagen y Estructura ---
   book.addPage(`
-    <div class="vstack">
-        <div class="card" style="background:var(--accent-soft); border-left: 8px solid var(--accent); padding:20px;">
-            <h3 class="serif" style="margin-top:0;">La Imagen</h3>
-            <p class="serif" style="font-size:1.1rem; opacity:0.9;">${escapeHtml(p.image_es)}</p>
+    <div class="vstack" style="gap:20px;">
+        <div class="callout">
+            <h3 class="serif" style="margin:0 0 10px; color:var(--accent); font-size:1rem; text-transform:uppercase; letter-spacing:0.08em;">La Imagen</h3>
+            <p class="serif" style="font-size:1.05rem; opacity:0.9; margin:0; font-style:italic;">${escapeHtml(p.image_es || '—')}</p>
         </div>
-        <section style="margin-top:20px;">
-             <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Estructura Trigramática</h3>
-             <div class="row" style="gap:20px; margin-top:15px;">
-                <div class="card" style="flex:1; padding:15px; text-align:center;">
-                   <div class="muted serif" style="font-size:0.7rem;">SUPERIOR</div>
-                   <div style="font-weight:600;">${escapeHtml(p.trigrams.upper.slug_es)}</div>
-                </div>
-                <div class="card" style="flex:1; padding:15px; text-align:center;">
-                   <div class="muted serif" style="font-size:0.7rem;">INFERIOR</div>
-                   <div style="font-weight:600;">${escapeHtml(p.trigrams.lower.slug_es)}</div>
-                </div>
-             </div>
-        </section>
+        <div class="card" style="padding:20px;">
+            <h3 class="serif" style="margin:0 0 12px; color:var(--accent); font-size:0.9rem; text-transform:uppercase; letter-spacing:0.08em;">Lectura General</h3>
+            <p class="serif" style="opacity:0.9; margin:0; font-size:0.95rem; line-height:1.8;">${escapeHtml(p.general_reading_es || '—')}</p>
+        </div>
+        <div style="margin-top:4px;">
+          <h3 class="muted serif" style="text-transform:uppercase; font-size:0.75rem; letter-spacing:0.1em; margin:0 0 12px;">Estructura Trigramática</h3>
+          <div class="row" style="gap:16px;">
+              <div class="card" style="flex:1; padding:16px; text-align:center; gap:8px;">
+                  <div class="muted serif" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em;">Superior</div>
+                  <div style="font-size:1.8rem; line-height:1;">${p.trigrams?.upper?.symbol_unicode || ''}</div>
+                  <div style="font-weight:600; font-size:0.9rem;">${escapeHtml(p.trigrams?.upper?.name_es || p.upper_trigram || '—')}</div>
+                  <div class="muted serif" style="font-size:0.7rem;">${escapeHtml((p.trigrams?.upper?.keywords_es || []).slice(0,2).join(' · '))}</div>
+              </div>
+              <div class="card" style="flex:1; padding:16px; text-align:center; gap:8px;">
+                  <div class="muted serif" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em;">Inferior</div>
+                  <div style="font-size:1.8rem; line-height:1;">${p.trigrams?.lower?.symbol_unicode || ''}</div>
+                  <div style="font-weight:600; font-size:0.9rem;">${escapeHtml(p.trigrams?.lower?.name_es || p.lower_trigram || '—')}</div>
+                  <div class="muted serif" style="font-size:0.7rem;">${escapeHtml((p.trigrams?.lower?.keywords_es || []).slice(0,2).join(' · '))}</div>
+              </div>
+          </div>
+        </div>
     </div>
   `, "--right");
 
-  // Page 3: Moving Lines (if any)
-  if (sess.lines && sess.lines.some(l => l.isMoving)) {
-    const moving = sess.lines.filter(l => l.isMoving);
+  // --- Page 3: Líneas en Movimiento (si las hay) ---
+  if (movingLines.length > 0) {
     book.addPage(`
-        <div class="vstack">
-           <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Líneas en Movimiento</h3>
-           <div class="vstack" style="gap:15px; margin-top:10px;">
-             ${moving.map(l => `
-               <div class="card" style="padding:15px; border-left:4px solid var(--accent);">
-                 <div style="font-weight:600; margin-bottom:5px;">Línea ${l.pos} — ${l.value === 6 ? 'Seis' : 'Nueve'}</div>
-                 <p class="serif" style="margin:0; opacity:0.9; font-size:0.9rem;">${escapeHtml(l.text_es)}</p>
-               </div>
-             `).join("")}
-           </div>
+        <div class="vstack" style="gap:16px;">
+            <div>
+              <h3 class="serif" style="color:var(--accent); margin:0 0 4px; font-size:1.1rem;">Líneas en Movimiento</h3>
+              <p class="muted serif" style="font-size:0.8rem; margin:0;">Las líneas que mutan transforman el hexagrama.</p>
+            </div>
+            <div class="vstack" style="gap:14px;">
+              ${movingLines.map(l => `
+                <div class="card" style="padding:16px; border-left:4px solid var(--accent); gap:8px;">
+                  <div class="hstack" style="gap:10px; margin-bottom:6px;">
+                    <div class="seal" style="width:28px; height:28px; font-size:11px; flex-shrink:0;">${l.pos}</div>
+                    <div style="font-weight:600; font-size:0.95rem;">Línea ${l.pos} — ${l.value === 6 ? 'Seis (Yin Móvil)' : 'Nueve (Yang Móvil)'}</div>
+                  </div>
+                  <p class="serif" style="margin:0; opacity:0.88; font-size:0.9rem; line-height:1.75;">${escapeHtml(l.text_es || '—')}</p>
+                </div>
+              `).join("")}
+            </div>
         </div>
       `, "--left");
   }
 
-  // Page 4: Resulting or Questions
-  if (isMutating) {
+  // --- Page 4: Transformación o Preguntas de Poder ---
+  if (isMutating && r) {
     book.addPage(`
-        <div class="vstack">
-          <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Transformación</h3>
-          <div class="card" style="margin-top:10px; display:flex; gap:20px; align-items:center; padding:20px;">
-            <div id="resultingHexSVG" style="flex-shrink:0;"></div>
-            <div class="vstack" style="gap:4px;">
-               <h4 style="margin:0; font-size:1.2rem;">${escapeHtml(r.hanzi)} · ${escapeHtml(r.slug)}</h4>
-               <p class="muted serif" style="margin:0; font-size:0.8rem;">El destino final de esta mutación.</p>
-            </div>
+        <div class="vstack" style="gap:18px;">
+          <div>
+            <h3 class="serif" style="color:var(--accent); margin:0 0 4px; font-size:1.1rem;">Hexagrama de Transformación</h3>
+            <p class="muted serif" style="font-size:0.8rem; margin:0;">Hacia dónde apunta la mutación.</p>
+          </div>
+          <div class="card" style="display:flex; gap:20px; align-items:center; padding:20px;">
+              <div id="resultingHexSVG" style="flex-shrink:0; color:var(--accent);"></div>
+              <div class="vstack" style="gap:6px; flex:1;">
+                 <h4 style="margin:0; font-size:1.15rem;">${escapeHtml(hexTitle(r))}</h4>
+                 <p class="muted serif" style="margin:0; font-size:0.8rem;">${escapeHtml(r.name_en_standard || '')}</p>
+                 <p class="serif" style="margin:0; font-size:0.88rem; opacity:0.82; line-height:1.6;">${escapeHtml((r.dynamic_core_es || '').substring(0, 130))}…</p>
+              </div>
           </div>
           <div class="divider"></div>
-          <h4 class="serif" style="color:var(--accent); margin-top:10px;">Preguntas de Poder</h4>
-          <ul style="padding-left:20px; opacity:0.8; font-size:0.9rem;">
-            ${(p.guiding_questions_es || []).map(q => `<li>${escapeHtml(q)}</li>`).join("")}
+          <h4 class="serif" style="color:var(--accent); margin:0;">Preguntas de Reflexión</h4>
+          <ul class="serif" style="padding-left:20px; opacity:0.85; margin:0; display:flex; flex-direction:column; gap:10px; font-size:0.92rem; line-height:1.7;">
+              ${(p.guiding_questions_es || []).map(q => `<li>${escapeHtml(q)}</li>`).join("")}
           </ul>
         </div>
-      `, isMutating ? "--right" : "--left");
+      `, "--right");
   } else {
     book.addPage(`
-        <div class="vstack">
-          <h4 class="serif" style="color:var(--accent); margin-top:0;">Preguntas de Poder</h4>
-          <ul style="padding-left:20px; opacity:0.8;">
-            ${(p.guiding_questions_es || []).map(q => `<li>${escapeHtml(q)}</li>`).join("")}
+        <div class="vstack" style="gap:18px;">
+          <div>
+            <h4 class="serif" style="color:var(--accent); margin:0 0 4px; font-size:1.1rem;">Preguntas de Reflexión</h4>
+            <p class="muted serif" style="font-size:0.8rem; margin:0;">Para profundizar en la consulta.</p>
+          </div>
+          <ul class="serif" style="padding-left:20px; opacity:0.85; margin:0; display:flex; flex-direction:column; gap:12px; font-size:0.95rem; line-height:1.75;">
+              ${(p.guiding_questions_es || []).map(q => `<li>${escapeHtml(q)}</li>`).join("")}
           </ul>
         </div>
       `, "--right");
   }
 
-  // Page 5: Deep Wisdom
+  // --- Page 5: Sabiduría Profunda y Acciones ---
   book.addPage(`
-    <div class="vstack">
-        <h3 class="serif" style="color:var(--accent); margin-top:0;">Sabiduría Profunda</h3>
-        <p class="serif" style="opacity:0.9;">${escapeHtml(p.taoist_reading_es || "—")}</p>
-        
-        <h4 class="serif" style="color:var(--accent); margin-top:20px;">Micro-Acción Ritual</h4>
-        <div class="callout" style="background:var(--accent-soft); padding:15px; border-radius:12px; font-size:0.95rem; border-left:4px solid var(--accent);">
-           ${escapeHtml(p.micro_action_es || "—")}
+    <div class="vstack" style="gap:18px;">
+        <div>
+          <h3 class="serif" style="color:var(--accent); margin:0 0 4px; font-size:1.1rem;">Perspectiva Taoísta</h3>
+          <p class="muted serif" style="font-size:0.8rem; margin:0;">Wu wei y flujo natural.</p>
         </div>
-        
+        <p class="serif" style="opacity:0.9; margin:0; font-size:0.95rem; line-height:1.8;">${escapeHtml(p.taoist_reading_es || "—")}</p>
+
+        <div class="callout" style="margin-top:4px;">
+            <h4 class="serif" style="margin:0 0 8px; color:var(--accent); font-size:0.9rem; text-transform:uppercase; letter-spacing:0.06em;">Micro-Acción Ritual</h4>
+            <p class="serif" style="margin:0; font-size:0.92rem; line-height:1.7;">${escapeHtml(p.micro_action_es || "—")}</p>
+        </div>
+
         <div class="divider"></div>
+
         <div class="vstack" style="gap:10px;">
-            <button class="btn btn--primary" id="btnSave" style="width:100%;">Guardar Reflexión</button>
-            <div class="row" style="gap:10px;">
-               <button class="btn btn--ghost" id="btnPDF" style="flex:1; font-size:0.8rem;">PDF</button>
-               <button class="btn btn--ghost" id="btnClose" style="flex:1; font-size:0.8rem;">Cerrar</button>
+            <button class="btn btn--primary" id="btnSave" style="width:100%; font-size:1rem;">Guardar en el Diario</button>
+            <div class="row" style="gap:10px; justify-content:center;">
+               <button class="btn btn--ghost" id="btnPDF" style="flex:1; font-size:0.85rem;">Exportar PDF</button>
+               <button class="btn btn--ghost" id="btnClose" style="flex:1; font-size:0.85rem;">Nueva Consulta</button>
             </div>
         </div>
+
+        ${p.ethics_note_es ? `
+        <p class="muted serif" style="font-size:0.72rem; opacity:0.5; text-align:center; margin:0; line-height:1.5;">${escapeHtml(p.ethics_note_es)}</p>
+        ` : ''}
     </div>
   `, book.pages.length % 2 === 0 ? "--left" : "--right");
 
   book.render();
 
-  // Re-run visual render for IDs inside pages
-  // Note: Hanzi and SVG need to be rendered AFTER PageFlip loads them into its own DOM structure if they rely on IDs
-  // Actually, let's render them manually after book.render()
-
-  // Render Primary Hexagram SVG
+  // Render visual components after book DOM is created
   const hexContainer = document.getElementById("primaryHexSVG");
-  if (hexContainer && p) {
+  if (hexContainer && p.lines) {
     new DynamicHexagram(p.lines).render(hexContainer);
   }
 
-  // Render Hanzi Animation
   const hanziContainer = document.getElementById("hanziAnimation");
   if (hanziContainer && p.hanzi) {
-    drawHanzi(hanziContainer, p.hanzi, 120);
+    drawHanzi(hanziContainer, p.hanzi, 110);
   }
 
-  // Render Resulting Hexagram SVG
   const resContainer = document.getElementById("resultingHexSVG");
-  if (resContainer && r) {
+  if (resContainer && r?.lines) {
     new DynamicHexagram(r.lines).render(resContainer);
   }
 
-  // Re-bind buttons because they were re-rendered inside the book
-  const root = document.getElementById("bookFlipContainer");
-  bindPageEvents(root);
+  // Re-bind page events (buttons inside book pages)
+  const bookRoot = document.getElementById("bookFlipContainer");
+  bindPageEvents(bookRoot);
 }
 
 function BookShellHTML() {
@@ -471,23 +483,24 @@ function BookShellHTML() {
            <div class="book" id="theBook">
               <!-- Cover -->
               <div class="book-face book-front">
-                 <div class="vstack" style="align-items:center; gap:40px;">
-                    <div class="seal" style="width:80px; height:80px; font-size:32px;">IC</div>
+                 <div class="vstack" style="align-items:center; gap:32px;">
+                    <div class="book-cover-seal">易</div>
                     <div style="text-align:center;">
-                       <h1 style="font-size:3rem; margin:0; color:var(--gold);">I CHING</h1>
-                       <p class="serif" style="font-style:italic; opacity:0.8;">El Libro de las Mutaciones</p>
+                       <h1 class="book-cover-title">I CHING</h1>
+                       <p class="serif" style="font-style:italic; opacity:0.7; margin:8px 0 0; font-size:1rem; letter-spacing:0.05em;">El Libro de las Mutaciones</p>
                     </div>
-                    <button class="btn btn--primary" id="btnOpenBook" style="padding:20px 40px; font-size:1.2rem;">Consultar el Oráculo</button>
+                    <div class="book-cover-divider"></div>
+                    <button class="btn book-cover-btn" id="btnOpenBook">Consultar el Oráculo</button>
+                    <p class="serif" style="opacity:0.4; font-size:0.72rem; margin:0; letter-spacing:0.08em; text-transform:uppercase;">Sabiduría Taoísta · Reflexión Local</p>
                  </div>
               </div>
 
               <!-- Inside (Pages) -->
               <div class="book-face book-inside">
                  <div id="bookPageContent" class="vstack" style="flex:1;"></div>
-                 
                  <div class="divider"></div>
-                 <div style="text-align:center;" class="muted serif">
-                    Reflexión Local · v1.1
+                 <div style="text-align:center;" class="muted serif" style="font-size:0.75rem; opacity:0.5;">
+                    I Ching · Reflexión Local · v1.1
                  </div>
               </div>
            </div>
@@ -499,50 +512,59 @@ function BookShellHTML() {
 
 function HomeFormView() {
   return `
-    <div class="vstack" style="gap:40px;">
+    <div class="vstack" style="gap:32px;">
       <div class="sage-container">
          <div id="homeAvatarTarget"></div>
          <div class="sage-bubble">
-            ${t("home.subtitle")}
+            El Tao que puede nombrarse no es el Tao eterno.<br>
+            Presenta tu pregunta con sinceridad y deja que el Libro hable.
          </div>
       </div>
 
       <div style="text-align:center;">
-         <div class="seal" style="width:50px; height:50px; margin:0 auto; background:var(--indigo);">IC</div>
-         <h2 class="hexTitle" style="margin-top:20px;">${t("home.title")}</h2>
-         <p class="muted serif">${t("home.subtitle")}</p>
+         <div class="seal" style="width:48px; height:48px; margin:0 auto; background:var(--indigo); font-size:22px;">易</div>
+         <h2 class="hexTitle" style="margin-top:16px;">${t("home.title") || "Nueva Consulta"}</h2>
+         <p class="muted serif">${t("home.subtitle") || "Plantea una pregunta abierta para iniciar."}</p>
       </div>
-      
-      <div class="vstack" style="gap:30px;">
+
+      <div class="vstack" style="gap:20px;">
         <div class="vstack" style="gap:8px;">
-          <label class="muted serif">${t("home.label_focus")}</label>
+          <label class="muted serif" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.06em;">${t("home.label_focus") || "Foco / Ámbito"}</label>
           <select id="qMode" class="input-field">
-              ${opt("reflexion", t("home.focus_options.reflexion"))}
-              ${opt("decision", t("home.focus_options.decision"))}
-              ${opt("relacion", t("home.focus_options.relacion"))}
-              ${opt("trabajo", t("home.focus_options.trabajo"))}
-              ${opt("salud", t("home.focus_options.salud"))}
-              ${opt("otro", t("home.focus_options.otro"))}
+              ${opt("reflexion", t("home.focus_options.reflexion") || "Reflexión general")}
+              ${opt("decision", t("home.focus_options.decision") || "Toma de decisión")}
+              ${opt("relacion", t("home.focus_options.relacion") || "Vínculos y relaciones")}
+              ${opt("trabajo", t("home.focus_options.trabajo") || "Trabajo y proyectos")}
+              ${opt("salud", t("home.focus_options.salud") || "Bienestar y salud")}
+              ${opt("otro", t("home.focus_options.otro") || "Otro")}
           </select>
         </div>
 
         <div class="vstack" style="gap:8px;">
-          <label class="muted serif">${t("home.label_question")}</label>
-          <textarea id="qText" class="input-field" style="min-height:120px; resize:none;" placeholder="${t("home.placeholder_question")}">${escapeHtml(state.draft.question.text_es || "")}</textarea>
+          <label class="muted serif" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.06em;">${t("home.label_question") || "Pregunta"}</label>
+          <textarea id="qText" class="input-field" style="min-height:120px; resize:none;" placeholder="${t("home.placeholder_question") || "¿Qué actitud conviene sostener ante esta situación?"}">${escapeHtml(state.draft.question.text_es || "")}</textarea>
         </div>
       </div>
 
-      <div class="row" style="justify-content:center; margin-top:20px;">
-        <button class="btn btn--primary" id="btnBegin" style="width:100%; max-width:300px;">${t("home.btn_toss")}</button>
+      <div style="display:flex; justify-content:center; margin-top:8px;">
+        <button class="btn btn--primary" id="btnBegin" style="width:100%; max-width:320px; padding:20px 40px; font-size:1.05rem;">${t("home.btn_toss") || "Tirar Monedas"}</button>
       </div>
+
+      ${state.history.length > 0 ? `
+      <div style="text-align:center; margin-top:-10px;">
+        <button class="btn btn--ghost" id="btnHistoryShortcut" style="font-size:0.85rem; padding:12px 24px;">Ver historial (${state.history.length})</button>
+      </div>
+      ` : ''}
     </div>
   `;
 }
 
 function TossView() {
   const n = state.draft.tosses.length;
+  const isComplete = n >= 6;
+
   return `
-    <div class="vstack" style="gap:30px;">
+    <div class="vstack" style="gap:24px;">
       <div class="sage-container">
          <div id="tossAvatarTarget"></div>
          <div class="sage-bubble">
@@ -550,142 +572,96 @@ function TossView() {
          </div>
       </div>
 
-      <div class="card" style="text-align:center;">
-        <div class="hstack" style="justify-content:center; margin-bottom:20px;">
-           <span class="muted serif">Línea ${n + 1} de 6</span>
+      <div class="card" style="text-align:center; padding:clamp(20px, 5vw, 40px);">
+        <div style="margin-bottom:16px;">
+           <span class="muted serif" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em;">
+             ${isComplete ? 'Hexagrama completo' : `Línea ${n + 1} de 6`}
+           </span>
         </div>
 
         <div class="coin-stage" id="coinStage">
            ${renderStageCoins()}
         </div>
 
-        <div id="ensoTarget"></div>
+        <div id="ensoTarget" style="min-height:20px;"></div>
 
         <div class="divider"></div>
 
-        <div class="hstack" style="justify-content:center; gap:20px;">
+        <div class="hstack" style="justify-content:center; gap:16px; flex-wrap:wrap;">
           <button class="btn btn--primary" id="btnToss" ${state._tossing ? "disabled" : ""} style="min-width:160px;">
-            ${n < 6 ? t("toss.btn_toss") : t("toss.btn_finish")}
+            ${isComplete ? (t("toss.btn_finish") || "Ver Lectura") : (t("toss.btn_toss") || "Tirar")}
           </button>
-          <button class="btn btn--ghost" id="btnBackHome" ${state._tossing ? "disabled" : ""}>Abandonar</button>
+          <button class="btn btn--ghost" id="btnBackHome" ${state._tossing ? "disabled" : ""} style="font-size:0.9rem;">Abandonar</button>
         </div>
       </div>
 
-      <div class="row" style="justify-content:center;">
-          ${renderHexLines(state.draft.tosses)}
+      ${n > 0 ? `
+      <div style="display:flex; justify-content:center;">
+          <div class="hex-accumulator">
+            <div class="muted serif" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px; text-align:center;">Hexagrama acumulado</div>
+            ${renderHexLines(state.draft.tosses)}
+          </div>
       </div>
+      ` : ''}
     </div>
   `;
 }
 
 function renderHexLines(tosses) {
-  // Solo mostramos líneas acumuladas
   if (tosses.length === 0) return "";
-  const items = tosses.map(t => `<div class="hex-line ${t.value % 2 === 0 ? 'yin' : 'yang'}"></div>`).reverse();
-  return `<div class="hex-visual" style="padding:20px; gap:8px;">${items.join("")}</div>`;
+  const items = tosses.map(toss => {
+    const val = toss.value || toss.sum || 7;
+    const isYin = val % 2 === 0; // 6, 8 = yin; 7, 9 = yang
+    const isMoving = toss.is_moving;
+    return `<div class="hex-line ${isYin ? 'yin' : 'yang'}${isMoving ? ' moving' : ''}"></div>`;
+  }).reverse();
+  return `<div class="hex-visual" style="padding:16px 24px; gap:8px;">${items.join("")}</div>`;
 }
 
 function ReadingView() {
-  const s = state.session || buildReading(state.draft);
-  if (!s) return "Error building reading";
-
-  return `
-    <div id="bookFlipContainer"></div>
-  `;
-}
-
-function renderLinesDetail(sess) {
-  const lines = sess.lines || [];
-  const moving = lines.filter(l => l.isMoving);
-  if (moving.length === 0) return "";
-
-  return `
-    <div class="divider"></div>
-    <section>
-      <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Líneas en Movimiento</h3>
-      <div class="vstack" style="gap:20px; margin-top:20px;">
-        ${moving.map(l => `
-          <div class="card" style="padding:24px; border-left:4px solid var(--accent);">
-            <div style="font-weight:600; margin-bottom:8px;">Línea ${l.pos} — ${l.value === 6 ? 'Seis' : 'Nueve'}</div>
-            <p class="serif" style="margin:0; opacity:0.9;">${escapeHtml(l.text_es)}</p>
-          </div>
-        `).join("")}
-      </div>
-    </section>
-  `;
-}
-
-function renderResultingSection(isMutating, hex) {
-  if (!isMutating || !hex) return "";
-
-  return `
-    <div class="divider"></div>
-    <section>
-      <h3 class="muted serif" style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.1em;">Hexagrama de Transformación</h3>
-      <div class="card" style="margin-top:20px; display:flex; gap:30px; align-items:center;">
-        <div id="resultingHexSVG" style="flex-shrink:0;"></div>
-        <div class="vstack" style="gap:4px;">
-           <h4 style="margin:0; font-size:1.4rem;">${escapeHtml(hex.hanzi)} · ${escapeHtml(hex.slug)}</h4>
-           <p class="muted serif" style="margin:0;">El destino final de esta mutación.</p>
-        </div>
-      </div>
-    </section>
-  `;
-}
-
-function renderPremiumReading(hex) {
-  if (!hex) return "";
-  const qs = Array.isArray(hex.guiding_questions_es) ? hex.guiding_questions_es : [];
-  return `
-    <div class="divider"></div>
-    <div class="card" style="background:var(--text); color:var(--bg); border:none;">
-      <h3 class="serif" style="color:var(--gold); margin-top:0;">Sabiduría Profunda</h3>
-      <p class="serif" style="opacity:0.9;">${escapeHtml(hex.taoist_reading_es || "—")}</p>
-      
-      <h4 class="serif" style="color:var(--gold); margin-top:30px;">Preguntas de Poder</h4>
-      <ul style="padding-left:20px; opacity:0.8;">
-        ${qs.map(q => `<li>${escapeHtml(q)}</li>`).join("")}
-      </ul>
-      
-      <h4 class="serif" style="color:var(--gold); margin-top:30px;">Micro-Acción Ritual</h4>
-      <div class="callout" style="background:rgba(255,255,255,0.1); padding:20px; border-radius:12px;">
-         ${escapeHtml(hex.micro_action_es || "—")}
-      </div>
-    </div>
-  `;
+  if (!state.session) {
+    return `<div style="text-align:center; padding:40px 0;"><p class="serif muted">Sin sesión activa. Inicia una nueva consulta.</p></div>`;
+  }
+  return `<div id="bookFlipContainer"></div>`;
 }
 
 function HistoryView() {
   const items = state.history.map((s) => {
     const p = s.hexagrams?.primary;
+    const dateStr = s.created_at_iso ? s.created_at_iso.split("T")[0] : "—";
+    const hexTitle = p ? `${p.hanzi || ''} ${p.slug ? p.slug.charAt(0).toUpperCase() + p.slug.slice(1) : 'Consulta'}` : 'Consulta';
     return `
-      <div class="card history-card" data-open="${escapeHtml(s.id)}" style="cursor:pointer; display:flex; align-items:center; gap:20px; padding:20px;">
-        <div class="seal" style="width:40px; height:40px; font-size:16px; flex-shrink:0;">${p?.id || '!!'}</div>
-        <div class="vstack" style="gap:2px; flex:1;">
-          <div style="font-weight:600; font-size:1.1rem;">${escapeHtml(p?.slug || "Consulta")}</div>
-          <div class="muted serif" style="font-size:0.8rem;">${escapeHtml(s.created_at_iso.split("T")[0])}</div>
+      <div class="card history-card" data-open="${escapeHtml(s.id)}" style="cursor:pointer; display:flex; align-items:center; gap:16px; padding:18px 24px;">
+        <div class="seal" style="width:36px; height:36px; font-size:13px; flex-shrink:0;">${p?.id || '?'}</div>
+        <div class="vstack" style="gap:2px; flex:1; min-width:0;">
+          <div style="font-weight:600; font-size:1rem;">${escapeHtml(hexTitle)}</div>
+          <div class="muted serif" style="font-size:0.78rem;">${dateStr} · ${escapeHtml(s.question?.mode || 'reflexion')}</div>
         </div>
-        <div class="muted" style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-style:italic;">
-          "${escapeHtml(s.question?.text_es || "—")}"
+        <div class="muted" style="max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-style:italic; font-size:0.85rem; flex-shrink:0;">
+          ${escapeHtml(s.question?.text_es || "—")}
         </div>
       </div>
     `;
   }).join("");
 
   return `
-    <div class="vstack" style="gap:30px;">
+    <div class="vstack" style="gap:24px;">
       <div style="text-align:center;">
-        <h2 class="hexTitle">Tu Bitácora de Cambios</h2>
-        <p class="muted serif">Tus consultas anteriores para reflexionar sobre el camino recorrido.</p>
+        <div class="seal" style="width:44px; height:44px; margin:0 auto; background:var(--indigo); font-size:20px;">◉</div>
+        <h2 class="hexTitle" style="margin-top:16px;">Tu Bitácora de Cambios</h2>
+        <p class="muted serif">Reflexiones anteriores para contemplar el camino.</p>
       </div>
 
-      <div class="vstack" style="gap:16px;">
-        ${state.history.length ? items : `<div class="card muted serif" style="text-align:center;">Aún no has guardado ninguna reflexión.</div>`}
+      <div class="vstack" style="gap:12px;">
+        ${state.history.length
+          ? items
+          : `<div class="card muted serif" style="text-align:center; padding:40px;">Aún no has guardado ninguna reflexión.</div>`
+        }
       </div>
 
-      <div class="hstack" style="justify-content:center; gap:16px;">
+      <div class="hstack" style="justify-content:center; gap:16px; flex-wrap:wrap;">
         <button class="btn btn--primary" id="btnBackHome2">Regresar</button>
-        ${state.history.length ? `<button class="btn btn--ghost" id="btnClearHistory">Limpiar Todo</button>` : ""}
+        ${state.history.length ? `<button class="btn btn--ghost" id="btnClearHistory">Limpiar todo</button>` : ""}
       </div>
     </div>
   `;
@@ -693,18 +669,18 @@ function HistoryView() {
 
 function BootErrorView() {
   return `
-    <div class="vstack" style="align-items:center; text-align:center; gap:30px; padding:60px 0;">
-      <div class="seal" style="background:var(--vermilion); width:64px; height:64px; font-size:32px;">!</div>
-      <h2 class="hexTitle">Error de Conexión</h2>
+    <div class="vstack" style="align-items:center; text-align:center; gap:24px; padding:40px 0;">
+      <div class="seal" style="background:var(--vermilion); width:56px; height:56px; font-size:24px;">!</div>
+      <h2 class="hexTitle">Error de Arranque</h2>
       <p class="serif muted" style="max-width:400px;">
-        No pudimos cargar los archivos necesarios para el oráculo. 
+        No se pudieron cargar los archivos necesarios para el oráculo.
         Por favor, verifica tu conexión a internet.
       </p>
-      <div class="card" style="background:var(--accent-soft); font-family:monospace; font-size:0.8rem;">
-        ${state.boot.error}
-        ${state.boot.missing.length ? `<br><br>Faltan: ${state.boot.missing.join(", ")}` : ""}
+      <div class="card" style="background:var(--accent-soft); font-family:monospace; font-size:0.78rem; text-align:left; max-width:500px; width:100%;">
+        <strong>Error:</strong> ${escapeHtml(state.boot.error || "Desconocido")}
+        ${state.boot.missing.length ? `<br><br><strong>Faltan:</strong> ${state.boot.missing.join(", ")}` : ""}
       </div>
-      <button class="btn btn--primary" onclick="location.reload()">Reintentar Ritual</button>
+      <button class="btn btn--primary" onclick="location.reload()">Reintentar</button>
     </div>
   `;
 }
@@ -717,17 +693,16 @@ function renderStageCoins() {
   return [1, 2, 3].map(() => `
     <div class="coin-3d">
       <div class="coin-face coin-front">
-        <img src="./assets/coin_yang.png" alt="Moneda Yang" decoding="async" loading="lazy">
+        <img src="./assets/coin_yang.png" alt="Yang" decoding="async" loading="lazy">
       </div>
       <div class="coin-face coin-back">
-        <img src="./assets/coin_yin.png" alt="Moneda Yin" decoding="async" loading="lazy">
+        <img src="./assets/coin_yin.png" alt="Yin" decoding="async" loading="lazy">
       </div>
     </div>
   `).join('');
 }
 
-
-// ---------- Domain Logic ----------
+// ---------- Shell Events ----------
 
 function bindShellEvents() {
   document.getElementById("btnOpenBook")?.addEventListener("click", () => {
@@ -739,19 +714,21 @@ function bindShellEvents() {
 function initPageEffects() {
   const zenEl = document.getElementById("zenText");
   if (zenEl) {
-    sageTyper = new Typewriter(zenEl, { typingSpeed: 40 });
+    if (sageTyper) sageTyper.cancel();
+    sageTyper = new Typewriter(zenEl, { typingSpeed: 35 });
     const n = state.draft.tosses.length;
     let msg = "";
-    if (n === 0) msg = "Silencia tus pensamientos... ¿Qué busca saber tu alma hoy? Lanza las monedas cuando sientas calma.";
-    else if (n < 6) msg = `El oráculo escucha... Línea ${n + 1}. Concéntrate en tu pregunta.`;
-    else msg = "El hexagrama está completo. El destino se revela.";
-
+    if (n === 0) msg = "Concentra tu mente en la pregunta... Lanza las monedas cuando sientas calma interior.";
+    else if (n < 6) msg = `El oráculo escucha... Línea ${n + 1} de 6. Sostén la pregunta en tu mente.`;
+    else msg = "El hexagrama está completo. La respuesta del Libro aguarda.";
     sageTyper.type(msg);
   }
 
-  // Tilt if cards present
-  document.querySelectorAll(".card").forEach(c => new TiltCard(c));
+  // Tilt effect on cards
+  document.querySelectorAll(".card:not([data-no-tilt])").forEach(c => new TiltCard(c));
 }
+
+// ---------- Toss Logic ----------
 
 function onTossNextLine() {
   if (state._tossing) return;
@@ -765,9 +742,8 @@ function onTossNextLine() {
   render();
 
   const ensoEl = document.getElementById("ensoTarget");
-  if (ensoEl) new EnsoLoader(ensoEl).show();
+  if (ensoEl) new EnsoLoader(ensoEl).show(2000);
 
-  // Animation delay
   setTimeout(() => {
     const coinEls = document.querySelectorAll(".coin-3d");
     coinEls.forEach(el => el.classList.add("tossing"));
@@ -775,60 +751,79 @@ function onTossNextLine() {
     setTimeout(() => {
       coinEls.forEach(el => el.classList.remove("tossing"));
 
-      // Math
-      const line = tossLine(); // returns { coins: [], value: 6..9, isMoving: bool }
+      const line = tossLine();
       state.draft.tosses.push(line);
 
-      // Orientation randomizer
+      // Show coin result orientation
       coinEls.forEach((el, idx) => {
         const isHeads = line.coins[idx] === 'heads';
         el.style.transform = isHeads ? `rotateY(0deg)` : `rotateY(180deg)`;
       });
 
-      state._tossing = false;
-      render();
+      // Brief pause to show result, then re-render
+      setTimeout(() => {
+        state._tossing = false;
+        render();
+        if (state.draft.tosses.length === 6) {
+          const btn = document.getElementById("btnToss");
+          if (btn) btn.textContent = t("toss.btn_finish") || "Ver Lectura";
+        }
+      }, 600);
 
-      if (state.draft.tosses.length === 6) {
-        document.getElementById("btnToss").innerText = t("toss.btn_finish");
-      }
-    }, 1250); // Matches CSS animation + small buffer
+    }, 1250);
   }, 50);
 }
 
 function finishToss() {
   try {
-    const sess = buildReading(state.draft);
-    state.session = sess;
-    state.session.id = cryptoRandomId();
+    const reading = buildReading(state.draft.tosses);
+    state.session = {
+      id: cryptoRandomId(),
+      question: { ...state.draft.question },
+      created_at_iso: new Date().toISOString(),
+      method: "three_coins",
+      ...reading
+    };
+    trackEvent("reading_viewed", { hex_id: state.session.hexagrams.primary?.id });
     nav("reading");
-    trackEvent("reading_viewed", { hex_id: sess.hexagrams.primary.id });
   } catch (e) {
     console.error("Finish toss fail", e);
+    openModal("Error", `<p>No se pudo construir la lectura: ${escapeHtml(e.message)}</p>`);
   }
 }
+
+// ---------- Page Events ----------
 
 function bindPageEvents(root) {
   if (!root) return;
 
   // Home
   root.querySelector("#btnBegin")?.addEventListener("click", () => {
-    if (!state.draft.question.text_es.trim()) {
-      openModal(t("home.error_empty_question"), `<p>${t("home.error_empty_question_body")}</p>`);
+    const q = state.draft.question.text_es.trim();
+    if (!q) {
+      openModal(t("home.error_empty_question") || "Falta pregunta",
+        `<p class="serif">${t("home.error_empty_question_body") || "Por favor escribe algo para reflexionar."}</p>`);
       return;
     }
     beginToss();
   });
-  root.querySelector("#qText")?.addEventListener("input", e => state.draft.question.text_es = e.target.value);
-  root.querySelector("#qMode")?.addEventListener("change", e => state.draft.question.mode = e.target.value);
+  root.querySelector("#qText")?.addEventListener("input", e => {
+    state.draft.question.text_es = e.target.value;
+  });
+  root.querySelector("#qMode")?.addEventListener("change", e => {
+    state.draft.question.mode = e.target.value;
+  });
+  root.querySelector("#btnHistoryShortcut")?.addEventListener("click", openHistory);
 
   // Toss
   root.querySelector("#btnToss")?.addEventListener("click", onTossNextLine);
   root.querySelector("#btnBackHome")?.addEventListener("click", startNew);
 
-  // Reading
+  // Reading (inside interactive book)
   root.querySelector("#btnSave")?.addEventListener("click", saveSession);
   root.querySelector("#btnPDF")?.addEventListener("click", exportPDF);
   root.querySelector("#btnClose")?.addEventListener("click", startNew);
+
   // History
   root.querySelector("#btnBackHome2")?.addEventListener("click", startNew);
   root.querySelector("#btnClearHistory")?.addEventListener("click", deleteHistory);
@@ -837,10 +832,12 @@ function bindPageEvents(root) {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-open");
       const sess = state.history.find(s => s.id === id);
-      if (sess) { state.session = sess; nav("reading"); }
+      if (sess) {
+        state.session = sess;
+        nav("reading");
+      }
     });
   });
-
 }
 
 // ---------- Helpers ----------
@@ -859,17 +856,18 @@ function escapeHtml(unsafe) {
 }
 
 function cryptoRandomId() {
-  return "sess_" + Math.random().toString(36).substr(2, 9);
+  const arr = new Uint32Array(3);
+  crypto.getRandomValues(arr);
+  return "sess_" + Array.from(arr).map(n => n.toString(36)).join('');
 }
 
 function openModal(title, content) {
   const m = document.getElementById("modal");
-  const tVal = document.getElementById("modalTitle");
-  const bVal = document.getElementById("modalBody");
-
-  if (m && tVal && bVal) {
-    tVal.innerText = title;
-    bVal.innerHTML = content;
+  const tEl = document.getElementById("modalTitle");
+  const bEl = document.getElementById("modalBody");
+  if (m && tEl && bEl) {
+    tEl.innerText = title;
+    bEl.innerHTML = content;
     m.showModal();
   }
 }
