@@ -1,3 +1,5 @@
+// ui-lib.js — Premium UI Component Library for I Ching
+
 export class Typewriter {
     constructor(element, options = {}) {
         this.element = typeof element === 'string' ? document.querySelector(element) : element;
@@ -9,7 +11,7 @@ export class Typewriter {
             onComplete: null,
             ...options
         };
-
+        this._cancelled = false;
         this.init();
     }
 
@@ -33,39 +35,50 @@ export class Typewriter {
 
     async type(text) {
         if (!this.element) return;
+        this._cancelled = false;
         this.contentEl.innerHTML = '';
         if (this.options.initialDelay) await this.delay(this.options.initialDelay);
 
         for (let i = 0; i < text.length; i++) {
+            if (this._cancelled) break;
             const char = document.createElement('span');
             char.textContent = text.charAt(i);
             char.style.opacity = '0';
             char.style.transition = 'opacity 0.3s ease-out';
             this.contentEl.appendChild(char);
-
-            // Force reflow
             void char.offsetWidth;
             char.style.opacity = '1';
-
-            // Variable speed for natural feel
-            const speedVar = Math.random() * 30;
+            const speedVar = Math.random() * 20;
             await this.delay(this.options.typingSpeed + speedVar);
         }
 
-        if (this.options.onComplete) this.options.onComplete();
+        if (!this._cancelled && this.options.onComplete) this.options.onComplete();
     }
+
+    cancel() { this._cancelled = true; }
 
     delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 }
 
 export class BubbleMenu {
-    constructor(items = [], options = {}) {
-        this.items = items;
-        this.options = {
-            position: 'bottom-right',
-            mainIcon: '☸', // Dharma Wheel instead of plain menu
-            ...options
-        };
+    constructor(itemsOrConfig = [], options = {}) {
+        // Support both legacy (items, options) and object config { container, items, ... }
+        if (!Array.isArray(itemsOrConfig) && typeof itemsOrConfig === 'object') {
+            this.items = itemsOrConfig.items || [];
+            this.options = {
+                position: 'bottom-right',
+                mainIcon: '☸',
+                ...options,
+                ...itemsOrConfig
+            };
+        } else {
+            this.items = itemsOrConfig;
+            this.options = {
+                position: 'bottom-right',
+                mainIcon: '☸',
+                ...options
+            };
+        }
         this.isOpen = false;
         this.render();
     }
@@ -75,25 +88,22 @@ export class BubbleMenu {
         this.root.className = 'bubble-menu-root';
         this.root.style.cssText = 'position:fixed; bottom:40px; right:40px; z-index:1000; display:flex; flex-direction:column-reverse; align-items:center; gap:16px;';
 
-        // Toggle Button
         this.toggleBtn = document.createElement('div');
         this.toggleBtn.className = 'bubble-toggle';
         this.toggleBtn.innerHTML = this.options.mainIcon;
-        this.toggleBtn.style.cssText = 'width:64px; height:64px; border-radius:50%; background:var(--text); color:var(--bg); box-shadow:0 15px 35px rgba(0,0,0,0.2); display:grid; place-items:center; cursor:pointer; font-size:24px; transition:all 0.4s cubic-bezier(0.16, 1, 0.3, 1);';
+        this.toggleBtn.style.cssText = 'width:64px; height:64px; border-radius:50%; background:var(--text); color:var(--bg); box-shadow:0 15px 35px rgba(0,0,0,0.2); display:grid; place-items:center; cursor:pointer; font-size:24px; transition:all 0.4s cubic-bezier(0.16, 1, 0.3, 1); user-select:none;';
         this.toggleBtn.onclick = () => this.toggle();
         this.root.appendChild(this.toggleBtn);
 
-        // Items Container
         this.itemsContainer = document.createElement('div');
         this.itemsContainer.style.cssText = 'display:flex; flex-direction:column; gap:12px; align-items:center;';
         this.root.appendChild(this.itemsContainer);
 
-        // Render Items
         this.items.forEach((item, idx) => {
             const btn = document.createElement('button');
             btn.className = 'bubble-btn';
-            btn.innerHTML = `<span>${item.label}</span>`;
-            btn.style.cssText = 'padding:12px 24px; background:var(--panel-bg); color:var(--text); border:1px solid var(--panel-border); border-radius:100px; backdrop-filter:blur(10px); cursor:pointer; font-family:var(--font-sans); font-weight:600; opacity:0; transform:translateY(20px); transition:all 0.4s cubic-bezier(0.16, 1, 0.3, 1); visibility:hidden; box-shadow:var(--panel-shadow);';
+            btn.innerHTML = `<span style="margin-right:8px;">${item.icon || ''}</span><span>${item.label}</span>`;
+            btn.style.cssText = 'padding:12px 24px; background:var(--panel-bg); color:var(--text); border:1px solid var(--panel-border); border-radius:100px; backdrop-filter:blur(10px); cursor:pointer; font-family:var(--font-sans); font-weight:600; font-size:0.9rem; opacity:0; transform:translateY(20px); transition:all 0.4s cubic-bezier(0.16, 1, 0.3, 1); visibility:hidden; box-shadow:var(--panel-shadow); white-space:nowrap;';
             btn.style.transitionDelay = `${idx * 0.05}s`;
 
             btn.onclick = () => {
@@ -129,6 +139,12 @@ export class BubbleMenu {
             });
         }
     }
+
+    destroy() {
+        if (this.root && this.root.parentNode) {
+            this.root.parentNode.removeChild(this.root);
+        }
+    }
 }
 
 export class InkGalaxy {
@@ -143,6 +159,7 @@ export class InkGalaxy {
         this.particles = [];
         this.mouseX = 0;
         this.mouseY = 0;
+        this._running = true;
         this.init();
     }
 
@@ -178,8 +195,8 @@ export class InkGalaxy {
                 y: this.canvas.height / 2 + Math.sin(angle) * radius,
                 size: Math.random() * 4 + 1,
                 color: this.options.colors[Math.floor(Math.random() * this.options.colors.length)],
-                angle: angle,
-                radius: radius,
+                angle,
+                radius,
                 speed: 0.001 + Math.random() * 0.002,
                 drift: Math.random() * 0.5
             });
@@ -187,22 +204,22 @@ export class InkGalaxy {
     }
 
     animate() {
+        if (!this._running) return;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         const cx = this.canvas.width / 2;
         const cy = this.canvas.height / 2;
 
-        this.ctx.filter = 'blur(3px)'; // Apply cloud-like effect here instead of per arc
+        this.ctx.filter = 'blur(3px)';
         this.particles.forEach(p => {
             p.angle += p.speed;
-
             let tx = cx + Math.cos(p.angle) * p.radius;
             let ty = cy + Math.sin(p.angle) * p.radius;
 
             const dx = tx - this.mouseX;
             const dy = ty - this.mouseY;
-            const dist = dx * dx + dy * dy; // Avoid sqrt for distance check
+            const dist = dx * dx + dy * dy;
 
-            if (dist < 40000) { // 200^2
+            if (dist < 40000) {
                 const d = Math.sqrt(dist);
                 const force = (200 - d) / 200;
                 tx += (dx / d) * force * 30;
@@ -223,12 +240,12 @@ export class TiltCard {
     constructor(element, options = {}) {
         this.element = element;
         this.options = {
-            maxTilt: 10,
+            maxTilt: 8,
             perspective: 1200,
-            scale: 1.02,
+            scale: 1.01,
             speed: 600,
             glare: true,
-            glareOpacity: 0.2,
+            glareOpacity: 0.15,
             ...options
         };
         this.init();
@@ -250,7 +267,7 @@ export class TiltCard {
         this.glareEl = document.createElement("div");
         this.glareEl.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10; border-radius:inherit; overflow:hidden; opacity:0; transition:opacity 400ms;';
         this.glareInner = document.createElement("div");
-        this.glareInner.style.cssText = 'position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:200%; height:200%; background:radial-gradient(circle at center, hsla(0, 0%, 100%, 0.8) 0%, transparent 60%);';
+        this.glareInner.style.cssText = 'position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:200%; height:200%; background:radial-gradient(circle at center, hsla(0, 0%, 100%, 0.7) 0%, transparent 60%);';
         this.glareEl.appendChild(this.glareInner);
         this.element.appendChild(this.glareEl);
     }
@@ -282,7 +299,7 @@ export class TiltCard {
 export class ShaoYongCircle {
     constructor(container, hexagrams, options = {}) {
         this.container = typeof container === 'string' ? document.querySelector(container) : container;
-        this.hexagrams = hexagrams; // Array of 64 hexagrams
+        this.hexagrams = hexagrams;
         this.options = {
             radius: 200,
             onHexClick: null,
@@ -303,26 +320,18 @@ export class ShaoYongCircle {
         const size = (radius + 50) * 2;
 
         let html = `<svg viewBox="0 0 ${size} ${size}" class="shaoYongCircle">`;
-
-        // Background circle
         html += `<circle cx="${centerX}" cy="${centerY}" r="${radius + 20}" fill="none" stroke="var(--accent-soft)" stroke-width="1" opacity="0.3"/>`;
 
         this.hexagrams.forEach((hex, i) => {
-            // Sequence logic: typically Shao Yong uses a binary sequence for the circle
-            // But for now we use the index to distribute them evenly
             const angle = (i / 64) * Math.PI * 2 - Math.PI / 2;
             const x = centerX + radius * Math.cos(angle);
             const y = centerY + radius * Math.sin(angle);
-
-            // Small hexagram representation (6 lines)
             const hexSize = 12;
             const lineSpacing = 2;
 
             html += `<g class="hex-node" transform="translate(${x - hexSize / 2}, ${y - (hexSize + lineSpacing * 5) / 2})" data-id="${hex.id}" style="cursor:pointer;">`;
 
-            // Draw 6 lines
-            // In the circle, we usually draw them simply
-            const binary = hex.binary || "000000"; // Fallback
+            const binary = hex.binary || "000000";
             for (let l = 0; l < 6; l++) {
                 const isYang = binary[5 - l] === '1';
                 const ly = l * (2 + lineSpacing);
@@ -333,7 +342,6 @@ export class ShaoYongCircle {
                     html += `<line x1="${hexSize - hexSize / 2.5}" y1="${ly}" x2="${hexSize}" y2="${ly}" stroke="var(--text)" stroke-width="1.5" />`;
                 }
             }
-
             html += `<rect x="-2" y="-2" width="${hexSize + 4}" height="${(2 + lineSpacing) * 6}" fill="transparent" />`;
             html += `</g>`;
         });
@@ -341,13 +349,11 @@ export class ShaoYongCircle {
         html += `</svg>`;
         this.container.innerHTML = html;
 
-        // Add events
         this.container.querySelectorAll('.hex-node').forEach(node => {
-            node.addEventListener('click', (e) => {
+            node.addEventListener('click', () => {
                 const id = node.getAttribute('data-id');
                 if (this.options.onHexClick) this.options.onHexClick(id);
             });
-
             node.addEventListener('mouseenter', () => {
                 node.style.filter = "drop-shadow(0 0 5px var(--gold))";
             });
@@ -355,5 +361,245 @@ export class ShaoYongCircle {
                 node.style.filter = "none";
             });
         });
+    }
+}
+
+// --- Premium Components ---
+
+export class DynamicHexagram {
+    constructor(lines) {
+        // lines: array of 6 bits (0=yin, 1=yang), ordered bottom-to-top
+        this.lines = Array.isArray(lines) ? lines : [0, 0, 0, 0, 0, 0];
+    }
+
+    render(container) {
+        if (!container) return;
+        const w = 120, lineH = 14, gap = 10;
+        const totalH = 6 * lineH + 5 * gap;
+        const breakGap = 20; // gap between yin segments
+
+        let svg = `<svg width="${w}" height="${totalH}" viewBox="0 0 ${w} ${totalH}" style="display:block; overflow:visible;">`;
+
+        // Render top-to-bottom visually (reverse of bit array order)
+        [...this.lines].reverse().forEach((bit, i) => {
+            const y = i * (lineH + gap);
+            const b = Number(bit);
+
+            if (b === 1) {
+                // Yang — solid line
+                svg += `<rect x="0" y="${y}" width="${w}" height="${lineH}" rx="3" fill="currentColor" opacity="0.88"/>`;
+            } else {
+                // Yin — broken line (two segments)
+                const segW = (w - breakGap) / 2;
+                svg += `<rect x="0" y="${y}" width="${segW}" height="${lineH}" rx="3" fill="currentColor" opacity="0.88"/>`;
+                svg += `<rect x="${w - segW}" y="${y}" width="${segW}" height="${lineH}" rx="3" fill="currentColor" opacity="0.88"/>`;
+            }
+        });
+
+        svg += '</svg>';
+        container.innerHTML = svg;
+    }
+}
+
+export class EnsoLoader {
+    constructor(container) {
+        this.container = typeof container === 'string' ? document.querySelector(container) : container;
+        this._timer = null;
+    }
+
+    show(duration = 2500) {
+        if (!this.container) return;
+        this.container.innerHTML = `
+            <div class="enso-container">
+                <svg class="enso-svg" viewBox="0 0 100 100">
+                    <circle class="enso-circle" cx="50" cy="50" r="45"/>
+                </svg>
+            </div>
+        `;
+        this._timer = setTimeout(() => {
+            if (this.container) this.container.innerHTML = '';
+        }, duration);
+    }
+
+    hide() {
+        if (this._timer) clearTimeout(this._timer);
+        if (this.container) this.container.innerHTML = '';
+    }
+}
+
+export function drawHanzi(container, char, size = 120) {
+    if (!container) return;
+
+    if (!window.HanziWriter) {
+        // Fallback: render static character
+        container.innerHTML = `<div style="font-size:${Math.floor(size * 0.8)}px; font-family:var(--font-serif), 'Noto Serif SC', serif; color:var(--text); line-height:1; text-align:center; width:${size}px;">${char}</div>`;
+        return;
+    }
+
+    const writerEl = document.createElement('div');
+    writerEl.style.cssText = `width:${size}px; height:${size}px; display:inline-block;`;
+    container.innerHTML = '';
+    container.appendChild(writerEl);
+
+    try {
+        const strokeColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--text').trim() || '#1a1a2e';
+
+        const writer = HanziWriter.create(writerEl, char, {
+            width: size,
+            height: size,
+            padding: 8,
+            strokeColor,
+            strokeAnimationSpeed: 1.2,
+            delayBetweenStrokes: 80,
+            drawingWidth: 4,
+            showOutline: true,
+            outlineColor: 'rgba(0,0,0,0.08)',
+        });
+        writer.animateCharacter();
+    } catch (e) {
+        container.innerHTML = `<div style="font-size:${Math.floor(size * 0.8)}px; font-family:var(--font-serif), serif; color:var(--text); line-height:1; text-align:center; width:${size}px;">${char}</div>`;
+    }
+}
+
+export class InteractiveBook {
+    constructor(container) {
+        this.container = typeof container === 'string' ? document.querySelector(container) : container;
+        this.pages = [];
+        this._currentPage = 0;
+        this._destroyed = false;
+    }
+
+    addPage(html, alignment = '--right') {
+        this.pages.push({ html, alignment });
+        return this;
+    }
+
+    render() {
+        if (!this.container || this._destroyed) return;
+
+        const isMobile = window.innerWidth <= 850;
+
+        if (isMobile) {
+            // Mobile: vertical stack of all pages
+            this.container.innerHTML = `
+                <div class="book-container">
+                    ${this.pages.map((p, i) => `
+                        <div class="book-page ${p.alignment}">
+                            <div class="page-content">${p.html}</div>
+                            <div class="page-footer">${i + 1} / ${this.pages.length}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } else {
+            // Desktop: paginated with prev/next navigation
+            this.container.innerHTML = `
+                <div class="book-reader">
+                    <div class="book-container" id="bookPagesContainer" style="position:relative; min-height:500px;">
+                        ${this.pages.map((p, i) => `
+                            <div class="book-page ${p.alignment}" data-page="${i}" style="${i === 0 ? '' : 'display:none;'}">
+                                <div class="page-content">${p.html}</div>
+                                <div class="page-footer">${i + 1} / ${this.pages.length}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${this.pages.length > 1 ? `
+                        <div class="book-nav">
+                            <button class="btn btn--ghost" id="bookPrev">← Anterior</button>
+                            <span class="book-nav-indicator" id="bookPageIndicator">1 / ${this.pages.length}</span>
+                            <button class="btn btn--ghost" id="bookNext">Siguiente →</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            this._bindNavigation();
+        }
+    }
+
+    _bindNavigation() {
+        const prevBtn = this.container.querySelector('#bookPrev');
+        const nextBtn = this.container.querySelector('#bookNext');
+        const indicator = this.container.querySelector('#bookPageIndicator');
+
+        const showPage = (idx) => {
+            const allPages = this.container.querySelectorAll('[data-page]');
+            allPages.forEach(p => p.style.display = 'none');
+            const current = this.container.querySelector(`[data-page="${idx}"]`);
+            if (current) {
+                current.style.display = '';
+                current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            if (indicator) indicator.textContent = `${idx + 1} / ${this.pages.length}`;
+            this._currentPage = idx;
+
+            // Disable buttons at edges
+            if (prevBtn) prevBtn.disabled = idx === 0;
+            if (nextBtn) nextBtn.disabled = idx === this.pages.length - 1;
+        };
+
+        prevBtn?.addEventListener('click', () => {
+            if (this._currentPage > 0) showPage(this._currentPage - 1);
+        });
+
+        nextBtn?.addEventListener('click', () => {
+            if (this._currentPage < this.pages.length - 1) showPage(this._currentPage + 1);
+        });
+
+        // Initialize button states
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn && this.pages.length <= 1) nextBtn.disabled = true;
+    }
+
+    destroy() {
+        this._destroyed = true;
+        if (this.container) this.container.innerHTML = '';
+    }
+}
+
+export class DynamicAvatar {
+    constructor(src, container) {
+        this.src = src;
+        this.container = typeof container === 'string' ? document.querySelector(container) : container;
+        this._destroyed = false;
+        this._handleMouseMove = null;
+        this._handleMouseLeave = null;
+    }
+
+    render() {
+        if (!this.container || this._destroyed) return;
+
+        this.container.innerHTML = `
+            <div class="sage-avatar" style="transform-style:preserve-3d; transition:transform 0.1s ease-out;">
+                <img src="${this.src}" alt="El Sabio" decoding="async" loading="eager">
+            </div>
+        `;
+
+        const avatar = this.container.querySelector('.sage-avatar');
+        if (!avatar) return;
+
+        this._handleMouseMove = (e) => {
+            if (this._destroyed) return;
+            const rect = avatar.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const dx = (e.clientX - cx) / rect.width;
+            const dy = (e.clientY - cy) / rect.height;
+            avatar.style.transform = `perspective(600px) rotateY(${dx * 18}deg) rotateX(${-dy * 18}deg)`;
+        };
+
+        this._handleMouseLeave = () => {
+            if (this._destroyed) return;
+            avatar.style.transform = '';
+        };
+
+        document.addEventListener('mousemove', this._handleMouseMove);
+        document.addEventListener('mouseleave', this._handleMouseLeave);
+    }
+
+    destroy() {
+        this._destroyed = true;
+        if (this._handleMouseMove) document.removeEventListener('mousemove', this._handleMouseMove);
+        if (this._handleMouseLeave) document.removeEventListener('mouseleave', this._handleMouseLeave);
     }
 }
