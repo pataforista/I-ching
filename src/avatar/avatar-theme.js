@@ -1,7 +1,7 @@
 export const FoxTheme = {
     // Colors for styling references if needed
     colors: {
-        base: 'hsl(42, 30%, 92%)',
+        base: 'hsl(14, 75%, 48%)',
         shadow: 'hsl(240, 6%, 12%)',
         innerEar: 'hsl(15, 30%, 75%)',
         lines: 'hsl(240, 6%, 20%)',

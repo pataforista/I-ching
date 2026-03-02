@@ -367,39 +367,148 @@ export class ShaoYongCircle {
 // --- Premium Components ---
 
 export class DynamicHexagram {
-    constructor(lines) {
-        // lines: array of 6 bits (0=yin, 1=yang), ordered bottom-to-top
+    constructor(lines, options = {}) {
+        // lines: array of 6 values (0/1 or coin values 6/7/8/9), ordered bottom-to-top
         this.lines = Array.isArray(lines) ? lines : [0, 0, 0, 0, 0, 0];
+        this.options = {
+            width: 130,
+            strokeWidth: 10,
+            lineGap: 16,
+            animate: true,
+            animationDuration: 0.55,   // seconds per stroke
+            animationBaseDelay: 0.08,  // stagger between lines
+            color: 'currentColor',
+            ...options
+        };
     }
 
     render(container) {
         if (!container) return;
-        const w = 120, lineH = 14, gap = 10;
-        const totalH = 6 * lineH + 5 * gap;
-        const breakGap = 20; // gap between yin segments
 
-        let svg = `<svg width="${w}" height="${totalH}" viewBox="0 0 ${w} ${totalH}" style="display:block; overflow:visible;">`;
+        const { width: w, strokeWidth: sw, lineGap, animate, animationDuration, animationBaseDelay, color } = this.options;
+        const lineH = sw;
+        const totalLines = 6;
+        const totalH = totalLines * lineH + (totalLines - 1) * lineGap;
+        const breakGap = 22; // gap between yin segments
+        const uid = Math.random().toString(36).slice(2, 8); // unique ID for keyframes
 
-        // Render top-to-bottom visually (reverse of bit array order)
-        [...this.lines].reverse().forEach((bit, i) => {
-            const y = i * (lineH + gap);
+        // Generate inline CSS keyframes once per render
+        const animCSS = animate ? `
+            @keyframes brush-paint-${uid} {
+                from { stroke-dashoffset: var(--dash-len); opacity: 0.4; }
+                to   { stroke-dashoffset: 0;               opacity: 1;   }
+            }` : '';
+
+        // Helper: produce a slightly wavy path between two x positions at given y center
+        // Uses a quadratic bezier with random-ish control point for organic feel
+        const wavyPath = (x1, x2, yc, seed) => {
+            const segLen = x2 - x1;
+            // Control point: horizontally centered, slight random vertical wobble
+            const wobble = (((seed * 7919) % 5) - 2) * 0.5; // deterministic, -1..+1 px
+            const cx = x1 + segLen * 0.5;
+            const cy = yc + wobble;
+            return `M ${x1} ${yc} Q ${cx} ${cy} ${x2} ${yc}`;
+        };
+
+        let svgPaths = '';
+
+        // Render lines top-to-bottom visually (bit array is bottom-to-top)
+        const reversed = [...this.lines].reverse();
+        reversed.forEach((bit, visualIdx) => {
+            const yCenter = visualIdx * (lineH + lineGap) + lineH / 2;
             const b = Number(bit);
+            // Normalize coin values → 0 (yin) / 1 (yang)
+            const isYang = b === 1 || b === 7 || b === 9;
+            const isMoving = b === 6 || b === 9;
 
-            if (b === 1) {
-                // Yang — solid line
-                svg += `<rect x="0" y="${y}" width="${w}" height="${lineH}" rx="3" fill="currentColor" opacity="0.88"/>`;
+            // Delay: top line paints first when text flows top→bottom
+            const delay = animate ? (visualIdx * animationBaseDelay) : 0;
+            const seed = visualIdx * 13 + (isYang ? 7 : 3);
+
+            const style = (pathLen) => animate
+                ? `style="stroke-dasharray:${pathLen};--dash-len:${pathLen};stroke-dashoffset:${pathLen};animation:brush-paint-${uid} ${animationDuration}s cubic-bezier(0.25, 0.1, 0.3, 1.0) ${delay}s forwards;"`
+                : '';
+
+            if (isYang) {
+                // Yang: one full brush stroke, slightly tapered look
+                const pathLen = w;
+                const d = wavyPath(0, w, yCenter, seed);
+                svgPaths += `
+                    <path
+                        d="${d}"
+                        fill="none"
+                        stroke="${color}"
+                        stroke-width="${sw}"
+                        stroke-linecap="round"
+                        opacity="${animate ? 0 : 0.9}"
+                        ${style(pathLen)}
+                    />`;
             } else {
-                // Yin — broken line (two segments)
+                // Yin: two broken strokes with gap in middle
                 const segW = (w - breakGap) / 2;
-                svg += `<rect x="0" y="${y}" width="${segW}" height="${lineH}" rx="3" fill="currentColor" opacity="0.88"/>`;
-                svg += `<rect x="${w - segW}" y="${y}" width="${segW}" height="${lineH}" rx="3" fill="currentColor" opacity="0.88"/>`;
+                const pathLen1 = segW;
+                const pathLen2 = segW;
+                const seed2 = seed + 31;
+
+                const d1 = wavyPath(0, segW, yCenter, seed);
+                const d2 = wavyPath(w - segW, w, yCenter, seed2);
+
+                // Left segment
+                svgPaths += `
+                    <path
+                        d="${d1}"
+                        fill="none"
+                        stroke="${color}"
+                        stroke-width="${sw}"
+                        stroke-linecap="round"
+                        opacity="${animate ? 0 : 0.9}"
+                        ${style(pathLen1)}
+                    />`;
+                // Right segment — slight extra delay so it paints after the left one
+                const delay2 = animate ? delay + animationDuration * 0.45 : 0;
+                const style2 = animate
+                    ? `style="stroke-dasharray:${pathLen2};--dash-len:${pathLen2};stroke-dashoffset:${pathLen2};animation:brush-paint-${uid} ${animationDuration * 0.7}s cubic-bezier(0.25, 0.1, 0.3, 1.0) ${delay2}s forwards;"`
+                    : '';
+                svgPaths += `
+                    <path
+                        d="${d2}"
+                        fill="none"
+                        stroke="${color}"
+                        stroke-width="${sw}"
+                        stroke-linecap="round"
+                        opacity="${animate ? 0 : 0.9}"
+                        ${style2}
+                    />`;
+            }
+
+            // Moving line marker: golden dot in the center
+            if (isMoving) {
+                const dotDelay = animate ? (delay + animationDuration * 0.9).toFixed(2) : 0;
+                svgPaths += `
+                    <circle
+                        cx="${w / 2}" cy="${yCenter}" r="${sw * 0.38}"
+                        fill="hsl(38, 80%, 58%)"
+                        opacity="${animate ? 0 : 1}"
+                        ${animate ? `style="animation: brush-paint-${uid} 0.3s ease ${dotDelay}s forwards;"` : ''}
+                    />`;
             }
         });
 
-        svg += '</svg>';
+        const svg = `
+            <svg
+                width="${w}"
+                height="${totalH}"
+                viewBox="0 0 ${w} ${totalH}"
+                style="display:block; overflow:visible;"
+            >
+                ${animCSS ? `<defs><style>${animCSS}</style></defs>` : ''}
+                ${svgPaths}
+            </svg>`;
+
         container.innerHTML = svg;
     }
 }
+
 
 export class EnsoLoader {
     constructor(container) {
