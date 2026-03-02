@@ -4,7 +4,7 @@ export class Typewriter {
     constructor(element, options = {}) {
         this.element = typeof element === 'string' ? document.querySelector(element) : element;
         this.options = {
-            typingSpeed: 40,
+            typingSpeed: 15,
             initialDelay: 0,
             cursor: true,
             cursorChar: '█',
@@ -86,7 +86,7 @@ export class BubbleMenu {
     render() {
         this.root = document.createElement('div');
         this.root.className = 'bubble-menu-root';
-        this.root.style.cssText = 'position:fixed; bottom:40px; right:40px; z-index:1000; display:flex; flex-direction:column-reverse; align-items:center; gap:16px;';
+        this.root.style.cssText = 'position:fixed; bottom:clamp(16px, 4vw, 40px); right:clamp(16px, 4vw, 40px); z-index:1000; display:flex; flex-direction:column-reverse; align-items:center; gap:16px;';
 
         this.toggleBtn = document.createElement('div');
         this.toggleBtn.className = 'bubble-toggle';
@@ -481,11 +481,11 @@ export class InteractiveBook {
         const isMobile = window.innerWidth <= 850;
 
         if (isMobile) {
-            // Mobile: vertical stack of all pages
+            // Mobile: vertical stack with scroll snap for direct physical manipulation
             this.container.innerHTML = `
-                <div class="book-container">
+                <div class="book-container" style="display:flex; flex-direction:column; gap:16px; scroll-snap-type: y mandatory; overflow-y: auto; height: 75vh; padding-bottom: 20px;">
                     ${this.pages.map((p, i) => `
-                        <div class="book-page ${p.alignment}">
+                        <div class="book-page ${p.alignment}" style="scroll-snap-align: start; flex-shrink: 0; height: 100%;">
                             <div class="page-content">${p.html}</div>
                             <div class="page-footer">${i + 1} / ${this.pages.length}</div>
                         </div>

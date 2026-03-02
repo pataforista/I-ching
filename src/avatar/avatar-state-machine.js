@@ -1,0 +1,141 @@
+import { FoxAnimations } from './avatar-animations.js';
+import { FoxMorphs } from './avatar-morphs.js';
+import { FoxTheme } from './avatar-theme.js';
+
+export class FoxStateMachine {
+    constructor(svgRoot) {
+        this.root = typeof svgRoot === 'string' ? document.querySelector(svgRoot) : svgRoot;
+        this.animations = new FoxAnimations(this.root);
+        this.morphs = new FoxMorphs(this.root);
+
+        this.currentState = null;
+        this.paused = false;
+
+        this.blinkTiming = FoxTheme.timing.blinkBase;
+        this.lastBlink = performance.now();
+        this.nextBlinkDelay = this.getRandomBlinkDelay();
+
+        this._loop = this._loop.bind(this);
+        this.rafId = requestAnimationFrame(this._loop);
+    }
+
+    destroy() {
+        this.paused = true;
+        cancelAnimationFrame(this.rafId);
+        this.animations.stopIdle();
+    }
+
+    pause() {
+        this.paused = true;
+        this.animations.stopIdle();
+    }
+
+    resume() {
+        this.paused = false;
+        if (this.currentState === 'idle_calm') {
+            this.animations.startIdle();
+        }
+        this.rafId = requestAnimationFrame(this._loop);
+    }
+
+    getRandomBlinkDelay() {
+        return 5000 + Math.random() * 6000;
+    }
+
+    _loop(timestamp) {
+        if (this.paused) return;
+
+        // Auto Blink Scheduler (only in states where eyes are open)
+        if (this.currentState !== 'rest_eyes_closed' && this.currentState !== 'ritual_trace') {
+            if (timestamp - this.lastBlink > this.nextBlinkDelay) {
+                this.morphs.blink(this.blinkTiming);
+                this.lastBlink = timestamp;
+                this.nextBlinkDelay = this.getRandomBlinkDelay();
+            }
+        }
+
+        this.rafId = requestAnimationFrame(this._loop);
+    }
+
+    async transitionTo(newState) {
+        if (this.paused) return;
+        if (this.currentState === newState) return;
+
+        this.currentState = newState;
+
+        if (newState !== 'idle_calm' && newState !== 'rest_eyes_closed' && newState !== 'listen' && newState !== 'guide_present') {
+            this.animations.stopIdle();
+        }
+
+        switch (newState) {
+            case 'idle_calm':
+                await this.morphs.setEyesOpen();
+                await this.morphs.setMouth('neutral');
+                this.animations.startIdle();
+                break;
+
+            case 'blink_soft':
+                await this.morphs.blink(this.blinkTiming * 1.5);
+                this.transitionTo('idle_calm');
+                break;
+
+            case 'listen':
+                this.animations.startIdle();
+                this.animations.twitchEar('left');
+                setTimeout(() => this.animations.twitchEar('right'), 400);
+                setTimeout(() => this.transitionTo('idle_calm'), 2000);
+                break;
+
+            case 'look_left':
+                await this.animations.look('left');
+                this.transitionTo('idle_calm');
+                break;
+
+            case 'look_right':
+                await this.animations.look('right');
+                this.transitionTo('idle_calm');
+                break;
+
+            case 'affirm_nod':
+                await this.morphs.setMouth('soft');
+                await this.animations.nod();
+                await this.morphs.setMouth('neutral');
+                this.transitionTo('idle_calm');
+                break;
+
+            case 'rest_eyes_closed':
+                this.animations.startIdle();
+                await this.morphs.setEyesClosed();
+                break;
+
+            case 'guide_present':
+                this.animations.startIdle();
+                await this.morphs.setEyesOpen();
+                await this.morphs.setMouth('soft');
+                await this.animations.guidePresent();
+                await this.morphs.setMouth('neutral');
+                this.transitionTo('idle_calm');
+                break;
+
+            case 'ritual_trace':
+                await this.morphs.setEyesClosed();
+                const halo = this.root.querySelector('#fox-halo circle');
+                if (halo) {
+                    halo.style.strokeDashoffset = '880';
+                    halo.animate([
+                        { strokeDashoffset: '880' },
+                        { strokeDashoffset: '0' }
+                    ], {
+                        duration: FoxTheme.timing.ritualTrace,
+                        fill: 'forwards',
+                        easing: 'ease-in-out'
+                    });
+                }
+                setTimeout(() => this.transitionTo('rest_eyes_closed'), FoxTheme.timing.ritualTrace);
+                break;
+
+            default:
+                this.transitionTo('idle_calm');
+        }
+    }
+}

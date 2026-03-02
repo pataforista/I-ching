@@ -1,4 +1,5 @@
 import { BubbleMenu, Typewriter, InkGalaxy, TiltCard, EnsoLoader, DynamicHexagram, drawHanzi, InteractiveBook, DynamicAvatar } from "./ui-lib.js";
+import { FoxAvatarController } from "./src/avatar/avatar-controller.js";
 import {
   initEngine,
   trackEvent,
@@ -6,6 +7,17 @@ import {
   buildReading,
   t
 } from "./engine.js";
+
+// Constants
+const LS_KEY = "iching_local_v1";
+const LS_THEME = "iching_theme_v1";
+
+function dispatchFox(eventName, payload) {
+  document.dispatchEvent(new CustomEvent('fox_event', { detail: { eventName, payload } }));
+}
+
+// Constants
+const CHUNK_DIR = "./data/content/";
 
 // Global UI Instances
 let sageTyper = null;
@@ -76,23 +88,23 @@ var state = {
     requestAnimationFrame(raf);
   }
 
-  // Init Grain (Paper Texture)
+  // Init Grain (Paper Texture) - Very subtle for Matte feel
   if (window.grained) {
     grained("body", {
       animate: true,
       patternWidth: 100,
       patternHeight: 100,
-      grainOpacity: 0.04,
-      grainDensity: 1.2,
-      grainWidth: 1.5,
-      grainHeight: 1.5,
-      grainChaos: 0.5,
-      grainSpeed: 20
+      grainOpacity: 0.02, /* Reduced from 0.04 */
+      grainDensity: 1.0,
+      grainWidth: 1.0,
+      grainHeight: 1.0,
+      grainChaos: 0.2,
+      grainSpeed: 10
     });
   }
 
-  // Init Ink Galaxy Background
-  galaxy = new InkGalaxy({ count: 160 });
+  // Init Ink Galaxy Background - Reduced distraction for Warm Minimalism
+  galaxy = new InkGalaxy({ count: 40 }); /* Reduced from 160 */
 
   try {
     await initEngine();
@@ -171,6 +183,11 @@ async function nav(to) {
   state.nav = to;
   render();
 
+  if (to === "home") dispatchFox('OPEN_SCREEN');
+  else if (to === "toss") dispatchFox('SHOW_ORACLE');
+  else if (to === "reading") dispatchFox('SHOW_READING');
+  else if (to === "history") dispatchFox('SLEEP_MODE');
+
   overlay.classList.remove("active");
   overlay.classList.add("fade-out");
   setTimeout(() => overlay.remove(), 600);
@@ -184,6 +201,7 @@ function startNew() {
 }
 
 function beginToss() {
+  dispatchFox('START_SESSION');
   state.draft.tosses = [];
   state.session = null;
   nav("toss");
@@ -262,8 +280,7 @@ function renderDynamicVisuals() {
   const homeTarget = document.getElementById("homeAvatarTarget");
   if (homeTarget) {
     if (homeAvatar) homeAvatar.destroy();
-    homeAvatar = new DynamicAvatar("./assets/sage.png", homeTarget);
-    homeAvatar.render();
+    homeAvatar = new FoxAvatarController(homeTarget);
   } else if (homeAvatar) {
     homeAvatar.destroy();
     homeAvatar = null;
@@ -273,8 +290,7 @@ function renderDynamicVisuals() {
   const tossTarget = document.getElementById("tossAvatarTarget");
   if (tossTarget) {
     if (tossAvatar) tossAvatar.destroy();
-    tossAvatar = new DynamicAvatar("./assets/sage.png", tossTarget);
-    tossAvatar.render();
+    tossAvatar = new FoxAvatarController(tossTarget);
   } else if (tossAvatar) {
     tossAvatar.destroy();
     tossAvatar = null;
@@ -349,13 +365,13 @@ function initInteractiveBook(sess) {
                   <div class="muted serif" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em;">Superior</div>
                   <div style="font-size:1.8rem; line-height:1;">${p.trigrams?.upper?.symbol_unicode || ''}</div>
                   <div style="font-weight:600; font-size:0.9rem;">${escapeHtml(p.trigrams?.upper?.name_es || p.upper_trigram || '—')}</div>
-                  <div class="muted serif" style="font-size:0.7rem;">${escapeHtml((p.trigrams?.upper?.keywords_es || []).slice(0,2).join(' · '))}</div>
+                  <div class="muted serif" style="font-size:0.7rem;">${escapeHtml((p.trigrams?.upper?.keywords_es || []).slice(0, 2).join(' · '))}</div>
               </div>
               <div class="card" style="flex:1; padding:16px; text-align:center; gap:8px;">
                   <div class="muted serif" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em;">Inferior</div>
                   <div style="font-size:1.8rem; line-height:1;">${p.trigrams?.lower?.symbol_unicode || ''}</div>
                   <div style="font-weight:600; font-size:0.9rem;">${escapeHtml(p.trigrams?.lower?.name_es || p.lower_trigram || '—')}</div>
-                  <div class="muted serif" style="font-size:0.7rem;">${escapeHtml((p.trigrams?.lower?.keywords_es || []).slice(0,2).join(' · '))}</div>
+                  <div class="muted serif" style="font-size:0.7rem;">${escapeHtml((p.trigrams?.lower?.keywords_es || []).slice(0, 2).join(' · '))}</div>
               </div>
           </div>
         </div>
@@ -514,7 +530,7 @@ function HomeFormView() {
   return `
     <div class="vstack" style="gap:32px;">
       <div class="sage-container">
-         <div id="homeAvatarTarget"></div>
+         <div id="homeAvatarTarget" style="width: clamp(180px, 22vw, 260px); height: clamp(180px, 22vw, 260px); margin: 0 auto -20px auto; position: relative; z-index: 10;"></div>
          <div class="sage-bubble">
             El Tao que puede nombrarse no es el Tao eterno.<br>
             Presenta tu pregunta con sinceridad y deja que el Libro hable.
@@ -564,10 +580,10 @@ function TossView() {
   const isComplete = n >= 6;
 
   return `
-    <div class="vstack" style="gap:24px;">
-      <div class="sage-container">
-         <div id="tossAvatarTarget"></div>
-         <div class="sage-bubble">
+    <div class="vstack" style="gap:24px; align-items:center;">
+      <div id="tossAvatarTarget" style="width: clamp(140px, 18vw, 200px); height: clamp(140px, 18vw, 200px); margin: 0 auto; position: relative; z-index: 10;"></div>
+      <div class="card" style="width:100%; text-align:center;">
+         <div class="sage-bubble" style="margin-top:0;">
             <span id="zenText"></span>
          </div>
       </div>
@@ -654,9 +670,9 @@ function HistoryView() {
 
       <div class="vstack" style="gap:12px;">
         ${state.history.length
-          ? items
-          : `<div class="card muted serif" style="text-align:center; padding:40px;">Aún no has guardado ninguna reflexión.</div>`
-        }
+      ? items
+      : `<div class="card muted serif" style="text-align:center; padding:40px;">Aún no has guardado ninguna reflexión.</div>`
+    }
       </div>
 
       <div class="hstack" style="justify-content:center; gap:16px; flex-wrap:wrap;">
@@ -732,6 +748,7 @@ function initPageEffects() {
 
 function onTossNextLine() {
   if (state._tossing) return;
+  dispatchFox('USER_TAP_PRIMARY');
   const n = state.draft.tosses.length;
   if (n >= 6) {
     finishToss();
@@ -798,15 +815,21 @@ function bindPageEvents(root) {
   if (!root) return;
 
   // Home
-  root.querySelector("#btnBegin")?.addEventListener("click", () => {
-    const q = state.draft.question.text_es.trim();
-    if (!q) {
-      openModal(t("home.error_empty_question") || "Falta pregunta",
-        `<p class="serif">${t("home.error_empty_question_body") || "Por favor escribe algo para reflexionar."}</p>`);
-      return;
-    }
-    beginToss();
-  });
+  const btnBegin = root.querySelector("#btnBegin");
+  if (btnBegin) {
+    btnBegin.addEventListener("click", () => {
+      const qTextEl = root.querySelector("#qText");
+      const q = qTextEl ? qTextEl.value.trim() : "";
+
+      if (!q) {
+        openModal(t("home.error_empty_question") || "Falta pregunta",
+          `<p class="serif">${t("home.error_empty_question_body") || "Por favor escribe algo para reflexionar."}</p>`);
+        return;
+      }
+      beginToss();
+    });
+  }
+
   root.querySelector("#qText")?.addEventListener("input", e => {
     state.draft.question.text_es = e.target.value;
   });
@@ -841,9 +864,6 @@ function bindPageEvents(root) {
 }
 
 // ---------- Helpers ----------
-
-const LS_KEY = "iching_sessions_v1";
-const LS_THEME = "iching_theme_v1";
 
 function escapeHtml(unsafe) {
   if (typeof unsafe !== "string") return "";

@@ -1,70 +1,86 @@
 /*
-   Premium Zen & Sumi-e Aesthetic
+   Premium Zen & Warm Minimalism Aesthetic
    Design System for I Ching — Reflexión Local
-   v1.1 — Premium Edition
+   v2.0 — Matte Paper UI Edition
 */
 
 :root {
-  /* High-end HSL Palette */
-  --ink-black: hsl(240, 10%, 8%);
-  --paper-white: hsl(45, 25%, 94%);
-  --paper-texture: hsl(45, 20%, 90%);
-  --vermilion: hsl(6, 68%, 56%);      /* Traditional Seal Red */
-  --indigo: hsl(215, 51%, 31%);       /* Deep Japanese Blue */
-  --gold: hsl(40, 48%, 56%);          /* Muted Antique Gold */
+  /* Warm Minimalism Palette */
+  --ink-black: hsl(240, 6%, 12%);
+  /* Soft off-black */
+  --paper-white: hsl(42, 30%, 96%);
+  /* Warm ivory / light stone */
+  --paper-texture: hsl(42, 25%, 92%);
+  /* Deeper ivory for contrast */
+  --accent: hsl(156, 30%, 42%);
+  /* Serene Muted Jade */
+  --indigo: hsl(215, 30%, 35%);
+  /* Quiet Slate Blue */
+  --gold: hsl(38, 30%, 60%);
+  /* Subdued earthy gold */
 
   /* Semantic Tokens */
   --bg: var(--paper-white);
   --text: var(--ink-black);
-  --text-muted: hsla(240, 10%, 8%, 0.55);
+  --text-muted: hsla(240, 6%, 12%, 0.55);
 
-  --panel-bg: hsla(0, 0%, 100%, 0.65);
-  --panel-border: hsla(215, 51%, 31%, 0.12);
-  --panel-shadow: 0 20px 60px -15px hsla(215, 51%, 31%, 0.12);
+  /* Opaque Surfaces (No glassmorphism) */
+  --panel-bg: hsl(40, 35%, 98%);
+  --panel-border: hsla(240, 6%, 12%, 0.08);
+  /* Matte Depth: very short, diffuse, almost imperceptible */
+  --panel-shadow: 0 4px 12px -2px hsla(240, 6%, 12%, 0.03), 0 1px 3px 0 hsla(240, 6%, 12%, 0.02);
 
-  --accent: var(--vermilion);
-  --accent-soft: hsla(6, 68%, 56%, 0.08);
+  --accent-soft: hsla(156, 30%, 42%, 0.06);
 
   /* Typography */
   --font-serif: "Shippori Mincho", "Spectral", Cochin, Georgia, serif;
+  /* Elegant display */
   --font-sans: "Outfit", system-ui, -apple-system, sans-serif;
+  /* Clean body */
 
-  --radius-lg: 28px;
-  --radius-md: 16px;
-  --radius-sm: 10px;
+  --radius-lg: 24px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
 
-  --page-max-w: 900px;
+  --page-max-w: 800px;
+  /* Slightly narrower for focus */
 
-  /* Sumi-e specific */
+  /* Effects */
   --sumi-filter: url(#sumi-e-brush);
 }
 
+/* Dark Mode - Muted Fog / Ink */
 :root[data-theme="ink"] {
-  --bg: hsl(240, 10%, 6%);
-  --text: hsl(45, 15%, 88%);
-  --text-muted: hsla(45, 15%, 88%, 0.45);
+  --bg: hsl(240, 8%, 10%);
+  --text: hsl(42, 20%, 90%);
+  --text-muted: hsla(42, 20%, 90%, 0.5);
 
-  --panel-bg: hsla(0, 0%, 100%, 0.05);
-  --panel-border: hsla(0, 0%, 100%, 0.09);
-  --panel-shadow: 0 40px 100px -20px hsla(0, 0%, 0%, 0.6);
+  --panel-bg: hsl(240, 8%, 14%);
+  --panel-border: hsla(42, 20%, 90%, 0.06);
+  --panel-shadow: 0 4px 12px -2px hsla(0, 0%, 0%, 0.2), 0 1px 3px 0 hsla(0, 0%, 0%, 0.1);
 
-  --accent: hsl(6, 75%, 62%);
-  --accent-soft: hsla(6, 75%, 62%, 0.12);
+  --accent: hsl(156, 25%, 55%);
+  --accent-soft: hsla(156, 25%, 55%, 0.1);
 
-  --paper-texture: hsl(240, 10%, 8%);
-  --gold: hsl(40, 55%, 65%);
+  --paper-texture: hsl(240, 8%, 8%);
+  --gold: hsl(38, 25%, 50%);
 }
 
 /* --- Base & Reset --- */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-html, body {
+/* --- Layout --- */
+html,
+body {
   margin: 0;
   padding: 0;
+  width: 100%;
   height: 100%;
   overflow-x: hidden;
 }
@@ -74,23 +90,27 @@ body {
   color: var(--text);
   font-family: var(--font-sans);
   line-height: 1.7;
-  transition: background 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              color 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.8s cubic-bezier(0.25, 1, 0.5, 1);
   font-size: 18px;
+  -webkit-tap-highlight-color: transparent;
+  /* better mobile feel */
 
+  /* Extremely subtle paper noise - 2% opacity */
   background-image:
-    radial-gradient(circle at 15% 15%, hsla(215, 51%, 31%, 0.05) 0%, transparent 40%),
-    radial-gradient(circle at 85% 85%, hsla(6, 68%, 56%, 0.04) 0%, transparent 40%),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    radial-gradient(circle at 15% 15%, hsla(215, 30%, 35%, 0.02) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, hsla(156, 30%, 42%, 0.02) 0%, transparent 40%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
 }
 
-/* --- Layout --- */
 .app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: clamp(20px, 5vw, 60px) 20px;
+  padding: clamp(16px, 4vw, 40px) 16px;
   align-items: center;
+  overflow-x: hidden;
+  /* Strict no horizontal scroll */
 }
 
 .content-wrapper {
@@ -100,24 +120,27 @@ body {
 }
 
 /* --- Typography --- */
-h1, h2, h3, h4, .serif {
+h1,
+h2,
+h3,
+h4,
+.serif {
   font-family: var(--font-serif);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .muted {
-  opacity: 0.55;
+  opacity: 0.6;
   color: var(--text);
 }
 
 .hexTitle {
+  font-family: var(--font-serif);
   font-size: clamp(1.8rem, 5vw, 2.8rem);
   margin-bottom: 0.5rem;
-  background: linear-gradient(to bottom, var(--text) 50%, var(--text-muted));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text);
+  font-weight: 500;
 }
 
 /* --- Utility Layout --- */
@@ -151,23 +174,21 @@ h1, h2, h3, h4, .serif {
 /* --- Card --- */
 .card {
   background: var(--panel-bg);
-  backdrop-filter: blur(30px) saturate(1.2);
-  -webkit-backdrop-filter: blur(30px) saturate(1.2);
   border: 1px solid var(--panel-border);
-  border-radius: var(--radius-lg);
-  padding: clamp(20px, 4vw, 40px);
+  border-radius: var(--radius-md);
+  padding: clamp(20px, 4vw, 36px);
   box-shadow: var(--panel-shadow);
   position: relative;
   overflow: hidden;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 28px 70px -18px hsla(215, 51%, 31%, 0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px hsla(240, 6%, 12%, 0.05), 0 2px 6px 0 hsla(240, 6%, 12%, 0.03);
 }
 
 /* --- Buttons --- */
@@ -175,62 +196,64 @@ h1, h2, h3, h4, .serif {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 15px 32px;
-  border-radius: 100px;
+  padding: 14px 28px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-sans);
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
   border: 1px solid var(--panel-border);
   background: var(--panel-bg);
   color: var(--text);
   gap: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  letter-spacing: 0.01em;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  letter-spacing: 0.02em;
   text-decoration: none;
   white-space: nowrap;
 }
 
 .btn:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-  background: var(--text);
-  color: var(--bg);
-  border-color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .btn:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .btn--primary {
   background: var(--accent);
-  color: white;
-  border: none;
-  box-shadow: 0 10px 28px -8px hsla(6, 68%, 56%, 0.45);
+  color: var(--bg);
+  border: 1px solid transparent;
+  box-shadow: 0 2px 8px -2px hsla(156, 30%, 42%, 0.3);
 }
 
 .btn--primary:hover:not(:disabled) {
-  background: hsl(6, 68%, 48%);
-  color: white;
-  box-shadow: 0 14px 36px -10px hsla(6, 68%, 56%, 0.55);
-  border-color: transparent;
+  background: hsl(156, 30%, 38%);
+  color: var(--bg);
+  box-shadow: 0 6px 16px -4px hsla(156, 30%, 42%, 0.4);
 }
 
 .btn--ghost {
   background: transparent;
-  border: 1px solid var(--panel-border);
+  border: 1px solid transparent;
   color: var(--text);
   box-shadow: none;
 }
 
 .btn--ghost:hover:not(:disabled) {
-  background: var(--panel-bg);
-  border-color: var(--text);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  transform: translateY(-1px);
+  background: var(--panel-border);
+  box-shadow: none;
+  transform: none;
 }
 
 /* --- Callout --- */
@@ -245,12 +268,12 @@ h1, h2, h3, h4, .serif {
 /* --- Form Fields --- */
 .input-field {
   width: 100%;
-  background: hsla(0, 0%, 100%, 0.04);
+  background: var(--bg);
   border: 1px solid var(--panel-border);
-  border-radius: var(--radius-md);
-  padding: 18px 20px;
-  font-family: var(--font-serif);
-  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 2.5vw, 1.1rem);
   color: var(--text);
   outline: none;
   transition: all 0.3s ease;
@@ -259,12 +282,12 @@ h1, h2, h3, h4, .serif {
 
 .input-field:focus {
   border-color: var(--accent);
-  background: hsla(0, 0%, 100%, 0.08);
+  background: var(--bg);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .input-field::placeholder {
-  opacity: 0.45;
+  opacity: 0.4;
 }
 
 select.input-field {
@@ -278,16 +301,16 @@ select.input-field {
 
 /* --- Seal Badge --- */
 .seal {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   background: var(--accent);
-  color: white;
-  border-radius: 12px;
+  color: var(--bg);
+  border-radius: 8px;
   display: grid;
   place-items: center;
-  font-family: var(--font-serif);
-  font-weight: 700;
-  box-shadow: 4px 4px 0 var(--text-muted);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  box-shadow: none;
   flex-shrink: 0;
 }
 
@@ -325,8 +348,17 @@ select.input-field {
 }
 
 @keyframes sage-breathing {
-  0%, 100% { transform: scale(1.0); filter: saturate(1.05) contrast(1.05) var(--sumi-filter) brightness(1); }
-  50%       { transform: scale(1.04); filter: saturate(1.1) contrast(1.08) var(--sumi-filter) brightness(1.04); }
+
+  0%,
+  100% {
+    transform: scale(1.0);
+    filter: saturate(1.05) contrast(1.05) var(--sumi-filter) brightness(1);
+  }
+
+  50% {
+    transform: scale(1.04);
+    filter: saturate(1.1) contrast(1.08) var(--sumi-filter) brightness(1.04);
+  }
 }
 
 .sage-avatar::before {
@@ -341,26 +373,32 @@ select.input-field {
 }
 
 @keyframes ink-pulse {
-  0%   { box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05); }
-  50%  { box-shadow: inset 0 0 30px var(--accent-soft); }
-  100% { box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05); }
+  0% {
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+  }
+
+  50% {
+    box-shadow: inset 0 0 30px var(--accent-soft);
+  }
+
+  100% {
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+  }
 }
 
 .sage-bubble {
   background: var(--panel-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--panel-border);
-  padding: clamp(18px, 3.5vw, 28px);
-  border-radius: var(--radius-md);
+  padding: clamp(16px, 3.5vw, 24px);
+  border-radius: var(--radius-sm);
   max-width: 480px;
   text-align: center;
-  box-shadow: var(--panel-shadow);
-  font-size: clamp(0.9rem, 2.2vw, 1.1rem);
-  font-family: var(--font-serif);
-  line-height: 1.65;
+  font-size: clamp(0.9rem, 2.2vw, 1.05rem);
+  font-family: var(--font-sans);
+  line-height: 1.6;
   position: relative;
   z-index: 5;
+  box-shadow: var(--panel-shadow);
 }
 
 /* --- Coin Stage --- */
@@ -415,11 +453,25 @@ select.input-field {
 }
 
 @keyframes spin {
-  0%   { transform: rotateY(0) rotateX(0) translateY(0); }
-  25%  { transform: rotateY(360deg) rotateX(45deg) translateY(-70px); }
-  50%  { transform: rotateY(720deg) rotateX(180deg) translateY(-90px); }
-  75%  { transform: rotateY(1080deg) rotateX(270deg) translateY(-40px); }
-  100% { transform: rotateY(1440deg) rotateX(360deg) translateY(0); }
+  0% {
+    transform: rotateY(0) rotateX(0) translateY(0);
+  }
+
+  25% {
+    transform: rotateY(360deg) rotateX(45deg) translateY(-70px);
+  }
+
+  50% {
+    transform: rotateY(720deg) rotateX(180deg) translateY(-90px);
+  }
+
+  75% {
+    transform: rotateY(1080deg) rotateX(270deg) translateY(-40px);
+  }
+
+  100% {
+    transform: rotateY(1440deg) rotateX(360deg) translateY(0);
+  }
 }
 
 .tossing {
@@ -486,8 +538,15 @@ select.input-field {
 }
 
 @keyframes line-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.6; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
 }
 
 /* --- Ink Transition --- */
@@ -516,15 +575,22 @@ select.input-field {
 
 /* --- Fade In Animation --- */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .fade-in {
   animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* --- The Book (Cover) --- */
+/* --- The Book (Cover and Inside) --- */
 .book-scene {
   perspective: 2500px;
   width: 100%;
@@ -537,7 +603,7 @@ select.input-field {
   margin: 0 auto;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .book.open {
@@ -549,34 +615,35 @@ select.input-field {
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  border-radius: 8px 32px 32px 8px;
+  border-radius: 8px 24px 24px 8px;
 }
 
 .book-front {
-  background: linear-gradient(145deg, hsl(215, 51%, 22%), hsl(240, 15%, 10%));
-  color: white;
+  background: var(--indigo);
+  color: var(--bg);
   z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: clamp(30px, 8vw, 80px);
-  border: 10px double var(--gold);
-  box-shadow: 24px 32px 80px rgba(0, 0, 0, 0.55), inset 0 0 80px hsla(215, 51%, 15%, 0.5);
+  box-shadow: 12px 16px 40px rgba(0, 0, 0, 0.15);
+  border-left: 12px solid hsl(215, 30%, 25%);
 }
 
 /* Book Cover Premium Elements */
 .book-cover-seal {
-  width: 88px;
-  height: 88px;
-  border: 2px solid var(--gold);
-  border-radius: 12px;
+  width: 80px;
+  height: 80px;
+  border: 1px solid var(--gold);
+  border-radius: 8px;
   display: grid;
   place-items: center;
-  font-family: var(--font-serif);
-  font-size: 42px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 36px;
   color: var(--gold);
-  box-shadow: 0 0 30px hsla(40, 48%, 56%, 0.2), inset 0 0 20px hsla(40, 48%, 56%, 0.05);
+  box-shadow: none;
 }
 
 .book-cover-title {
@@ -619,7 +686,7 @@ select.input-field {
   flex-direction: column;
   overflow-y: auto;
   border: 1px solid var(--panel-border);
-  box-shadow: -16px 32px 80px rgba(0, 0, 0, 0.12);
+  box-shadow: -8px 16px 40px rgba(0, 0, 0, 0.08);
 }
 
 /* --- Reading Components --- */
@@ -691,8 +758,14 @@ select.input-field {
   z-index: 1;
 }
 
-.page-content::-webkit-scrollbar { width: 4px; }
-.page-content::-webkit-scrollbar-thumb { background: var(--panel-border); border-radius: 10px; }
+.page-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.page-content::-webkit-scrollbar-thumb {
+  background: var(--panel-border);
+  border-radius: 10px;
+}
 
 .page-footer {
   text-align: center;
@@ -775,27 +848,35 @@ select.input-field {
 }
 
 @keyframes enso-draw {
-  0%   { stroke-dashoffset: 283; opacity: 0; }
-  20%  { opacity: 1; }
-  100% { stroke-dashoffset: 40; opacity: 0.85; }
+  0% {
+    stroke-dashoffset: 283;
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: 40;
+    opacity: 0.85;
+  }
 }
 
 /* --- Modal Dialog --- */
 dialog.modal {
   border: 1px solid var(--panel-border);
-  border-radius: var(--radius-lg);
-  background: var(--bg);
+  border-radius: var(--radius-md);
+  background: var(--panel-bg);
   color: var(--text);
-  padding: clamp(24px, 5vw, 48px);
+  padding: clamp(24px, 5vw, 40px);
   max-width: 480px;
   width: calc(100vw - 40px);
-  box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(20px);
+  box-shadow: var(--panel-shadow);
 }
 
 dialog.modal::backdrop {
-  background: hsla(240, 10%, 8%, 0.6);
-  backdrop-filter: blur(6px);
+  background: hsla(240, 6%, 12%, 0.4);
 }
 
 dialog.modal .hexTitle {
@@ -833,9 +914,13 @@ dialog.modal .hexTitle {
 
 /* --- Mobile Adjustments --- */
 @media (max-width: 850px) {
-  body { font-size: 16px; }
+  body {
+    font-size: 16px;
+  }
 
-  .book-scene { perspective: none; }
+  .book-scene {
+    perspective: none;
+  }
 
   .book {
     height: auto;
@@ -844,7 +929,9 @@ dialog.modal .hexTitle {
     max-width: 100%;
   }
 
-  .book-front { display: none; }
+  .book-front {
+    display: none;
+  }
 
   .book-inside {
     position: static;
@@ -879,19 +966,35 @@ dialog.modal .hexTitle {
 }
 
 @media (max-width: 480px) {
-  .book-cover-seal { width: 70px; height: 70px; font-size: 32px; }
-  .book-cover-title { font-size: 2rem; }
-  .history-card { flex-wrap: wrap; }
-  .history-card > div:last-child { display: none; }
+  .book-cover-seal {
+    width: 70px;
+    height: 70px;
+    font-size: 32px;
+  }
+
+  .book-cover-title {
+    font-size: 2rem;
+  }
+
+  .history-card {
+    flex-wrap: wrap;
+  }
+
+  .history-card>div:last-child {
+    display: none;
+  }
 }
 
 /* --- Print Styles (PDF Export) --- */
 @media print {
+
   .bubble-menu-root,
   .ink-transition-overlay,
   canvas,
   .book-nav,
-  #btnSave, #btnPDF, #btnClose,
+  #btnSave,
+  #btnPDF,
+  #btnClose,
   .btn {
     display: none !important;
   }
