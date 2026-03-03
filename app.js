@@ -1,5 +1,6 @@
 import { BubbleMenu, Typewriter, InkGalaxy, TiltCard, EnsoLoader, DynamicHexagram, drawHanzi, DynamicAvatar } from "./ui-lib.js";
 import { FoxAvatarController } from "./src/avatar/avatar-controller.js";
+import { ArtBackground } from "./src/art-background.js";
 import {
   initEngine,
   trackEvent,
@@ -25,6 +26,7 @@ let bubbleMenu = null;
 let galaxy = null;
 let homeAvatar = null;
 let tossAvatar = null;
+let artBg = null;
 
 var state = {
   // Boot status
@@ -90,7 +92,7 @@ var state = {
 
   // Init Grain (Paper Texture) - Very subtle for Matte feel
   if (window.grained) {
-    grained("body", {
+    grained("#paper-texture", {
       animate: true,
       patternWidth: 100,
       patternHeight: 100,
@@ -105,6 +107,10 @@ var state = {
 
   // Init Ink Galaxy Background - Reduced distraction for Warm Minimalism
   galaxy = new InkGalaxy({ count: 40 }); /* Reduced from 160 */
+
+  // Init Art Background (ukiyo-e / sumi-e paintings)
+  artBg = new ArtBackground();
+  artBg.init();
 
   try {
     await initEngine();
@@ -183,6 +189,9 @@ async function nav(to) {
   state.nav = to;
   render();
 
+  // Crossfade to new artwork on each screen change
+  if (artBg) artBg.transition();
+
   if (to === "home") dispatchFox('OPEN_SCREEN');
   else if (to === "toss") dispatchFox('SHOW_ORACLE');
   else if (to === "reading") dispatchFox('SHOW_READING');
@@ -195,7 +204,12 @@ async function nav(to) {
 
 // ---------- Actions ----------
 function startNew() {
-  state.draft = { question: { text_es: "", mode: "reflexion" }, tosses: [] };
+  state.draft = {
+    question: { text_es: "", mode: "reflexion" },
+    tosses: [],
+    tossMode: "digital",
+    manualCoins: ["heads", "heads", "heads"]
+  };
   state.session = null;
   nav("home");
 }
@@ -203,6 +217,8 @@ function startNew() {
 function beginToss() {
   dispatchFox('START_SESSION');
   state.draft.tosses = [];
+  state.draft.tossMode = "digital";
+  state.draft.manualCoins = ["heads", "heads", "heads"];
   state.session = null;
   nav("toss");
 }
@@ -325,170 +341,12 @@ function initReadingVisuals() {
   if (resContainer && r?.lines) new DynamicHexagram(r.lines).render(resContainer);
 }
 
-const isMutating = !!r;
-const movingLines = (sess.lines || []).filter(l => l.isMoving);
-
-// Helper: format hexagram title
-const hexTitle = (hex) => `${hex.hanzi} · ${hex.slug.charAt(0).toUpperCase() + hex.slug.slice(1)}`;
-
-// --- Page 1: Revelación ---
-const primaryJudgment = p.dynamic_core_es || "—";
-book.addPage(`
-    <div class="vstack" style="align-items:center; text-align:center; gap:20px;">
-        <div class="reading-meta">
-          <span class="seal" style="width:32px; height:32px; font-size:12px; display:inline-grid;">${p.id}</span>
-          <span class="muted serif" style="font-size:0.75rem; margin-left:10px; text-transform:uppercase; letter-spacing:0.1em;">${p.name_en_standard || ''}</span>
-        </div>
-        <div id="hanziAnimation" style="min-height:120px; display:grid; place-items:center;"></div>
-        <div id="primaryHexSVG" style="margin: 8px auto; display:grid; place-items:center; color:var(--text);"></div>
-        <h2 class="hexTitle" style="margin:0;">${escapeHtml(hexTitle(p))}</h2>
-        <div class="reading-judgment">
-            <p class="serif" style="font-size:1.05rem; line-height:1.7; opacity:0.85; max-width:480px; margin:0 auto;">${escapeHtml(primaryJudgment)}</p>
-        </div>
-        ${sess.question?.text_es ? `
-        <div class="reading-question-echo">
-          <span class="muted serif" style="font-size:0.8rem; font-style:italic;">"${escapeHtml(sess.question.text_es)}"</span>
-        </div>` : ''}
-    </div>
-  `, "--left");
-
-// --- Page 2: Imagen y Estructura ---
-book.addPage(`
-    <div class="vstack" style="gap:20px;">
-        <div class="callout">
-            <h3 class="serif" style="margin:0 0 10px; color:var(--accent); font-size:1rem; text-transform:uppercase; letter-spacing:0.08em;">La Imagen</h3>
-            <p class="serif" style="font-size:1.05rem; opacity:0.9; margin:0; font-style:italic;">${escapeHtml(p.image_es || '—')}</p>
-        </div>
-        <div class="card" style="padding:20px;">
-            <h3 class="serif" style="margin:0 0 12px; color:var(--accent); font-size:0.9rem; text-transform:uppercase; letter-spacing:0.08em;">Lectura General</h3>
-            <p class="serif" style="opacity:0.9; margin:0; font-size:0.95rem; line-height:1.8;">${escapeHtml(p.general_reading_es || '—')}</p>
-        </div>
-        <div style="margin-top:4px;">
-          <h3 class="muted serif" style="text-transform:uppercase; font-size:0.75rem; letter-spacing:0.1em; margin:0 0 12px;">Estructura Trigramática</h3>
-          <div class="row" style="gap:16px;">
-              <div class="card" style="flex:1; padding:16px; text-align:center; gap:8px;">
-                  <div class="muted serif" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em;">Superior</div>
-                  <div style="font-size:1.8rem; line-height:1;">${p.trigrams?.upper?.symbol_unicode || ''}</div>
-                  <div style="font-weight:600; font-size:0.9rem;">${escapeHtml(p.trigrams?.upper?.name_es || p.upper_trigram || '—')}</div>
-                  <div class="muted serif" style="font-size:0.7rem;">${escapeHtml((p.trigrams?.upper?.keywords_es || []).slice(0, 2).join(' · '))}</div>
-              </div>
-              <div class="card" style="flex:1; padding:16px; text-align:center; gap:8px;">
-                  <div class="muted serif" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em;">Inferior</div>
-                  <div style="font-size:1.8rem; line-height:1;">${p.trigrams?.lower?.symbol_unicode || ''}</div>
-                  <div style="font-weight:600; font-size:0.9rem;">${escapeHtml(p.trigrams?.lower?.name_es || p.lower_trigram || '—')}</div>
-                  <div class="muted serif" style="font-size:0.7rem;">${escapeHtml((p.trigrams?.lower?.keywords_es || []).slice(0, 2).join(' · '))}</div>
-              </div>
-          </div>
-        </div>
-    </div>
-  `, "--right");
-
-// --- Page 3: Líneas en Movimiento (si las hay) ---
-if (movingLines.length > 0) {
-  book.addPage(`
-        <div class="vstack" style="gap:16px;">
-            <div>
-              <h3 class="serif" style="color:var(--accent); margin:0 0 4px; font-size:1.1rem;">Líneas en Movimiento</h3>
-              <p class="muted serif" style="font-size:0.8rem; margin:0;">Las líneas que mutan transforman el hexagrama.</p>
-            </div>
-            <div class="vstack" style="gap:14px;">
-              ${movingLines.map(l => `
-                <div class="card" style="padding:16px; border-left:4px solid var(--accent); gap:8px;">
-                  <div class="hstack" style="gap:10px; margin-bottom:6px;">
-                    <div class="seal" style="width:28px; height:28px; font-size:11px; flex-shrink:0;">${l.pos}</div>
-                    <div style="font-weight:600; font-size:0.95rem;">Línea ${l.pos} — ${l.value === 6 ? 'Seis (Yin Móvil)' : 'Nueve (Yang Móvil)'}</div>
-                  </div>
-                  <p class="serif" style="margin:0; opacity:0.88; font-size:0.9rem; line-height:1.75;">${escapeHtml(l.text_es || '—')}</p>
-                </div>
-              `).join("")}
-            </div>
-        </div>
-      `, "--left");
-}
-
-// --- Page 4: Transformación o Preguntas de Poder ---
-if (isMutating && r) {
-  book.addPage(`
-        <div class="vstack" style="gap:18px;">
-          <div>
-            <h3 class="serif" style="color:var(--accent); margin:0 0 4px; font-size:1.1rem;">Hexagrama de Transformación</h3>
-            <p class="muted serif" style="font-size:0.8rem; margin:0;">Hacia dónde apunta la mutación.</p>
-          </div>
-          <div class="card" style="display:flex; gap:20px; align-items:center; padding:20px;">
-              <div id="resultingHexSVG" style="flex-shrink:0; color:var(--accent);"></div>
-              <div class="vstack" style="gap:6px; flex:1;">
-                 <h4 style="margin:0; font-size:1.15rem;">${escapeHtml(hexTitle(r))}</h4>
-                 <p class="muted serif" style="margin:0; font-size:0.8rem;">${escapeHtml(r.name_en_standard || '')}</p>
-                 <p class="serif" style="margin:0; font-size:0.88rem; opacity:0.82; line-height:1.6;">${escapeHtml((r.dynamic_core_es || '').substring(0, 130))}…</p>
-              </div>
-          </div>
-          <div class="divider"></div>
-          <h4 class="serif" style="color:var(--accent); margin:0;">Preguntas de Reflexión</h4>
-          <ul class="serif" style="padding-left:20px; opacity:0.85; margin:0; display:flex; flex-direction:column; gap:10px; font-size:0.92rem; line-height:1.7;">
-              ${(p.guiding_questions_es || []).map(q => `<li>${escapeHtml(q)}</li>`).join("")}
-          </ul>
-        </div>
-      `, "--right");
-} else {
-  book.addPage(`
-        <div class="vstack" style="gap:18px;">
-          <div>
-            <h4 class="serif" style="color:var(--accent); margin:0 0 4px; font-size:1.1rem;">Preguntas de Reflexión</h4>
-            <p class="muted serif" style="font-size:0.8rem; margin:0;">Para profundizar en la consulta.</p>
-          </div>
-          <ul class="serif" style="padding-left:20px; opacity:0.85; margin:0; display:flex; flex-direction:column; gap:12px; font-size:0.95rem; line-height:1.75;">
-              ${(p.guiding_questions_es || []).map(q => `<li>${escapeHtml(q)}</li>`).join("")}
-          </ul>
-        </div>
-      `, "--right");
-}
-
-// --- Page 5: Sabiduría Profunda y Acciones ---
-book.addPage(`
-    <div class="vstack" style="gap:18px;">
-        <div>
-          <h3 class="serif" style="color:var(--accent); margin:0 0 4px; font-size:1.1rem;">Perspectiva Taoísta</h3>
-          <p class="muted serif" style="font-size:0.8rem; margin:0;">Wu wei y flujo natural.</p>
-        </div>
-        <p class="serif" style="opacity:0.9; margin:0; font-size:0.95rem; line-height:1.8;">${escapeHtml(p.taoist_reading_es || "—")}</p>
-
-        <div class="callout" style="margin-top:4px;">
-            <h4 class="serif" style="margin:0 0 8px; color:var(--accent); font-size:0.9rem; text-transform:uppercase; letter-spacing:0.06em;">Micro-Acción Ritual</h4>
-            <p class="serif" style="margin:0; font-size:0.92rem; line-height:1.7;">${escapeHtml(p.micro_action_es || "—")}</p>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="vstack" style="gap:10px;">
-            <button class="btn btn--primary" id="btnSave" style="width:100%; font-size:1rem;">Guardar en el Diario</button>
-            <div class="row" style="gap:10px; justify-content:center;">
-               <button class="btn btn--ghost" id="btnPDF" style="flex:1; font-size:0.85rem;">Exportar PDF</button>
-               <button class="btn btn--ghost" id="btnClose" style="flex:1; font-size:0.85rem;">Nueva Consulta</button>
-            </div>
-        </div>
-
-        ${p.ethics_note_es ? `
-        <p class="muted serif" style="font-size:0.72rem; opacity:0.5; text-align:center; margin:0; line-height:1.5;">${escapeHtml(p.ethics_note_es)}</p>
-        ` : ''}
-    </div>
-  `, book.pages.length % 2 === 0 ? "--left" : "--right");
-
-book.render();
-
-// Render visual components after book DOM is created
-const hexContainer = document.getElementById("primaryHexSVG");
-if (hexContainer && p.lines) {
-  new DynamicHexagram(p.lines).render(hexContainer);
-}
-
-const hanziContainer = document.getElementById("hanziAnimation");
-if (hanziContainer && p.hanzi) {
-  drawHanzi(hanziContainer, p.hanzi, 110);
-}
-
 // No book shell — views render directly into immersive-shell
 
 function HomeFormView() {
+  const qText = state.draft.question.text_es || "";
+  const placeholder = t("home.placeholder_question") || "¿Qué actitud conviene sostener ante esta situación?";
+
   return `
     <div class="immersive-screen screen-home">
       <div class="home-hero">
@@ -516,7 +374,7 @@ function HomeFormView() {
 
             <div class="vstack" style="gap:8px;">
               <label class="muted serif" style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.08em;">${t("home.label_question") || "Tu Pregunta"}</label>
-              <textarea id="qText" class="input-field" style="min-height:110px; resize:none;" placeholder="${t("home.placeholder_question") || "¿Qué actitud conviene sostener ante esta situación?"}">\${escapeHtml(state.draft.question.text_es || "")}</textarea>
+              <textarea id="qText" class="input-field" style="min-height:110px; resize:none;" placeholder="${placeholder}">${escapeHtml(qText)}</textarea>
             </div>
 
             <button class="btn btn--primary" id="btnBegin" style="width:100%; padding:18px; font-size:1.05rem; margin-top:4px;">
@@ -1208,7 +1066,12 @@ function onManualConfirm() {
   const sum = coins.reduce((s, f) => s + (f === 'heads' ? 3 : 2), 0);
 
   // Compute outcome exactly like tossLine() does
-  const outcomes = { '6': { value: 6, is_moving: true, type: 'old_yin' }, '7': { value: 7, is_moving: false, type: 'young_yang' }, '8': { value: 8, is_moving: false, type: 'young_yin' }, '9': { value: 9, is_moving: true, type: 'old_yang' } };
+  const outcomes = {
+    '6': { value: 6, is_moving: true, line_bit: 0, transforms_to_bit: 1, type: 'old_yin' },
+    '7': { value: 7, is_moving: false, line_bit: 1, transforms_to_bit: 1, type: 'young_yang' },
+    '8': { value: 8, is_moving: false, line_bit: 0, transforms_to_bit: 0, type: 'young_yin' },
+    '9': { value: 9, is_moving: true, line_bit: 1, transforms_to_bit: 0, type: 'old_yang' }
+  };
   const outcome = outcomes[String(sum)] || outcomes['7'];
 
   const line = {

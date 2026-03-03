@@ -9,9 +9,9 @@ export const FoxTheme = {
     },
     // Animation Durations in ms
     timing: {
-        breathTorso: 4800,
-        breathHead: 4800,
-        tailSway: 6200,
+        breathTorso: 5400, // Slower (was 4800)
+        breathHead: 5400,  // Slower
+        tailSway: 7200,    // Slower (was 6200)
         blinkBase: 200, // 180-260ms
         nodBase: 500, // 420-650ms
         lookBase: 400, // 300-500ms

@@ -53,14 +53,18 @@
       
       <!-- Ears -->
       <g id="fox-ear-left" style="transform-origin: -25px -30px;">
-        <!-- Base ear -->
+        <!-- Base ear with fur tufts -->
         <path d="M -15,-25 C -30,-50 -45,-60 -45,-30 C -45,-15 -35,-10 -25,0 Z" fill="hsl(14, 70%, 45%)" />
+        <path d="M -40,-48 L -45,-55 L -48,-45 Z" fill="hsl(14, 70%, 45%)" /> <!-- Ear tuft 1 -->
+        <path d="M -35,-52 L -38,-60 L -42,-53 Z" fill="hsl(14, 70%, 45%)" /> <!-- Ear tuft 2 -->
         <!-- Inner ear terracota suave -->
-        <path d="M -20,-22 C -30,-40 -38,-45 -38,-30 C -38,-20 -30,-15 -25,-5 Z" fill="hsl(15, 30%, 75%)" />
+        <path d="M -20,-22 C -30,-40 -38,-45 -38,-30 C -38,-20 -30,-15 -25,-5 Z" fill="hsl(15, 40%, 82%)" />
       </g>
       <g id="fox-ear-right" style="transform-origin: 25px -30px;">
         <path d="M 15,-25 C 30,-50 45,-60 45,-30 C 45,-15 35,-10 25,0 Z" fill="hsl(14, 70%, 45%)" />
-        <path d="M 20,-22 C 30,-40 38,-45 38,-30 C 38,-20 30,-15 25,-5 Z" fill="hsl(15, 30%, 75%)" />
+        <path d="M 40,-48 L 45,-55 L 48,-45 Z" fill="hsl(14, 70%, 45%)" /> <!-- Ear tuft 1 -->
+        <path d="M 35,-52 L 38,-60 L 42,-53 Z" fill="hsl(14, 70%, 45%)" /> <!-- Ear tuft 2 -->
+        <path d="M 20,-22 C 30,-40 38,-45 38,-30 C 38,-20 30,-15 25,-5 Z" fill="hsl(15, 40%, 82%)" />
       </g>
 
       <!-- Head Base -->
@@ -72,24 +76,38 @@
         <ellipse cx="0" cy="22" rx="4" ry="3" fill="hsl(240, 6%, 20%)" />
       </g>
 
+      <!-- Cheek Blush (Kawaii touch) -->
+      <g id="fox-cheeks" opacity="0.8">
+        <ellipse cx="-28" cy="12" rx="7" ry="3.5" fill="hsl(340, 95%, 85%)" />
+        <ellipse cx="28" cy="12" rx="7" ry="3.5" fill="hsl(340, 95%, 85%)" />
+        <!-- Cheek fur tufts -->
+        <path d="M -40,5 L -48,2 L -42,10 Z" fill="hsl(14, 75%, 48%)" opacity="0.8" />
+        <path d="M 40,5 L 48,2 L 42,10 Z" fill="hsl(14, 75%, 48%)" opacity="0.8" />
+      </g>
+
       <!-- Mouth Morphs (Neutral visible, others hidden by default) -->
       <g id="fox-mouth">
-        <path id="fox-mouth-neutral" d="M -6,28 Q 0,30 6,28" fill="none" stroke="hsl(240, 6%, 30%)" stroke-width="1.5" stroke-linecap="round" />
-        <path id="fox-mouth-soft" d="M -8,27 Q 0,32 8,27" fill="none" stroke="hsl(240, 6%, 30%)" stroke-width="1.5" stroke-linecap="round" visibility="hidden" />
+        <path id="fox-mouth-neutral" d="M -6,28 Q 0,30 6,28" fill="none" stroke="hsl(240, 6%, 30%)" stroke-width="1.2" stroke-linecap="round" />
+        <!-- Soft smile: subtle 'w' or 'omega' curve for cuteness -->
+        <path id="fox-mouth-soft" d="M -8,27 Q -4,31 0,28 Q 4,31 8,27" fill="none" stroke="hsl(240, 6%, 30%)" stroke-width="1.2" stroke-linecap="round" visibility="hidden" />
       </g>
 
       <!-- Eyes (Left) -->
       <g id="fox-eye-left">
         <path id="fox-eye-left-open" d="M -22,-2 Q -16,-8 -10,-2 Q -16,2 -22,-2 Z" fill="hsl(240, 6%, 20%)" />
+        <!-- Eye sparkle -->
+        <circle cx="-19" cy="-4" r="1.5" fill="white" opacity="0.8" />
         <path id="fox-eye-left-half" d="M -22,-2 Q -16,-4 -10,-2 Q -16,-1 -22,-2 Z" fill="hsl(240, 6%, 20%)" visibility="hidden" />
-        <path id="fox-eye-left-closed" d="M -22,-2 Q -16,-1 -10,-2" fill="none" stroke="hsl(240, 6%, 20%)" stroke-width="2" stroke-linecap="round" visibility="hidden" />
+        <path id="fox-eye-left-closed" d="M -22,-2 Q -16,0 -10,-2" fill="none" stroke="hsl(240, 6%, 20%)" stroke-width="2.5" stroke-linecap="round" visibility="hidden" />
       </g>
 
       <!-- Eyes (Right) -->
       <g id="fox-eye-right">
         <path id="fox-eye-right-open" d="M 10,-2 Q 16,-8 22,-2 Q 16,2 10,-2 Z" fill="hsl(240, 6%, 20%)" />
+        <!-- Eye sparkle -->
+        <circle cx="13" cy="-4" r="1.5" fill="white" opacity="0.8" />
         <path id="fox-eye-right-half" d="M 10,-2 Q 16,-4 22,-2 Q 16,-1 10,-2 Z" fill="hsl(240, 6%, 20%)" visibility="hidden" />
-        <path id="fox-eye-right-closed" d="M 10,-2 Q 16,-1 22,-2" fill="none" stroke="hsl(240, 6%, 20%)" stroke-width="2" stroke-linecap="round" visibility="hidden" />
+        <path id="fox-eye-right-closed" d="M 10,-2 Q 16,0 22,-2" fill="none" stroke="hsl(240, 6%, 20%)" stroke-width="2.5" stroke-linecap="round" visibility="hidden" />
       </g>
 
       <!-- Brows -->

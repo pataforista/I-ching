@@ -45,11 +45,6 @@
     href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Spectral:wght@400;600&family=Outfit:wght@400;600&display=swap"
     rel="stylesheet">
 
-  <!-- Preload critical assets -->
-  <link rel="preload" href="./assets/sage.png" as="image">
-  <link rel="preload" href="./assets/coin_yang.png" as="image">
-  <link rel="preload" href="./assets/coin_yin.png" as="image">
-
   <link rel="stylesheet" href="./styles.css" />
 
   <!-- Libraries -->
@@ -58,7 +53,9 @@
   <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 </head>
 
-<body>
+<body id="body">
+  <!-- Grained surface wrapper -->
+  <div id="paper-texture" style="position:fixed; inset:0; pointer-events:none; z-index:9999;"></div>
   <!-- SVG Filters for Zen Aesthetics -->
   <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true" focusable="false">
     <defs>

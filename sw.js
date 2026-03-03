@@ -1,5 +1,5 @@
-const CACHE_NAME = "iching-tao-shell-v0.1.1";
-const DATA_CACHE = "iching-tao-data-v0.1.1";
+const CACHE_NAME = "iching-tao-shell-v0.2.2";
+const DATA_CACHE = "iching-tao-data-v0.1.3";
 
 const SHELL = [
   "./",
@@ -9,12 +9,19 @@ const SHELL = [
   "./engine.js",
   "./ui-lib.js",
   "./manifest.webmanifest",
+  "./src/art-background.js",
   "https://unpkg.com/lenis@1.1.20/dist/lenis.min.js",
   "https://cdn.jsdelivr.net/gh/sarathsaleem/grained@master/grained.js",
   "https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js",
   "./assets/sage.png",
   "./assets/coin_yang.png",
-  "./assets/coin_yin.png"
+  "./assets/coin_yin.png",
+  // Sumi-e / ukiyo-e SVG fallbacks (offline-safe art backgrounds)
+  "./assets/fallback/sumi-mountains.svg",
+  "./assets/fallback/sumi-bamboo.svg",
+  "./assets/fallback/sumi-waves.svg",
+  "./assets/fallback/sumi-moon.svg",
+  "./assets/fallback/sumi-reeds.svg"
 ];
 
 self.addEventListener("install", (event) => {

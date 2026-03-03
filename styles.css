@@ -103,6 +103,65 @@ body {
     url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
 }
 
+/* --- Art Background Layer (ukiyo-e / sumi-e paintings) --- */
+#art-bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+}
+
+#art-bg-layer img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 2s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: opacity;
+}
+
+/* Paper/ink overlay — keeps text readable over the painting */
+#art-bg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  /* Light mode: warm ivory veil, 82% opacity */
+  background: hsla(42, 25%, 96%, 0.83);
+  transition: background 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+[data-theme="ink"] #art-bg-overlay {
+  /* Dark mode: deep ink veil, 80% opacity */
+  background: hsla(240, 8%, 10%, 0.80);
+}
+
+/* Attribution badge (bottom-right, barely visible) */
+#art-bg-attr {
+  position: fixed;
+  bottom: 8px;
+  right: 12px;
+  z-index: 9998;
+  font-size: 0.58rem;
+  opacity: 0.22;
+  font-family: var(--font-serif);
+  color: var(--text);
+  pointer-events: none;
+  letter-spacing: 0.04em;
+  max-width: 380px;
+  text-align: right;
+  line-height: 1.4;
+  transition: opacity 0.4s ease;
+}
+
+#art-bg-attr:hover {
+  opacity: 0.6;
+  pointer-events: auto;
+}
+
 .app-container {
   min-height: 100vh;
   display: flex;
@@ -608,9 +667,9 @@ select.input-field {
 /* HOME: atmospheric oracle screen */
 .screen-home {
   background:
-    radial-gradient(ellipse at 30% 20%, hsla(215, 30%, 35%, 0.12) 0%, transparent 55%),
-    radial-gradient(ellipse at 75% 80%, hsla(156, 30%, 42%, 0.08) 0%, transparent 50%),
-    var(--bg);
+    radial-gradient(ellipse at 30% 20%, hsla(215, 30%, 35%, 0.07) 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 80%, hsla(156, 30%, 42%, 0.05) 0%, transparent 50%),
+    transparent;
 }
 
 .home-hero {
@@ -664,8 +723,8 @@ select.input-field {
 /* TOSS: ritual center-stage screen */
 .screen-toss {
   background:
-    radial-gradient(ellipse at 50% 40%, hsla(215, 30%, 35%, 0.08) 0%, transparent 60%),
-    var(--bg);
+    radial-gradient(ellipse at 50% 40%, hsla(215, 30%, 35%, 0.05) 0%, transparent 60%),
+    transparent;
   justify-content: flex-start;
   padding-top: clamp(40px, 8vh, 80px);
 }

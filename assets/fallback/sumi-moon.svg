@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="night-sky" cx="50%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="hsl(220,22%,88%)"/>
+      <stop offset="100%" stop-color="hsl(38,18%,82%)"/>
+    </radialGradient>
+    <radialGradient id="moon-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="hsl(42,35%,98%)" stop-opacity="1"/>
+      <stop offset="60%" stop-color="hsl(42,28%,95%)" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="hsl(42,20%,90%)" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="moon-blur">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <filter id="reflection-blur">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+    <filter id="mist-blur">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+
+  <!-- Paper background -->
+  <rect width="1200" height="800" fill="url(#night-sky)"/>
+
+  <!-- Moon halo (soft wash behind moon) -->
+  <circle cx="320" cy="220" r="160" fill="url(#moon-glow)" filter="url(#moon-blur)"/>
+
+  <!-- Moon disc — ink wash technique (circular with soft edge) -->
+  <circle cx="320" cy="220" r="70" fill="hsl(42,30%,97%)" opacity="0.9"/>
+  <circle cx="320" cy="220" r="74" fill="none" stroke="hsl(220,14%,55%)" stroke-width="1.5" opacity="0.4"/>
+  <!-- Subtle surface wash on moon -->
+  <ellipse cx="305" cy="208" rx="28" ry="22" fill="hsl(220,12%,88%)" opacity="0.3" filter="url(#reflection-blur)"/>
+
+  <!-- Distant shore / mountain silhouette -->
+  <path d="M0,480 Q200,440 400,460 Q600,440 800,455 Q1000,440 1200,460 L1200,800 L0,800 Z"
+        fill="hsl(220,12%,60%)" opacity="0.3" filter="url(#mist-blur)"/>
+
+  <!-- Water surface -->
+  <rect x="0" y="510" width="1200" height="290" fill="hsl(215,18%,72%)" opacity="0.18"/>
+
+  <!-- Moon reflection on water -->
+  <ellipse cx="320" cy="650" rx="45" ry="130" fill="hsl(42,28%,94%)" opacity="0.35" filter="url(#reflection-blur)"/>
+  <!-- Ripple distortion of reflection -->
+  <path d="M285,560 Q320,555 355,560" fill="none" stroke="hsl(42,28%,90%)" stroke-width="2" opacity="0.5"/>
+  <path d="M278,580 Q320,572 362,580" fill="none" stroke="hsl(42,28%,90%)" stroke-width="2" opacity="0.45"/>
+  <path d="M272,600 Q320,590 368,600" fill="none" stroke="hsl(42,28%,90%)" stroke-width="2" opacity="0.40"/>
+  <path d="M265,620 Q320,608 375,620" fill="none" stroke="hsl(42,28%,90%)" stroke-width="2" opacity="0.35"/>
+  <path d="M260,640 Q320,625 380,640" fill="none" stroke="hsl(42,28%,90%)" stroke-width="1.5" opacity="0.30"/>
+  <path d="M258,660 Q320,644 382,660" fill="none" stroke="hsl(42,28%,90%)" stroke-width="1.5" opacity="0.22"/>
+
+  <!-- Water ripple lines (ink strokes) -->
+  <g opacity="0.22">
+    <path d="M0,540 Q150,530 300,540 Q450,550 600,540 Q750,530 900,540 Q1050,550 1200,540"
+          fill="none" stroke="hsl(220,16%,38%)" stroke-width="2"/>
+    <path d="M0,570 Q200,558 400,570 Q600,582 800,570 Q1000,558 1200,570"
+          fill="none" stroke="hsl(220,16%,38%)" stroke-width="1.8"/>
+    <path d="M0,600 Q180,590 360,600 Q540,610 720,600 Q900,590 1080,600 Q1140,604 1200,600"
+          fill="none" stroke="hsl(220,16%,38%)" stroke-width="1.5"/>
+  </g>
+
+  <!-- Foreground shoreline dark mass -->
+  <path d="M0,720 Q300,700 600,712 Q900,700 1200,715 L1200,800 L0,800 Z"
+        fill="hsl(222,18%,22%)" opacity="0.7"/>
+
+  <!-- A few ink birds in the sky (simple V shapes) -->
+  <g fill="none" stroke="hsl(222,18%,22%)" stroke-width="1.8" stroke-linecap="round" opacity="0.45">
+    <path d="M600,150 Q612,142 624,150"/>
+    <path d="M640,140 Q652,132 664,140"/>
+    <path d="M580,165 Q593,157 606,165"/>
+    <path d="M720,130 Q732,122 744,130"/>
+    <path d="M760,125 Q772,117 784,125"/>
+  </g>
+</svg>

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <filter id="blur-mist">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <filter id="blur-soft">
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+    <radialGradient id="sky-grad" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="hsl(210,18%,92%)"/>
+      <stop offset="100%" stop-color="hsl(38,20%,88%)"/>
+    </radialGradient>
+    <linearGradient id="ink-fade" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="hsl(220,12%,22%)" stop-opacity="0"/>
+      <stop offset="100%" stop-color="hsl(220,12%,22%)" stop-opacity="0.65"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="1200" height="800" fill="url(#sky-grad)"/>
+
+  <!-- Distant mist / horizon band -->
+  <ellipse cx="600" cy="500" rx="700" ry="120" fill="hsl(210,15%,96%)" filter="url(#blur-mist)" opacity="0.7"/>
+
+  <!-- Far mountain range (lightest, most mist) -->
+  <path d="M0,560 Q120,430 220,480 Q330,400 440,450 Q530,390 620,440 Q720,370 820,420 Q920,360 1020,400 Q1100,380 1200,420 L1200,800 L0,800 Z"
+        fill="hsl(220,10%,70%)" filter="url(#blur-mist)" opacity="0.5"/>
+
+  <!-- Mid mountain range -->
+  <path d="M0,620 Q80,530 160,570 Q260,490 370,540 Q460,480 560,520 Q650,465 740,505 Q850,450 960,490 Q1060,460 1200,490 L1200,800 L0,800 Z"
+        fill="hsl(220,10%,55%)" filter="url(#blur-soft)" opacity="0.6"/>
+
+  <!-- Near mountain range (darkest ink) -->
+  <path d="M-20,680 Q60,600 140,640 Q220,575 320,615 Q420,560 500,595 Q590,545 680,580 Q780,535 880,570 Q970,540 1070,570 Q1140,555 1220,570 L1220,800 L-20,800 Z"
+        fill="hsl(225,12%,30%)" opacity="0.75"/>
+
+  <!-- Foreground dark ink wash silhouette -->
+  <path d="M0,730 Q200,700 400,720 Q600,700 800,715 Q1000,700 1200,718 L1200,800 L0,800 Z"
+        fill="hsl(225,15%,18%)"/>
+
+  <!-- Ground mist at base -->
+  <ellipse cx="600" cy="760" rx="800" ry="80" fill="hsl(210,15%,96%)" filter="url(#blur-mist)" opacity="0.45"/>
+
+  <!-- Ink wash gradient overlay -->
+  <rect width="1200" height="800" fill="url(#ink-fade)"/>
+</svg>
