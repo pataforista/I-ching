@@ -9,6 +9,16 @@
       <stop offset="0%" stop-color="hsl(14, 75%, 48%)" />
       <stop offset="100%" stop-color="hsl(14, 65%, 35%)" />
     </linearGradient>
+    <radialGradient id="fox-head-grad" cx="40%" cy="28%" r="70%">
+      <stop offset="0%" stop-color="hsl(15, 78%, 56%)" />
+      <stop offset="62%" stop-color="hsl(14, 74%, 47%)" />
+      <stop offset="100%" stop-color="hsl(14, 66%, 36%)" />
+    </radialGradient>
+    <linearGradient id="fox-cheek-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="hsl(340, 95%, 86%)" stop-opacity="0.15"/>
+      <stop offset="50%" stop-color="hsl(340, 95%, 84%)" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="hsl(340, 95%, 86%)" stop-opacity="0.15"/>
+    </linearGradient>
     <filter id="soft-shadow">
       <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="hsl(240, 6%, 12%)" flood-opacity="0.06"/>
     </filter>
@@ -68,7 +78,7 @@
       </g>
 
       <!-- Head Base -->
-      <path d="M -40,-10 C -50,20 0,40 40,-10 C 60,-40 20,-60 0,-60 C -20,-60 -60,-40 -40,-10 Z" fill="hsl(14, 75%, 48%)" filter="url(#soft-shadow)"/>
+      <path d="M -40,-10 C -50,20 0,40 40,-10 C 60,-40 20,-60 0,-60 C -20,-60 -60,-40 -40,-10 Z" fill="url(#fox-head-grad)" filter="url(#soft-shadow)"/>
 
       <!-- Muzzle -->
       <g id="fox-muzzle">
@@ -76,10 +86,15 @@
         <ellipse cx="0" cy="22" rx="4" ry="3" fill="hsl(240, 6%, 20%)" />
       </g>
 
+      <g id="fox-whiskers" opacity="0.45">
+        <path d="M -16,19 Q -28,18 -36,14" fill="none" stroke="hsl(240, 6%, 32%)" stroke-width="1" stroke-linecap="round"/>
+        <path d="M 16,19 Q 28,18 36,14" fill="none" stroke="hsl(240, 6%, 32%)" stroke-width="1" stroke-linecap="round"/>
+      </g>
+
       <!-- Cheek Blush (Kawaii touch) -->
-      <g id="fox-cheeks" opacity="0.8">
-        <ellipse cx="-28" cy="12" rx="7" ry="3.5" fill="hsl(340, 95%, 85%)" />
-        <ellipse cx="28" cy="12" rx="7" ry="3.5" fill="hsl(340, 95%, 85%)" />
+      <g id="fox-cheeks" opacity="0.9">
+        <ellipse cx="-28" cy="12" rx="8" ry="3.8" fill="url(#fox-cheek-grad)" />
+        <ellipse cx="28" cy="12" rx="8" ry="3.8" fill="url(#fox-cheek-grad)" />
         <!-- Cheek fur tufts -->
         <path d="M -40,5 L -48,2 L -42,10 Z" fill="hsl(14, 75%, 48%)" opacity="0.8" />
         <path d="M 40,5 L 48,2 L 42,10 Z" fill="hsl(14, 75%, 48%)" opacity="0.8" />

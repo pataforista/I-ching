@@ -73,7 +73,7 @@ var state = {
   // Init Smooth Scroll (Lenis)
   if (window.Lenis) {
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 0.95,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
@@ -93,11 +93,11 @@ var state = {
   // Init Grain (Paper Texture) - Very subtle for Matte feel
   if (window.grained) {
     grained("#paper-texture", {
-      animate: true,
+      animate: false,
       patternWidth: 100,
       patternHeight: 100,
-      grainOpacity: 0.02, /* Reduced from 0.04 */
-      grainDensity: 1.0,
+      grainOpacity: 0.015, /* Reduced from 0.04 */
+      grainDensity: 0.85,
       grainWidth: 1.0,
       grainHeight: 1.0,
       grainChaos: 0.2,
@@ -106,11 +106,15 @@ var state = {
   }
 
   // Init Ink Galaxy Background - Reduced distraction for Warm Minimalism
-  galaxy = new InkGalaxy({ count: 40 }); /* Reduced from 160 */
+  galaxy = new InkGalaxy({ count: 24 }); /* Reduced from 160 for faster boot */
 
   // Init Art Background (ukiyo-e / sumi-e paintings)
   artBg = new ArtBackground();
-  artBg.init();
+  if (window.requestIdleCallback) {
+    requestIdleCallback(() => artBg.init(), { timeout: 1200 });
+  } else {
+    setTimeout(() => artBg.init(), 200);
+  }
 
   try {
     await initEngine();
@@ -416,7 +420,7 @@ function TossView() {
     <div class="immersive-screen screen-toss">
       <div class="toss-ritual">
 
-        <div id="tossAvatarTarget" style="width: clamp(110px, 15vw, 160px); height: clamp(110px, 15vw, 160px); position: relative;"></div>
+        <div id="tossAvatarTarget" style="width: clamp(96px, 28vw, 156px); height: clamp(96px, 28vw, 156px); position: relative;"></div>
 
         <!-- Mode toggle -->
         ${!isComplete ? `
@@ -947,7 +951,7 @@ function renderStageCoins() {
     </svg>`;
 
   return [1, 2, 3].map(() => `
-    <div class="coin-3d">
+    <div class="coin-3d" style="--spin-y:0deg;">
       <div class="coin-face coin-front">
         ${yangFaceSVG}
       </div>
@@ -1004,7 +1008,11 @@ function onTossNextLine() {
 
   setTimeout(() => {
     const coinEls = document.querySelectorAll(".coin-3d");
-    coinEls.forEach(el => el.classList.add("tossing"));
+    coinEls.forEach((el, idx) => {
+      const extraTurns = 1080 + (idx * 180) + Math.round(Math.random() * 540);
+      el.style.setProperty("--spin-y", `${extraTurns}deg`);
+      el.classList.add("tossing");
+    });
 
     setTimeout(() => {
       coinEls.forEach(el => el.classList.remove("tossing"));
@@ -1026,9 +1034,9 @@ function onTossNextLine() {
           const btn = document.getElementById("btnToss");
           if (btn) btn.textContent = t("toss.btn_finish") || "Ver Lectura";
         }
-      }, 600);
+      }, 450);
 
-    }, 1250);
+    }, 1050);
   }, 50);
 }
 
