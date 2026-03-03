@@ -1,5 +1,5 @@
-const CACHE_NAME = "iching-tao-shell-v0.2.2";
-const DATA_CACHE = "iching-tao-data-v0.1.3";
+const CACHE_NAME = "iching-tao-shell-v0.6.0";
+const DATA_CACHE = "iching-tao-data-v0.5.0";
 
 const SHELL = [
   "./",

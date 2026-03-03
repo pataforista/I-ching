@@ -201,7 +201,7 @@ export function t(key, params = {}) {
   for (const p of parts) {
     val = val?.[p];
   }
-  if (!val) return key;
+  if (!val) return null;
 
   return val.replace(/{{(\w+)}}/g, (_, k) => params[k] !== undefined ? params[k] : `{{${k}}}`);
 }

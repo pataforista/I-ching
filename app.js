@@ -133,11 +133,40 @@ var state = {
 })();
 
 function initBubbleMenu() {
+  const hasSub = localStorage.getItem("iching_notifications") === "true";
   bubbleMenu = new BubbleMenu({
     items: [
       { id: "home", icon: "⊕", label: t("menu.home") || "Nueva consulta", onClick: () => startNew() },
       { id: "history", icon: "◉", label: t("menu.history") || "Historial", onClick: () => openHistory() },
       { id: "theme", icon: "◐", label: t("menu.theme") || "Tema", onClick: () => onToggleTheme() },
+      {
+        id: "notify", icon: hasSub ? "🔔" : "🔕", label: "Recordatorio Diario", onClick: async () => {
+          if (!("Notification" in window)) {
+            openModal("Notificaciones", "<p class='serif'>Tu navegador no soporta notificaciones.</p>");
+            return;
+          }
+          if (Notification.permission === "granted") {
+            const current = localStorage.getItem("iching_notifications") === "true";
+            localStorage.setItem("iching_notifications", current ? "false" : "true");
+            openModal("Recordatorios", `<p class='serif'>Recordatorios ${current ? 'desactivados' : 'activados'}.</p>`);
+            // Re-render menu icon
+            if (bubbleMenu && bubbleMenu.items) {
+              bubbleMenu.items[3].icon = !current ? "🔔" : "🔕";
+              bubbleMenu.render();
+            }
+          } else if (Notification.permission !== "denied") {
+            const perm = await Notification.requestPermission();
+            if (perm === "granted") {
+              localStorage.setItem("iching_notifications", "true");
+              new Notification("I Ching — Sabiduría Taoísta", { body: "El oráculo te recordará tu momento de reflexión." });
+              if (bubbleMenu && bubbleMenu.items) {
+                bubbleMenu.items[3].icon = "🔔";
+                bubbleMenu.render();
+              }
+            }
+          }
+        }
+      },
     ]
   });
 }
@@ -171,6 +200,56 @@ function onToggleTheme() {
 function applyTheme(name) {
   document.documentElement.setAttribute("data-theme", name);
   localStorage.setItem(LS_THEME, name);
+}
+
+// ---------- Micro-Interactions ----------
+/**
+ * Attaches a CSS ripple to every .btn element in the document.
+ * Each click spawns a temporary ripple span that animates out then removes itself.
+ */
+function attachRipple() {
+  document.querySelectorAll('.btn').forEach(btn => {
+    if (btn.dataset.ripple) return; // already attached
+    btn.dataset.ripple = '1';
+    btn.style.position = btn.style.position || 'relative';
+    btn.style.overflow = 'hidden';
+    btn.addEventListener('click', e => {
+      const rect = btn.getBoundingClientRect();
+      const r = document.createElement('span');
+      r.style.cssText = `
+        position:absolute;
+        border-radius:50%;
+        width:4px;height:4px;
+        background:hsla(0,0%,100%,0.35);
+        left:${e.clientX - rect.left}px;
+        top:${e.clientY - rect.top}px;
+        transform:translate(-50%,-50%) scale(0);
+        pointer-events:none;
+        animation: ripple-spread 0.55s cubic-bezier(0,0.5,0.5,1) forwards;
+      `;
+      btn.appendChild(r);
+      r.addEventListener('animationend', () => r.remove());
+    });
+  });
+}
+
+/**
+ * Stagger-animates cards within a container by setting --stagger-i custom property.
+ */
+function staggerCards(selector = '.history-card', baseDelay = 0.05) {
+  document.querySelectorAll(selector).forEach((el, i) => {
+    el.style.setProperty('--stagger-i', i);
+    el.style.animationDelay = `${(i * baseDelay).toFixed(2)}s`;
+    el.style.opacity = el.style.opacity || '0';
+    requestAnimationFrame(() => {
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1)';
+      el.style.transform = 'translateY(16px)';
+      requestAnimationFrame(() => {
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      });
+    });
+  });
 }
 
 // ---------- SW ----------
@@ -276,6 +355,12 @@ function render() {
   bindPageEvents(root);
   initPageEffects();
   renderDynamicVisuals();
+
+  // Premium micro-interactions
+  requestAnimationFrame(() => {
+    attachRipple();
+    if (state.nav === 'history') staggerCards('.history-card', 0.06);
+  });
 }
 
 function renderDynamicVisuals() {
@@ -700,6 +785,7 @@ function ReadingView() {
             <div class="reading-divider"></div>
             <div class="row" style="gap:10px; justify-content:center; flex-wrap:wrap;">
               <button class="btn btn--primary" id="btnSave2" style="padding:14px 32px;">Guardar en el Diario</button>
+              <button class="btn btn--ghost" id="btnShare" style="font-size:0.88rem;">Compartir</button>
               <button class="btn btn--ghost" id="btnPDF" style="font-size:0.88rem;">Exportar PDF</button>
               <button class="btn btn--ghost" id="btnClose2" style="font-size:0.88rem;">Nueva Consulta</button>
             </div>
@@ -950,13 +1036,15 @@ function renderStageCoins() {
       <circle cx="100" cy="100" r="96" fill="url(#rimShadow-yin)"/>
     </svg>`;
 
-  return [1, 2, 3].map(() => `
-    <div class="coin-3d" style="--spin-y:0deg;">
-      <div class="coin-face coin-front">
-        ${yangFaceSVG}
-      </div>
-      <div class="coin-face coin-back">
-        ${yinFaceSVG}
+  return [1, 2, 3].map((_, i) => `
+    <div class="coin-3d" style="--toss-dur:${880 + i * 60}ms;">
+      <div class="coin-spin-inner" style="position:relative; width:100%; height:100%; transform-style:preserve-3d;">
+        <div class="coin-face coin-front">
+          ${yangFaceSVG}
+        </div>
+        <div class="coin-face coin-back">
+          ${yinFaceSVG}
+        </div>
       </div>
     </div>
   `).join('');
@@ -1006,27 +1094,37 @@ function onTossNextLine() {
   const ensoEl = document.getElementById("ensoTarget");
   if (ensoEl) new EnsoLoader(ensoEl).show(2000);
 
+  // Small delay so the DOM is painted before we animate
   setTimeout(() => {
     const coinEls = document.querySelectorAll(".coin-3d");
-    coinEls.forEach((el, idx) => {
-      const extraTurns = 1080 + (idx * 180) + Math.round(Math.random() * 540);
-      el.style.setProperty("--spin-y", `${extraTurns}deg`);
-      el.classList.add("tossing");
+    const spinEls = document.querySelectorAll(".coin-spin-inner");
+    const totalTurns = [1440, 1620, 1800]; // multiples of 360 so always ends face-up
+
+    coinEls.forEach((el, i) => {
+      el.style.setProperty("--full-spin", `${totalTurns[i] + Math.round(Math.random() * 360)}deg`);
     });
 
-    setTimeout(() => {
-      coinEls.forEach(el => el.classList.remove("tossing"));
+    // Trigger animation (CSS handles timing via --toss-dur)
+    coinEls.forEach(el => el.classList.add("tossing"));
 
+    const dur = 880 + 2 * 60 + 80; // max coin dur + small buffer
+    setTimeout(() => {
+      // Compute the result
       const line = tossLine();
       state.draft.tosses.push(line);
 
-      // Show coin result orientation
-      coinEls.forEach((el, idx) => {
-        const isHeads = line.coins[idx] === 'heads';
-        el.style.transform = isHeads ? `rotateY(0deg)` : `rotateY(180deg)`;
+      // Remove animation class, then set final orientation via transition
+      coinEls.forEach((el, i) => {
+        el.classList.remove("tossing");
+        const spinEl = el.querySelector(".coin-spin-inner");
+        if (!spinEl) return;
+        const isHeads = line.coins[i] === 'heads';
+        // The inner was spinning; reset it to show correct face
+        spinEl.style.transition = 'transform 0.35s cubic-bezier(0.16,1,0.3,1)';
+        spinEl.style.transform = isHeads ? 'rotateY(0deg)' : 'rotateY(180deg)';
       });
 
-      // Brief pause to show result, then re-render
+      // Brief pause so user sees the result, then advance
       setTimeout(() => {
         state._tossing = false;
         render();
@@ -1158,6 +1256,35 @@ function bindPageEvents(root) {
   root.querySelector("#btnPDF")?.addEventListener("click", exportPDF);
   root.querySelector("#btnClose")?.addEventListener("click", startNew);
   root.querySelector("#btnClose2")?.addEventListener("click", startNew);
+
+  root.querySelector("#btnShare")?.addEventListener("click", () => {
+    if (navigator.share && state.session && state.session.hexagrams.primary) {
+      const p = state.session.hexagrams.primary;
+      const title = `I Ching: ${p.hanzi} ${p.name_es || p.slug}`;
+      const text = `He consultado el oráculo del I Ching. Mi lectura es el hexagrama ${p.id}: ${title}.\n\n"${p.dynamic_core_es}"`;
+      navigator.share({
+        title: title,
+        text: text,
+        url: window.location.href
+      }).catch(console.error);
+    } else {
+      openModal("Compartir", "<p class='serif'>Tu dispositivo no soporta la función de compartir nativa.</p>");
+    }
+  });
+
+  // Premium Animations: Staggered reveal
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
+
+    root.querySelectorAll('.reveal-section').forEach(el => observer.observe(el));
+  }
 
 
   // History
