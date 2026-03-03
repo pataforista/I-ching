@@ -1,7 +1,7 @@
 {
-  "version": "0.1.2",
+  "version": "0.1.3",
   "ordering": "king_wen",
-  "notes_es": "Metadatos de navegación en secuencia King Wen. symbol_unicode usa el bloque Unicode Yijing Hexagram Symbols (䷀–䷿). Se agrega pinyin estándar y nombre inglés de referencia para cada hexagrama.",
+  "notes_es": "Metadatos de navegación en secuencia King Wen. symbol_unicode usa el bloque Unicode Yijing Hexagram Symbols (䷀–䷿). Se agrega pinyin estándar, nombre español (Wilhelm) y nombre inglés de referencia para cada hexagrama.",
   "hexagrams": [
     {
       "id": 1,
@@ -12,6 +12,7 @@
       "upper_trigram": "qian",
       "lower_trigram": "qian",
       "pinyin": "qián",
+      "name_es": "El Creativo",
       "name_en_standard": "The Creative"
     },
     {
@@ -23,6 +24,7 @@
       "upper_trigram": "kun",
       "lower_trigram": "kun",
       "pinyin": "kūn",
+      "name_es": "Lo Receptivo",
       "name_en_standard": "The Receptive"
     },
     {
@@ -34,6 +36,7 @@
       "upper_trigram": "kan",
       "lower_trigram": "zhen",
       "pinyin": "zhūn",
+      "name_es": "La Dificultad Inicial",
       "name_en_standard": "Difficulty at the Beginning"
     },
     {
@@ -45,6 +48,7 @@
       "upper_trigram": "gen",
       "lower_trigram": "kan",
       "pinyin": "méng",
+      "name_es": "La Necedad Juvenil",
       "name_en_standard": "Youthful Folly"
     },
     {
@@ -56,6 +60,7 @@
       "upper_trigram": "kan",
       "lower_trigram": "qian",
       "pinyin": "xū",
+      "name_es": "La Espera",
       "name_en_standard": "Waiting"
     },
     {
@@ -67,6 +72,7 @@
       "upper_trigram": "qian",
       "lower_trigram": "kan",
       "pinyin": "sòng",
+      "name_es": "El Conflicto",
       "name_en_standard": "Conflict"
     },
     {
@@ -78,6 +84,7 @@
       "upper_trigram": "kun",
       "lower_trigram": "kan",
       "pinyin": "shī",
+      "name_es": "El Ejército",
       "name_en_standard": "The Army"
     },
     {
@@ -89,6 +96,7 @@
       "upper_trigram": "kan",
       "lower_trigram": "kun",
       "pinyin": "bǐ",
+      "name_es": "La Solidaridad",
       "name_en_standard": "Holding Together"
     },
     {
@@ -100,6 +108,7 @@
       "upper_trigram": "xun",
       "lower_trigram": "qian",
       "pinyin": "xiǎo chù",
+      "name_es": "El Poder de lo Pequeño",
       "name_en_standard": "Small Taming"
     },
     {
@@ -111,6 +120,7 @@
       "upper_trigram": "qian",
       "lower_trigram": "dui",
       "pinyin": "lǚ",
+      "name_es": "El Porte",
       "name_en_standard": "Treading"
     },
     {
@@ -122,6 +132,7 @@
       "upper_trigram": "kun",
       "lower_trigram": "qian",
       "pinyin": "tài",
+      "name_es": "La Paz",
       "name_en_standard": "Peace"
     },
     {
@@ -133,6 +144,7 @@
       "upper_trigram": "qian",
       "lower_trigram": "kun",
       "pinyin": "pǐ",
+      "name_es": "El Estancamiento",
       "name_en_standard": "Standstill"
     },
     {
@@ -144,6 +156,7 @@
       "upper_trigram": "qian",
       "lower_trigram": "li",
       "pinyin": "tóng rén",
+      "name_es": "Comunidad con los Hombres",
       "name_en_standard": "Fellowship"
     },
     {
@@ -155,17 +168,19 @@
       "upper_trigram": "li",
       "lower_trigram": "qian",
       "pinyin": "dà yǒu",
+      "name_es": "La Posesión de lo Grande",
       "name_en_standard": "Great Possession"
     },
     {
       "id": 15,
-      "slug": "qian",
+      "slug": "modestia",
       "hanzi": "謙",
       "symbol_unicode": "䷎",
       "pair": 16,
       "upper_trigram": "kun",
       "lower_trigram": "gen",
       "pinyin": "qiān",
+      "name_es": "La Modestia",
       "name_en_standard": "Modesty"
     },
     {
@@ -177,6 +192,7 @@
       "upper_trigram": "zhen",
       "lower_trigram": "kun",
       "pinyin": "yù",
+      "name_es": "El Entusiasmo",
       "name_en_standard": "Enthusiasm"
     },
     {
@@ -188,6 +204,7 @@
       "upper_trigram": "dui",
       "lower_trigram": "zhen",
       "pinyin": "suí",
+      "name_es": "El Seguimiento",
       "name_en_standard": "Following"
     },
     {
@@ -199,6 +216,7 @@
       "upper_trigram": "gen",
       "lower_trigram": "xun",
       "pinyin": "gǔ",
+      "name_es": "El Trabajo en lo Corrompido",
       "name_en_standard": "Work on What Has Been Spoiled"
     },
     {
@@ -210,6 +228,7 @@
       "upper_trigram": "kun",
       "lower_trigram": "dui",
       "pinyin": "lín",
+      "name_es": "El Acercamiento",
       "name_en_standard": "Approach"
     },
     {
@@ -221,6 +240,7 @@
       "upper_trigram": "xun",
       "lower_trigram": "kun",
       "pinyin": "guān",
+      "name_es": "La Contemplación",
       "name_en_standard": "Contemplation"
     },
     {
@@ -232,17 +252,19 @@
       "upper_trigram": "li",
       "lower_trigram": "zhen",
       "pinyin": "shì kè",
+      "name_es": "La Mordedura que Une",
       "name_en_standard": "Biting Through"
     },
     {
       "id": 22,
-      "slug": "bi",
+      "slug": "bi-grace",
       "hanzi": "賁",
       "symbol_unicode": "䷕",
       "pair": 21,
       "upper_trigram": "gen",
       "lower_trigram": "li",
       "pinyin": "bì",
+      "name_es": "La Gracia",
       "name_en_standard": "Grace"
     },
     {
@@ -254,6 +276,7 @@
       "upper_trigram": "gen",
       "lower_trigram": "kun",
       "pinyin": "bō",
+      "name_es": "La Disgregación",
       "name_en_standard": "Splitting Apart"
     },
     {
@@ -265,6 +288,7 @@
       "upper_trigram": "kun",
       "lower_trigram": "zhen",
       "pinyin": "fù",
+      "name_es": "El Retorno",
       "name_en_standard": "Return"
     },
     {
@@ -276,6 +300,7 @@
       "upper_trigram": "qian",
       "lower_trigram": "zhen",
       "pinyin": "wú wàng",
+      "name_es": "La Inocencia",
       "name_en_standard": "Innocence"
     },
     {
@@ -287,17 +312,19 @@
       "upper_trigram": "gen",
       "lower_trigram": "qian",
       "pinyin": "dà chù",
+      "name_es": "El Gran Poder Doméstico",
       "name_en_standard": "Great Taming"
     },
     {
       "id": 27,
-      "slug": "yi",
+      "slug": "yi-nour",
       "hanzi": "頤",
       "symbol_unicode": "䷚",
       "pair": 28,
       "upper_trigram": "gen",
       "lower_trigram": "zhen",
       "pinyin": "yí",
+      "name_es": "El Alimento",
       "name_en_standard": "Nourishment"
     },
     {
@@ -309,6 +336,7 @@
       "upper_trigram": "dui",
       "lower_trigram": "xun",
       "pinyin": "dà guò",
+      "name_es": "La Preponderancia de lo Grande",
       "name_en_standard": "Great Exceeding"
     },
     {
@@ -320,6 +348,7 @@
       "upper_trigram": "kan",
       "lower_trigram": "kan",
       "pinyin": "kǎn",
+      "name_es": "Lo Abismal",
       "name_en_standard": "The Abysmal"
     },
     {
@@ -331,6 +360,7 @@
       "upper_trigram": "li",
       "lower_trigram": "li",
       "pinyin": "lí",
+      "name_es": "Lo que se Adhiere",
       "name_en_standard": "The Clinging"
     },
     {
@@ -342,6 +372,7 @@
       "upper_trigram": "dui",
       "lower_trigram": "gen",
       "pinyin": "xián",
+      "name_es": "El Influjo",
       "name_en_standard": "Influence"
     },
     {
@@ -353,6 +384,7 @@
       "upper_trigram": "zhen",
       "lower_trigram": "xun",
       "pinyin": "héng",
+      "name_es": "La Duración",
       "name_en_standard": "Duration"
     },
     {
@@ -364,6 +396,7 @@
       "upper_trigram": "qian",
       "lower_trigram": "gen",
       "pinyin": "dùn",
+      "name_es": "La Retirada",
       "name_en_standard": "Retreat"
     },
     {
@@ -375,6 +408,7 @@
       "upper_trigram": "zhen",
       "lower_trigram": "qian",
       "pinyin": "dà zhuàng",
+      "name_es": "El Gran Poder",
       "name_en_standard": "Great Power"
     },
     {
@@ -386,6 +420,7 @@
       "upper_trigram": "li",
       "lower_trigram": "kun",
       "pinyin": "jìn",
+      "name_es": "El Progreso",
       "name_en_standard": "Progress"
     },
     {
@@ -397,6 +432,7 @@
       "upper_trigram": "kun",
       "lower_trigram": "li",
       "pinyin": "míng yí",
+      "name_es": "El Oscurecimiento de la Luz",
       "name_en_standard": "Darkening of the Light"
     },
     {
@@ -408,6 +444,7 @@
       "upper_trigram": "xun",
       "lower_trigram": "li",
       "pinyin": "jiā rén",
+      "name_es": "La Familia",
       "name_en_standard": "The Family"
     },
     {
@@ -419,6 +456,7 @@
       "upper_trigram": "li",
       "lower_trigram": "dui",
       "pinyin": "kuí",
+      "name_es": "La Oposición",
       "name_en_standard": "Opposition"
     },
     {
@@ -430,17 +468,19 @@
       "upper_trigram": "kan",
       "lower_trigram": "gen",
       "pinyin": "jiǎn",
+      "name_es": "El Impedimento",
       "name_en_standard": "Obstruction"
     },
     {
       "id": 40,
-      "slug": "jie",
+      "slug": "jie-lib",
       "hanzi": "解",
       "symbol_unicode": "䷧",
       "pair": 39,
       "upper_trigram": "zhen",
       "lower_trigram": "kan",
       "pinyin": "xiè",
+      "name_es": "La Liberación",
       "name_en_standard": "Deliverance"
     },
     {
@@ -452,6 +492,7 @@
       "upper_trigram": "gen",
       "lower_trigram": "dui",
       "pinyin": "sǔn",
+      "name_es": "La Disminución",
       "name_en_standard": "Decrease"
     },
     {
@@ -463,6 +504,7 @@
       "upper_trigram": "xun",
       "lower_trigram": "zhen",
       "pinyin": "yì",
+      "name_es": "El Aumento",
       "name_en_standard": "Increase"
     },
     {
@@ -474,6 +516,7 @@
       "upper_trigram": "dui",
       "lower_trigram": "qian",
       "pinyin": "guài",
+      "name_es": "El Desbordamiento",
       "name_en_standard": "Breakthrough"
     },
     {
@@ -485,6 +528,7 @@
       "upper_trigram": "qian",
       "lower_trigram": "xun",
       "pinyin": "gòu",
+      "name_es": "El Encuentro",
       "name_en_standard": "Coming to Meet"
     },
     {
@@ -496,6 +540,7 @@
       "upper_trigram": "dui",
       "lower_trigram": "kun",
       "pinyin": "cuì",
+      "name_es": "La Reunión",
       "name_en_standard": "Gathering Together"
     },
     {
@@ -507,17 +552,19 @@
       "upper_trigram": "kun",
       "lower_trigram": "xun",
       "pinyin": "shēng",
+      "name_es": "El Ascenso",
       "name_en_standard": "Pushing Upward"
     },
     {
       "id": 47,
-      "slug": "kun",
+      "slug": "kun-opr",
       "hanzi": "困",
       "symbol_unicode": "䷮",
       "pair": 48,
       "upper_trigram": "dui",
       "lower_trigram": "kan",
       "pinyin": "kùn",
+      "name_es": "El Agotamiento",
       "name_en_standard": "Oppression"
     },
     {
@@ -529,6 +576,7 @@
       "upper_trigram": "kan",
       "lower_trigram": "xun",
       "pinyin": "jǐng",
+      "name_es": "El Pozo",
       "name_en_standard": "The Well"
     },
     {
@@ -540,6 +588,7 @@
       "upper_trigram": "dui",
       "lower_trigram": "li",
       "pinyin": "gé",
+      "name_es": "La Revolución",
       "name_en_standard": "Revolution"
     },
     {
@@ -551,6 +600,7 @@
       "upper_trigram": "li",
       "lower_trigram": "xun",
       "pinyin": "dǐng",
+      "name_es": "El Caldero",
       "name_en_standard": "The Cauldron"
     },
     {
@@ -562,6 +612,7 @@
       "upper_trigram": "zhen",
       "lower_trigram": "zhen",
       "pinyin": "zhèn",
+      "name_es": "Lo Suscitativo",
       "name_en_standard": "The Arousing"
     },
     {
@@ -573,17 +624,19 @@
       "upper_trigram": "gen",
       "lower_trigram": "gen",
       "pinyin": "gèn",
+      "name_es": "El Aquietamiento",
       "name_en_standard": "Keeping Still"
     },
     {
       "id": 53,
-      "slug": "jian",
+      "slug": "jian-dev",
       "hanzi": "漸",
       "symbol_unicode": "䷴",
       "pair": 54,
       "upper_trigram": "xun",
       "lower_trigram": "gen",
       "pinyin": "jiàn",
+      "name_es": "El Desarrollo Gradual",
       "name_en_standard": "Development"
     },
     {
@@ -595,6 +648,7 @@
       "upper_trigram": "zhen",
       "lower_trigram": "dui",
       "pinyin": "guī mèi",
+      "name_es": "La Muchacha que se Casa",
       "name_en_standard": "The Marrying Maiden"
     },
     {
@@ -606,17 +660,19 @@
       "upper_trigram": "zhen",
       "lower_trigram": "li",
       "pinyin": "fēng",
+      "name_es": "La Plenitud",
       "name_en_standard": "Abundance"
     },
     {
       "id": 56,
-      "slug": "lu",
+      "slug": "lu-trav",
       "hanzi": "旅",
       "symbol_unicode": "䷷",
       "pair": 55,
       "upper_trigram": "li",
       "lower_trigram": "gen",
       "pinyin": "lǚ",
+      "name_es": "El Viandante",
       "name_en_standard": "The Wanderer"
     },
     {
@@ -628,6 +684,7 @@
       "upper_trigram": "xun",
       "lower_trigram": "xun",
       "pinyin": "xùn",
+      "name_es": "Lo Suave",
       "name_en_standard": "The Gentle"
     },
     {
@@ -639,6 +696,7 @@
       "upper_trigram": "dui",
       "lower_trigram": "dui",
       "pinyin": "duì",
+      "name_es": "Lo Sereno",
       "name_en_standard": "The Joyous"
     },
     {
@@ -650,6 +708,7 @@
       "upper_trigram": "xun",
       "lower_trigram": "kan",
       "pinyin": "huàn",
+      "name_es": "La Disolución",
       "name_en_standard": "Dispersion"
     },
     {
@@ -661,6 +720,7 @@
       "upper_trigram": "kan",
       "lower_trigram": "dui",
       "pinyin": "jié",
+      "name_es": "La Limitación",
       "name_en_standard": "Limitation"
     },
     {
@@ -672,6 +732,7 @@
       "upper_trigram": "xun",
       "lower_trigram": "dui",
       "pinyin": "zhōng fú",
+      "name_es": "La Verdad Interior",
       "name_en_standard": "Inner Truth"
     },
     {
@@ -683,6 +744,7 @@
       "upper_trigram": "zhen",
       "lower_trigram": "gen",
       "pinyin": "xiǎo guò",
+      "name_es": "La Preponderancia de lo Pequeño",
       "name_en_standard": "Small Exceeding"
     },
     {
@@ -694,6 +756,7 @@
       "upper_trigram": "kan",
       "lower_trigram": "li",
       "pinyin": "jì jì",
+      "name_es": "Después de la Consumación",
       "name_en_standard": "After Completion"
     },
     {
@@ -705,6 +768,7 @@
       "upper_trigram": "li",
       "lower_trigram": "kan",
       "pinyin": "wèi jì",
+      "name_es": "Antes de la Consumación",
       "name_en_standard": "Before Completion"
     }
   ]

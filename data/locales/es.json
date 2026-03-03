@@ -5,7 +5,7 @@
         "boot_error_desc": "Faltan archivos o rutas.",
         "missing_files": "Archivos faltantes:",
         "unknown_error": "Error desconocido",
-        "footer_version": "Versión 0.1.1 · Local Storage",
+        "footer_version": "Versión 0.1.3 · Local Storage",
         "footer_default": "Reflexión personal."
     },
     "home": {
@@ -100,6 +100,6 @@
         "stats_paywall": "Paywall Visto",
         "stats_conversions": "Conversiones",
         "stats_locks": "Bloqueos",
-        "footer": "Versión 0.1.1 · Local Storage"
+        "footer": "Versión 0.1.3 · Local Storage"
     }
 }
