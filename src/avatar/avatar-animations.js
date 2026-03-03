@@ -55,9 +55,20 @@ export class FoxAnimations {
             duration: timing.tailSway,
             iterations: Infinity,
             easing: 'ease-in-out',
-            delay: 500
+            delay: 300
         });
 
+        const haloAnim = this.layers.halo?.animate([
+            { opacity: 0.62, transform: 'scale(1)' },
+            { opacity: 0.78, transform: 'scale(1.03)' },
+            { opacity: 0.62, transform: 'scale(1)' }
+        ], {
+            duration: 4200,
+            iterations: Infinity,
+            easing: 'ease-in-out'
+        });
+
+        if (haloAnim) this.activeAnimations.push(haloAnim);
         this.activeAnimations.push(bodyAnim, headAnim, tailAnim);
     }
 
