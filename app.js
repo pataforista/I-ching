@@ -650,8 +650,8 @@ function ReadingView() {
   if (!p) return `<div class="immersive-screen"><p class="serif muted">No se pudo cargar la lectura.</p></div>`;
 
   const movingLines = (state.session.lines || []).filter(l => l.isMoving);
-  const hexTitle = `${p.hanzi || ''} · ${p.slug ? p.slug.charAt(0).toUpperCase() + p.slug.slice(1) : ''}`.trim();
-  const hexTitleR = r ? `${r.hanzi || ''} · ${r.slug ? r.slug.charAt(0).toUpperCase() + r.slug.slice(1) : ''}`.trim() : '';
+  const hexTitle = `${p.hanzi || ''} · ${p.name_es || (p.slug ? p.slug.charAt(0).toUpperCase() + p.slug.slice(1) : '')}`.trim();
+  const hexTitleR = r ? `${r.hanzi || ''} · ${r.name_es || (r.slug ? r.slug.charAt(0).toUpperCase() + r.slug.slice(1) : '')}`.trim() : '';
 
   return `
     <div class="immersive-screen screen-reading">
@@ -676,7 +676,7 @@ function ReadingView() {
           <div id="hanziAnimation" style="min-height:100px; display:grid; place-items:center;"></div>
           <div id="primaryHexSVG" style="display:grid; place-items:center; color:var(--text);"></div>
           <h1 class="hexTitle" style="font-size:clamp(1.6rem,5vw,2.4rem); margin:0;">${escapeHtml(hexTitle)}</h1>
-          <p class="muted serif" style="font-size:0.85rem; margin:0;">${escapeHtml(p.name_en_standard || '')}</p>
+          <p class="muted serif" style="font-size:0.85rem; margin:0;">${escapeHtml(p.pinyin || '')}${p.name_es && p.pinyin ? ' · ' : ''}${escapeHtml(p.name_es || p.name_en_standard || '')}</p>
           ${state.session.question?.text_es ? `
           <div class="reading-question-echo">"${escapeHtml(state.session.question.text_es)}"</div>
           ` : ''}
@@ -746,7 +746,7 @@ function ReadingView() {
             <div id="resultingHexSVG" style="flex-shrink:0; color:var(--accent);"></div>
             <div class="vstack" style="gap:6px; flex:1;">
               <h4 style="margin:0; font-size:1.05rem;">${escapeHtml(hexTitleR)}</h4>
-              <p class="muted serif" style="margin:0; font-size:0.8rem;">${escapeHtml(r.name_en_standard || '')}</p>
+              <p class="muted serif" style="margin:0; font-size:0.8rem;">${escapeHtml(r.name_es || r.name_en_standard || '')}</p>
               <p class="serif" style="margin:0; font-size:0.88rem; opacity:0.8; line-height:1.6;">${escapeHtml((r.dynamic_core_es || '').substring(0, 150))}…</p>
             </div>
           </div>
