@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Keystore (never commit — keep safe offline)
+*.keystore
+*.jks
+
+# Android build output
+android/
+app/build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
