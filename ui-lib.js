@@ -248,6 +248,18 @@ export class InkGalaxy {
         } else {
             this._renderStatic();
         }
+
+        // Pause rAF loop when tab is hidden — no wasted GPU cycles
+        this._onVisibilityChange = () => {
+            if (document.hidden) {
+                this._running = false;
+                if (this._rafId) { cancelAnimationFrame(this._rafId); this._rafId = null; }
+            } else if (!prefersReducedMotion()) {
+                this._running = true;
+                this.animate();
+            }
+        };
+        document.addEventListener('visibilitychange', this._onVisibilityChange);
     }
 
     resize() {
@@ -321,6 +333,7 @@ export class InkGalaxy {
     destroy() {
         this._running = false;
         if (this._rafId) cancelAnimationFrame(this._rafId);
+        if (this._onVisibilityChange) document.removeEventListener('visibilitychange', this._onVisibilityChange);
         if (this.canvas && this.canvas.parentNode) this.canvas.parentNode.removeChild(this.canvas);
     }
 }

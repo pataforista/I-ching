@@ -435,22 +435,17 @@ select.input-field {
   object-fit: cover;
   border-radius: 50%;
   display: block;
+  /* Static filter stays on a dedicated layer; scale animation is composited separately */
   filter: saturate(1.05) contrast(1.05) var(--sumi-filter);
-  animation: sage-breathing 5s ease-in-out infinite;
+  animation: sage-scale 5s ease-in-out infinite;
+  will-change: transform;
 }
 
-@keyframes sage-breathing {
-
+/* Scale-only keyframe: GPU-composited, no filter in keyframe = 60 FPS guaranteed */
+@keyframes sage-scale {
   0%,
-  100% {
-    transform: scale(1.0);
-    filter: saturate(1.05) contrast(1.05) var(--sumi-filter) brightness(1);
-  }
-
-  50% {
-    transform: scale(1.04);
-    filter: saturate(1.1) contrast(1.08) var(--sumi-filter) brightness(1.04);
-  }
+  100% { transform: scale(1.0);  }
+  50%  { transform: scale(1.04); }
 }
 
 .sage-avatar::before {
@@ -550,7 +545,8 @@ select.input-field {
    Strategy:
    - Separate spin axis (rotateY only) from vertical arc (translateY only)
    - No rotateX — it mixed the axes and caused gimbal jitter
-   - Shadow keyframe adds depth illusion without extra 3D complexity
+   - Shadow uses opacity on a ::after pseudo-element (GPU-composited, no filter in keyframe)
+   - Landing squish adds tactile weight to the settle
    - End state set by JS transition, not animation fill-mode, to avoid conflict
 */
 
@@ -565,46 +561,23 @@ select.input-field {
 }
 
 @keyframes coin-arc {
-  0% {
-    transform: translateY(0px) scale(1);
-  }
-
-  18% {
-    transform: translateY(-14px) scale(1.02);
-  }
-
-  38% {
-    transform: translateY(-38px) scale(1.05);
-  }
-
-  60% {
-    transform: translateY(-24px) scale(1.03);
-  }
-
-  80% {
-    transform: translateY(-8px) scale(1.01);
-  }
-
-  100% {
-    transform: translateY(0px) scale(1);
-  }
+  0%   { transform: translateY(0px)  scale(1);    }
+  15%  { transform: translateY(-18px) scale(1.03); }
+  38%  { transform: translateY(-42px) scale(1.06); }
+  62%  { transform: translateY(-22px) scale(1.03); }
+  82%  { transform: translateY(-4px)  scale(1.01); }
+  92%  { transform: translateY(3px)   scale(0.985); } /* landing squish */
+  100% { transform: translateY(0px)  scale(1);    }
 }
 
-@keyframes coin-shadow {
-  0% {
-    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.38)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.22));
-  }
-
-  38% {
-    filter: drop-shadow(0 20px 32px rgba(0, 0, 0, 0.18)) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.12));
-  }
-
-  100% {
-    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.38)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.22));
-  }
+/* GPU-composited shadow: fade opacity instead of animating filter */
+@keyframes coin-shadow-opacity {
+  0%   { opacity: 1;    }
+  38%  { opacity: 0.35; } /* coin is highest — shadow is faint */
+  100% { opacity: 1;    }
 }
 
-/* Wrapper: controls the arc + shadow — no transform-style needed */
+/* Wrapper: controls the arc — no transform-style needed */
 .coin-toss-wrapper {
   position: relative;
   display: contents;
@@ -614,7 +587,7 @@ select.input-field {
 /* Apply arc animation to the outer .coin-3d container */
 .tossing {
   animation:
-    coin-arc var(--toss-dur, 900ms) cubic-bezier(0.34, 1.12, 0.64, 1) forwards;
+    coin-arc var(--toss-dur, 900ms) cubic-bezier(0.34, 1.06, 0.64, 1) forwards;
 }
 
 /* Spin applied inside via a new inner element targeting .coin-spin-inner */
@@ -623,10 +596,10 @@ select.input-field {
     coin-spin-y var(--toss-dur, 900ms) cubic-bezier(0.33, 0, 0.66, 1) forwards;
 }
 
-/* Shadow on the coin face during toss */
+/* Shadow depth: animate only opacity (composited), not filter */
 .tossing .coin-face {
   animation:
-    coin-shadow var(--toss-dur, 900ms) cubic-bezier(0.33, 0, 0.66, 1) forwards;
+    coin-shadow-opacity var(--toss-dur, 900ms) cubic-bezier(0.33, 0, 0.66, 1) forwards;
 }
 
 /* --- Hex Visual (Accumulator) --- */
@@ -917,14 +890,12 @@ select.input-field {
 @keyframes oracle-text-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
-    filter: blur(4px);
+    transform: translateY(10px) scale(0.98);
   }
 
   to {
     opacity: 0.55;
-    transform: translateY(0);
-    filter: blur(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -1097,6 +1068,7 @@ select.input-field {
 .reveal-section {
   opacity: 0;
   transform: translateY(28px);
+  will-change: opacity, transform; /* GPU-prime before animation starts */
   transition:
     opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1105,6 +1077,7 @@ select.input-field {
 .reveal-section.visible {
   opacity: 1;
   transform: translateY(0);
+  will-change: auto; /* release compositor layer once settled */
 }
 
 .reveal-section:nth-child(1) {
@@ -1654,6 +1627,14 @@ dialog.modal .hexTitle {
   }
 
   50% {
+    opacity: 0;
+  }
+}
+
+/* --- Ripple Spread (btn click micro-interaction) --- */
+@keyframes ripple-spread {
+  to {
+    transform: translate(-50%, -50%) scale(40);
     opacity: 0;
   }
 }

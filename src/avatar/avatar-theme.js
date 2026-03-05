@@ -21,8 +21,8 @@ export const FoxTheme = {
     amplitudes: {
         headY: 1.8,
         torsoY: 2.3,
-        tailRot: 2.8,
+        tailRot: 3.8,  // was 2.8 — more alive, still subtle
         nodRot: 6,
-        lookX: 1.5
+        lookX: 5       // was 1.5 — barely visible at 1.5px; 5px is clearly perceptible
     }
 };

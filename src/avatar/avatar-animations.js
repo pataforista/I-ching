@@ -24,7 +24,7 @@ export class FoxAnimations {
 
         const { timing, amplitudes } = FoxTheme;
 
-        // Torso breathing
+        // Torso breathing — organic sine-like feel with cubic-bezier
         const bodyAnim = this.layers.body.animate([
             { transform: 'translateY(0px)' },
             { transform: `translateY(${amplitudes.torsoY}px)` },
@@ -32,10 +32,10 @@ export class FoxAnimations {
         ], {
             duration: timing.breathTorso,
             iterations: Infinity,
-            easing: 'ease-in-out'
+            easing: 'cubic-bezier(0.37, 0, 0.63, 1)' // smooth sine wave
         });
 
-        // Head breathing (same phase, less amplitude)
+        // Head breathing — slightly offset phase for natural dissociation
         const headAnim = this.layers.head.animate([
             { transform: 'translateY(0px)' },
             { transform: `translateY(${amplitudes.headY}px)` },
@@ -43,10 +43,11 @@ export class FoxAnimations {
         ], {
             duration: timing.breathHead,
             iterations: Infinity,
-            easing: 'ease-in-out'
+            easing: 'cubic-bezier(0.37, 0, 0.63, 1)',
+            delay: 180 // slight phase offset from torso
         });
 
-        // Tail sway 
+        // Tail sway — pendulum feel: slow out, slow in, weighted
         const tailAnim = this.layers.tail.animate([
             { transform: 'rotate(0deg)' },
             { transform: `rotate(${amplitudes.tailRot}deg)` },
@@ -54,7 +55,7 @@ export class FoxAnimations {
         ], {
             duration: timing.tailSway,
             iterations: Infinity,
-            easing: 'ease-in-out',
+            easing: 'cubic-bezier(0.45, 0.05, 0.55, 0.95)', // pendulum
             delay: 300
         });
 
@@ -79,16 +80,13 @@ export class FoxAnimations {
 
     async nod() {
         if (!this.layers.head) return;
-        // Add randomness to nod
         const duration = FoxTheme.timing.nodBase + (Math.random() * 230 - 80);
+        // Slight overshoot bounce for weight: goes past 0 then settles
         const anim = this.layers.head.animate([
-            { transform: 'rotate(0deg)' },
-            { transform: `rotate(${FoxTheme.amplitudes.nodRot}deg)` },
+            { transform: 'rotate(0deg)',                              easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' },
+            { transform: `rotate(${FoxTheme.amplitudes.nodRot}deg)`, easing: 'cubic-bezier(0.34, 1.2, 0.64, 1)' },
             { transform: 'rotate(0deg)' }
-        ], {
-            duration,
-            easing: 'ease-in-out'
-        });
+        ], { duration });
         return anim.finished;
     }
 
@@ -96,27 +94,26 @@ export class FoxAnimations {
         if (!this.layers.head) return;
         const duration = FoxTheme.timing.lookBase + (Math.random() * 200 - 100);
         const x = direction === 'left' ? -FoxTheme.amplitudes.lookX : FoxTheme.amplitudes.lookX;
+        // Quick move then gentle return with slight overshoot
         const anim = this.layers.head.animate([
-            { transform: 'translateX(0px)' },
-            { transform: `translateX(${x}px)` },
+            { transform: 'translateX(0px)',  easing: 'cubic-bezier(0.25, 1, 0.5, 1)' },
+            { transform: `translateX(${x}px)`, easing: 'cubic-bezier(0.34, 1.3, 0.64, 1)' },
             { transform: 'translateX(0px)' }
-        ], {
-            duration: duration,
-            easing: 'ease-in-out'
-        });
+        ], { duration });
         return anim.finished;
     }
 
     twitchEar(side) {
         const ear = side === 'left' ? this.layers.earLeft : this.layers.earRight;
         if (!ear) return;
+        const dir = side === 'left' ? -6 : 6;
         ear.animate([
-            { transform: 'rotate(0deg)' },
-            { transform: side === 'left' ? 'rotate(-5deg)' : 'rotate(5deg)' },
+            { transform: 'rotate(0deg)',          easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)' },
+            { transform: `rotate(${dir}deg)`,     easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' },
+            { transform: `rotate(${dir * 0.3}deg)`, easing: 'cubic-bezier(0.34, 1.2, 0.64, 1)' },
             { transform: 'rotate(0deg)' }
         ], {
-            duration: 150,
-            easing: 'ease-out'
+            duration: 240,
         });
     }
 

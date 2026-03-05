@@ -284,12 +284,21 @@ function haptic(type = 'light') {
 }
 
 // ---------- Read Progress Bar ----------
+// Keep one reference to the active scroll handler so we can remove it on cleanup
+let _readProgressCleanup = null;
+
 function initReadProgress() {
   let bar = document.getElementById('read-progress');
   if (!bar) {
     bar = document.createElement('div');
     bar.id = 'read-progress';
     document.body.appendChild(bar);
+  }
+
+  // Always tear down the previous listener before re-attaching
+  if (_readProgressCleanup) {
+    _readProgressCleanup();
+    _readProgressCleanup = null;
   }
 
   if (state.nav !== 'reading') {
@@ -310,8 +319,13 @@ function initReadProgress() {
   };
 
   content.addEventListener('scroll', onScroll, { passive: true });
-  // Also watch window scroll for immersive screens
   window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Store cleanup so next call (or nav away) removes these listeners
+  _readProgressCleanup = () => {
+    content.removeEventListener('scroll', onScroll);
+    window.removeEventListener('scroll', onScroll);
+  };
 }
 
 // ---------- Swipe Gesture Navigation ----------
@@ -691,6 +705,19 @@ function TossView() {
   `;
 }
 
+// Inject the hex-line brush paint keyframe once into the document head.
+// This avoids creating a new rule inside each SVG on every toss,
+// which causes the stylesheet to grow unboundedly over 6 tosses.
+(function injectHexLineKeyframe() {
+  const id = 'hex-line-keyframe-style';
+  if (document.getElementById(id)) return;
+  const style = document.createElement('style');
+  style.id = id;
+  style.textContent =
+    '@keyframes hx-paint{from{stroke-dashoffset:var(--dl);opacity:0.2;}to{stroke-dashoffset:0;opacity:1;}}';
+  document.head.appendChild(style);
+})();
+
 function renderHexLines(tosses) {
   if (tosses.length === 0) return "";
 
@@ -699,7 +726,6 @@ function renderHexLines(tosses) {
   const segW = (w - breakGap) / 2;
   const totalLines = 6;
   const totalH = totalLines * sw + (totalLines - 1) * lineGap;
-  const uid = Math.random().toString(36).slice(2, 7);
 
   // Build a 6-slot array: filled tosses (bottom→top) + empty placeholders
   const slots = Array(6).fill(null);
@@ -709,8 +735,6 @@ function renderHexLines(tosses) {
     const wobble = (((seed * 7919) % 5) - 2) * 0.4;
     return `M ${x1} ${yc} Q ${x1 + (x2 - x1) * 0.5} ${yc + wobble} ${x2} ${yc}`;
   };
-
-  const animCSS = `@keyframes hx-${uid}{from{stroke-dashoffset:var(--dl);opacity:0.2;}to{stroke-dashoffset:0;opacity:1;}}`;
 
   // Render bottom-to-top display (slot[0] = line 1 = bottom)
   // But visually reverse: slot[5] = top of SVG
@@ -732,12 +756,12 @@ function renderHexLines(tosses) {
     const val = toss.value || 7;
     const isYang = val % 2 !== 0;
     const isMoving = toss.is_moving;
-    const delay = isNew ? '0s' : '0s';
     const dur = isNew ? '0.5s' : '0.01s';
 
-    const stk = (len, d, extraDelay = 0) =>
+    // Reuse the single shared @keyframes 'hx-paint' (injected once at module load)
+    const stk = (len, d) =>
       `<path d="${d}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round"
-        style="stroke-dasharray:${len};--dl:${len};stroke-dashoffset:${len};animation:hx-${uid} ${dur} cubic-bezier(.25,.1,.3,1) ${delay} forwards;" opacity="0"/>`;
+        style="stroke-dasharray:${len};--dl:${len};stroke-dashoffset:${len};animation:hx-paint ${dur} cubic-bezier(.25,.1,.3,1) 0s forwards;" opacity="0"/>`;
 
     if (isYang) {
       paths += stk(w, wavyPath(0, w, yc, seed));
@@ -753,7 +777,6 @@ function renderHexLines(tosses) {
 
   return `
     <svg width="${w}" height="${totalH}" viewBox="0 0 ${w} ${totalH}" style="display:block;overflow:visible;">
-      <defs><style>${animCSS}</style></defs>
       ${paths}
     </svg>`;
 }
@@ -1155,18 +1178,24 @@ function renderStageCoins() {
       <circle cx="100" cy="100" r="96" fill="url(#rimShadow-yin)"/>
     </svg>`;
 
-  return [1, 2, 3].map((_, i) => `
+  // Suffix gradient/filter IDs with the coin index to prevent cross-coin ID collisions
+  // (multiple SVGs in the same DOM sharing identical IDs causes browsers to resolve
+  //  to the first match, producing wrong gradients on coins 2 and 3)
+  return [1, 2, 3].map((_, i) => {
+    const yang = yangFaceSVG.replace(/-yang/g, `-yang-${i}`).replace(/yang"/g, `yang-${i}"`);
+    const yin  = yinFaceSVG.replace(/-yin/g, `-yin-${i}`).replace(/yin"/g, `yin-${i}"`);
+    return `
     <div class="coin-3d" style="--toss-dur:${880 + i * 60}ms;">
       <div class="coin-spin-inner" style="position:relative; width:100%; height:100%; transform-style:preserve-3d;">
         <div class="coin-face coin-front">
-          ${yangFaceSVG}
+          ${yang}
         </div>
         <div class="coin-face coin-back">
-          ${yinFaceSVG}
+          ${yin}
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 
