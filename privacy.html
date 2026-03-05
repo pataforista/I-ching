@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="paper">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#4a9070" />
+    <title>Política de Privacidad — I Ching · Guía Taoísta</title>
+    <meta name="description"
+        content="Política de privacidad de la aplicación I Ching · Guía Taoísta. Tus datos son tuyos — todo es local y privado." />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <style>
+        :root {
+            --bg: hsl(42, 30%, 96%);
+            --text: hsl(240, 6%, 12%);
+            --accent: hsl(156, 30%, 42%);
+            --muted: hsla(240, 6%, 12%, 0.55);
+            --panel: hsl(40, 35%, 98%);
+            --border: hsla(240, 6%, 12%, 0.08);
+            --font-serif: "Shippori Mincho", "Spectral", Cochin, Georgia, serif;
+            --font-sans: "Outfit", system-ui, sans-serif;
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.7;
+            font-size: clamp(15px, 1vw + 13px, 17px);
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: clamp(40px, 8vw, 80px) clamp(20px, 5vw, 48px);
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 48px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo-glyph {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            color: var(--accent);
+            line-height: 1;
+        }
+
+        .logo-text {
+            font-family: var(--font-serif);
+        }
+
+        .logo-text h1 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+
+        .logo-text p {
+            margin: 0;
+            font-size: 0.78rem;
+            opacity: 0.5;
+        }
+
+        h2 {
+            font-family: var(--font-serif);
+            font-weight: 500;
+            font-size: 1.15rem;
+            margin: 40px 0 12px;
+            color: var(--accent);
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--text);
+            opacity: 0.88;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin: 0 0 16px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            opacity: 0.88;
+        }
+
+        .callout {
+            background: hsla(156, 30%, 42%, 0.07);
+            border-left: 3px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin: 24px 0;
+        }
+
+        .callout p {
+            margin: 0;
+            font-family: var(--font-serif);
+            font-style: italic;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            margin-bottom: 32px;
+            font-weight: 500;
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        footer {
+            margin-top: 64px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            font-size: 0.78rem;
+            opacity: 0.45;
+            font-family: var(--font-serif);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 32px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <span class="logo-glyph">易</span>
+            <div class="logo-text">
+                <h1>I Ching · Guía Taoísta</h1>
+                <p>Política de Privacidad</p>
+            </div>
+        </header>
+
+        <a href="./index.html" class="back-link">← Volver a la app</a>
+
+        <div class="badge">
+            <span class="badge-dot"></span>
+            Última actualización: Marzo 2026
+        </div>
+
+        <div class="callout">
+            <p>
+                "Tus reflexiones son tuyas. Esta app no recopila, transmite ni comparte ningún dato personal.
+                Todo permanece en tu dispositivo."
+            </p>
+        </div>
+
+        <h2>1. Información que recopilamos</h2>
+        <p>
+            <strong>No recopilamos ningún dato personal.</strong> La aplicación I Ching · Guía Taoísta
+            funciona completamente de manera local en tu dispositivo. No existe ningún servidor de backend,
+            base de datos remota, ni sistema de sincronización en la nube.
+        </p>
+
+        <h2>2. Datos almacenados localmente</h2>
+        <p>La app guarda exclusivamente en tu dispositivo:</p>
+        <ul>
+            <li>Tu historial de consultas y lecturas del I Ching (en <code>localStorage</code>)</li>
+            <li>Tu preferencia de tema visual (claro u oscuro)</li>
+            <li>Tu configuración de recordatorios (activados/desactivados)</li>
+        </ul>
+        <p>
+            Puedes borrar estos datos en cualquier momento desde la configuración de tu navegador o
+            dentro de la propia app mediante la opción "Limpiar historial".
+        </p>
+
+        <h2>3. Servicios de terceros</h2>
+        <p>La app carga recursos externos únicamente para su funcionamiento visual:</p>
+        <ul>
+            <li><strong>Google Fonts</strong> — para las tipografías Shippori Mincho, Spectral y Outfit.
+                Solo se accede a esto si tienes conexión a internet. Google puede registrar la solicitud
+                de fuente de forma anónima, sin datos personales.</li>
+            <li><strong>jsDelivr / unpkg</strong> — para cargar bibliotecas JavaScript de animación.
+                Aplica su propia política de privacidad para el registro de acceso estándar.</li>
+        </ul>
+        <p>
+            Una vez instalada como PWA, todos estos recursos quedan en caché local y no se realizan
+            más solicitudes externas.
+        </p>
+
+        <h2>4. Notificaciones</h2>
+        <p>
+            Si activas los recordatorios diarios, la app solicita permiso de notificación de tu
+            dispositivo. Este permiso se usa únicamente para enviarte un recordatorio local de reflexión.
+            No se envía ningún dato a servidores externos. Puedes revocar este permiso en cualquier
+            momento desde la configuración de notificaciones de tu dispositivo.
+        </p>
+
+        <h2>5. Permisos de la app</h2>
+        <p>La app solicita únicamente los siguientes permisos:</p>
+        <ul>
+            <li><strong>Notificaciones</strong> — opcional, para recordatorios diarios</li>
+            <li><strong>Almacenamiento local</strong> — para guardar tu historial de reflexiones</li>
+        </ul>
+
+        <h2>6. Menores de edad</h2>
+        <p>
+            Esta app no está dirigida a menores de 13 años (o la edad mínima aplicable en tu país).
+            Al ser una aplicación sin recopilación de datos, no existe riesgo de recopilación de
+            información de menores.
+        </p>
+
+        <h2>7. Cambios a esta política</h2>
+        <p>
+            Si realizamos cambios significativos a esta política, lo indicaremos actualizando la
+            fecha de "Última actualización" en esta página. Al ser una app sin registro de usuarios,
+            no podemos notificarte directamente de los cambios.
+        </p>
+
+        <h2>8. Contacto</h2>
+        <p>
+            Si tienes preguntas sobre esta política de privacidad, puedes contactarnos a través del
+            repositorio del proyecto en
+            <a href="https://github.com/pataforista/I-ching/issues" target="_blank" rel="noopener">GitHub</a>.
+        </p>
+
+        <footer>
+            <span>© 2026 I Ching · Guía Taoísta</span>
+            <span><a href="./index.html">Volver a la app</a></span>
+        </footer>
+    </div>
+</body>
+
+</html>

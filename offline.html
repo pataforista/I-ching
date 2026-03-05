@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="paper">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#4a9070" />
+    <title>Sin conexión — I Ching</title>
+    <style>
+        :root {
+            --bg: hsl(42, 30%, 96%);
+            --text: hsl(240, 6%, 12%);
+            --accent: hsl(156, 30%, 42%);
+            --muted: hsla(240, 6%, 12%, 0.5);
+            --panel: hsl(40, 35%, 98%);
+            --border: hsla(240, 6%, 12%, 0.08);
+            --font-serif: "Shippori Mincho", "Spectral", Cochin, Georgia, serif;
+            --font-sans: "Outfit", system-ui, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+            text-align: center;
+        }
+
+        .glyph {
+            font-family: var(--font-serif);
+            font-size: 5rem;
+            color: var(--accent);
+            line-height: 1;
+            margin-bottom: 16px;
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+
+        h1 {
+            font-family: var(--font-serif);
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 400;
+            margin: 0 0 12px;
+        }
+
+        p {
+            font-family: var(--font-serif);
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.7;
+            max-width: 380px;
+            margin: 0 auto 32px;
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px 32px;
+            max-width: 400px;
+            width: 100%;
+            margin-bottom: 24px;
+        }
+
+        .card-label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-family: var(--font-sans);
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            background: var(--accent);
+            color: hsl(42, 30%, 96%);
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px hsla(156, 30%, 42%, 0.35);
+        }
+
+        .divider {
+            width: 40px;
+            height: 1px;
+            background: var(--accent);
+            opacity: 0.3;
+            margin: 0 auto 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="glyph">易</div>
+    <h1>Sin conexión</h1>
+    <div class="divider"></div>
+    <p>
+        El oráculo permanece en silencio mientras el hilo se interrumpe.<br>
+        Recupera la conexión para continuar.
+    </p>
+
+    <div class="card">
+        <span class="card-label">Mientras tanto</span>
+        <p>
+            Tus consultas guardadas siguen disponibles.<br>
+            Pulsa "Regresar" para acceder a lo que ya está en caché.
+        </p>
+    </div>
+
+    <a href="./index.html" class="btn">Regresar a la app</a>
+
+    <script>
+        // Auto-redirect when online
+        window.addEventListener('online', () => {
+            window.location.href = './index.html';
+        });
+    </script>
+</body>
+
+</html>

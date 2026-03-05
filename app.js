@@ -68,6 +68,13 @@ var state = {
   loadLocal();
   if (!state.history) state.history = [];
 
+  // Handle PWA shortcut deep links
+  const bootNav = sessionStorage.getItem('iching_boot_nav');
+  if (bootNav) {
+    sessionStorage.removeItem('iching_boot_nav');
+    state.nav = bootNav;
+  }
+
   initBubbleMenu();
 
   // Init Smooth Scroll (Lenis)
@@ -96,7 +103,7 @@ var state = {
       animate: false,
       patternWidth: 100,
       patternHeight: 100,
-      grainOpacity: 0.015, /* Reduced from 0.04 */
+      grainOpacity: 0.015,
       grainDensity: 0.85,
       grainWidth: 1.0,
       grainHeight: 1.0,
@@ -105,8 +112,8 @@ var state = {
     });
   }
 
-  // Init Ink Galaxy Background - Reduced distraction for Warm Minimalism
-  galaxy = new InkGalaxy({ count: 24 }); /* Reduced from 160 for faster boot */
+  // Init Ink Galaxy Background
+  galaxy = new InkGalaxy({ count: 24 });
 
   // Init Art Background (ukiyo-e / sumi-e paintings)
   artBg = new ArtBackground();
@@ -130,17 +137,20 @@ var state = {
 
   registerSW();
   render();
+
+  // Signal splash screen to hide
+  document.dispatchEvent(new CustomEvent('app-ready'));
 })();
 
 function initBubbleMenu() {
   const hasSub = localStorage.getItem("iching_notifications") === "true";
   bubbleMenu = new BubbleMenu({
     items: [
-      { id: "home", icon: "⊕", label: t("menu.home") || "Nueva consulta", onClick: () => startNew() },
-      { id: "history", icon: "◉", label: t("menu.history") || "Historial", onClick: () => openHistory() },
-      { id: "theme", icon: "◐", label: t("menu.theme") || "Tema", onClick: () => onToggleTheme() },
+      { id: "home", icon: "✦", label: "Nueva consulta", onClick: () => startNew() },
+      { id: "history", icon: "◎", label: "Mi bitácora", onClick: () => openHistory() },
+      { id: "theme", icon: "◑", label: "Cambiar tema", onClick: () => onToggleTheme() },
       {
-        id: "notify", icon: hasSub ? "🔔" : "🔕", label: "Recordatorio Diario", onClick: async () => {
+        id: "notify", icon: hasSub ? "◉" : "○", label: hasSub ? "Silenciar recordatorio" : "Activar recordatorio", onClick: async () => {
           if (!("Notification" in window)) {
             openModal("Notificaciones", "<p class='serif'>Tu navegador no soporta notificaciones.</p>");
             return;
@@ -149,9 +159,9 @@ function initBubbleMenu() {
             const current = localStorage.getItem("iching_notifications") === "true";
             localStorage.setItem("iching_notifications", current ? "false" : "true");
             openModal("Recordatorios", `<p class='serif'>Recordatorios ${current ? 'desactivados' : 'activados'}.</p>`);
-            // Re-render menu icon
             if (bubbleMenu && bubbleMenu.items) {
-              bubbleMenu.items[3].icon = !current ? "🔔" : "🔕";
+              bubbleMenu.items[3].icon = !current ? "◉" : "○";
+              bubbleMenu.items[3].label = !current ? "Silenciar recordatorio" : "Activar recordatorio";
               bubbleMenu.render();
             }
           } else if (Notification.permission !== "denied") {
@@ -160,11 +170,17 @@ function initBubbleMenu() {
               localStorage.setItem("iching_notifications", "true");
               new Notification("I Ching — Sabiduría Taoísta", { body: "El oráculo te recordará tu momento de reflexión." });
               if (bubbleMenu && bubbleMenu.items) {
-                bubbleMenu.items[3].icon = "🔔";
+                bubbleMenu.items[3].icon = "◉";
+                bubbleMenu.items[3].label = "Silenciar recordatorio";
                 bubbleMenu.render();
               }
             }
           }
+        }
+      },
+      {
+        id: "privacy", icon: "⊙", label: "Privacidad", onClick: () => {
+          window.open('./privacy.html', '_blank', 'noopener');
         }
       },
     ]
@@ -260,6 +276,105 @@ async function registerSW() {
   } catch { /* silent */ }
 }
 
+// ---------- Haptic ----------
+function haptic(type = 'light') {
+  if (!navigator.vibrate) return;
+  const patterns = { light: [8], medium: [18], heavy: [35], success: [8, 50, 18] };
+  navigator.vibrate(patterns[type] || patterns.light);
+}
+
+// ---------- Read Progress Bar ----------
+function initReadProgress() {
+  let bar = document.getElementById('read-progress');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'read-progress';
+    document.body.appendChild(bar);
+  }
+
+  if (state.nav !== 'reading') {
+    bar.style.width = '0%';
+    bar.classList.remove('visible');
+    return;
+  }
+
+  bar.classList.add('visible');
+  const content = document.querySelector('.reading-content');
+  if (!content) return;
+
+  const onScroll = () => {
+    const scrollable = content.scrollHeight - content.clientHeight;
+    if (scrollable <= 0) return;
+    const pct = Math.min(100, (content.scrollTop / scrollable) * 100);
+    bar.style.width = `${pct}%`;
+  };
+
+  content.addEventListener('scroll', onScroll, { passive: true });
+  // Also watch window scroll for immersive screens
+  window.addEventListener('scroll', onScroll, { passive: true });
+}
+
+// ---------- Swipe Gesture Navigation ----------
+function initSwipeGestures() {
+  const SWIPE_THRESHOLD = 60;
+  const EDGE_ZONE = 40; // pixels from left/right edge
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+
+  // Create swipe hint element if not exists
+  let hint = document.querySelector('.swipe-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'swipe-hint';
+    document.body.appendChild(hint);
+  }
+
+  // Remove old listeners by replacing element
+  document.body.removeEventListener('touchstart', document.body._swipeStart);
+  document.body.removeEventListener('touchend', document.body._swipeEnd);
+
+  document.body._swipeStart = (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+
+    // Show hint on left edge
+    if (touchStartX < EDGE_ZONE && (state.nav === 'reading' || state.nav === 'history')) {
+      hint.classList.add('active');
+    }
+  };
+
+  document.body._swipeEnd = (e) => {
+    hint.classList.remove('active');
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+    const elapsed = Date.now() - touchStartTime;
+
+    // Must be a fast, mostly horizontal gesture
+    if (elapsed > 500 || dy > 60) return;
+
+    // Right swipe from left edge → go back
+    if (dx > SWIPE_THRESHOLD && touchStartX < EDGE_ZONE) {
+      haptic('light');
+      if (state.nav === 'reading') startNew();
+      else if (state.nav === 'history') startNew();
+      else if (state.nav === 'toss') startNew();
+    }
+
+    // Left swipe → advance (toss screen only)
+    if (dx < -SWIPE_THRESHOLD && state.nav === 'toss') {
+      const tossBtn = document.getElementById('btnToss');
+      const finishBtn = document.getElementById('btnFinish');
+      if (finishBtn) { haptic('medium'); finishToss(); }
+      else if (tossBtn && !state._tossing) { haptic('light'); onTossNextLine(); }
+    }
+  };
+
+  document.body.addEventListener('touchstart', document.body._swipeStart, { passive: true });
+  document.body.addEventListener('touchend', document.body._swipeEnd, { passive: true });
+}
+
 // ---------- Navigation ----------
 async function nav(to) {
   const overlay = document.createElement("div");
@@ -279,6 +394,10 @@ async function nav(to) {
   else if (to === "toss") dispatchFox('SHOW_ORACLE');
   else if (to === "reading") dispatchFox('SHOW_READING');
   else if (to === "history") dispatchFox('SLEEP_MODE');
+
+  // Premium: progress bar + swipe gestures on each screen
+  initReadProgress();
+  initSwipeGestures();
 
   overlay.classList.remove("active");
   overlay.classList.add("fade-out");
