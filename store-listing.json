@@ -1,0 +1,43 @@
+{
+  "app": {
+    "package_name": "com.iching.taoista",
+    "version": "0.1.3",
+    "version_code": 2
+  },
+  "listing": {
+    "language": "es-MX",
+    "title": "I Ching · Guía Taoísta",
+    "short_description": "Oráculo del I Ching con estética Zen. Privado, local y sin conexión.",
+    "full_description": "Consulta el I Ching — el milenario Libro de las Mutaciones — con una experiencia íntima y profunda, diseñada para la reflexión y el autoconocimiento.\n\n✦ ORÁCULO AUTÉNTICO\nSimula el ritual clásico de lanzamiento de monedas: tres monedas, seis líneas, un hexagrama. La app construye tu hexagrama de forma auténtica, siguiendo las reglas tradicionales incluyendo las líneas móviles y el hexagrama mutante.\n\n✦ INTERPRETACIONES PROFUNDAS\nCada hexagrama incluye interpretación completa basada en el texto canónico, con comentarios extendidos en español y el contexto filosófico taoísta de cada figura.\n\n✦ PRIVACIDAD TOTAL\nTodo funciona localmente en tu dispositivo. No hay servidores, no hay cuentas, no hay sincronización en la nube. Tu bitácora de reflexiones es tuya y solo tuya.\n\n✦ FUNCIONA SIN CONEXIÓN\nUna vez instalada, la app funciona completamente sin internet. Ideal para momentos de meditación sin distracciones.\n\n✦ BITÁCORA PERSONAL\nGuarda y revisa tu historial de consultas. Cada lectura queda almacenada en tu dispositivo para que puedas revisitar tus reflexiones cuando lo necesites.\n\n✦ ESTÉTICA ZEN\nDiseño minimalista inspirado en la pintura Sumi-e japonesa. Textura de papel, tipografía clásica y fondo con obras maestras del arte oriental de dominio público (Hokusai, Hiroshige y otros).\n\n✦ AVATAR INTERACTIVO\nUn zorro sabio te acompaña en cada consulta, con animaciones fluidas que responden al estado de la lectura.\n\n─────────────────────────\n\nACCESO PREMIUM (pago único)\nDesbloquea el diario personal completo, exportación en PDF y las secciones de interpretación extendida de James Legge.\n\n─────────────────────────\n\nÚnico requisito: reflexión genuina.",
+    "screenshots_phone": [
+      "assets/screenshots/screen-home.png",
+      "assets/screenshots/screen-reading.png"
+    ],
+    "feature_graphic": "assets/screenshots/feature-graphic.png",
+    "icon": "assets/icons/icon-512.png"
+  },
+  "content_rating": {
+    "rating": "Everyone",
+    "interactive_elements": ["In-app purchases"],
+    "content_descriptors": []
+  },
+  "distribution": {
+    "countries": "all",
+    "pricing": "free",
+    "contains_ads": false,
+    "in_app_purchases": true,
+    "target_age_group": "general"
+  },
+  "category": {
+    "primary": "LIFESTYLE",
+    "secondary": "EDUCATION"
+  },
+  "contact": {
+    "email": "REEMPLAZAR_CON_TU_EMAIL",
+    "website": "https://i-ching-taoista.netlify.app",
+    "privacy_policy": "https://i-ching-taoista.netlify.app/privacy.html"
+  },
+  "release_notes": {
+    "es-MX": "Primera versión en Google Play Store. Experiencia completa del oráculo I Ching con soporte offline, bitácora personal y estética Zen-Sumi-e."
+  }
+}

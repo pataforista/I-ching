@@ -1,10 +1,10 @@
 {
   "name": "I Ching · Guía Taoísta",
   "short_name": "IChing Tao",
-  "id": "/",
+  "id": "https://i-ching-taoista.netlify.app/",
   "description": "Tu oráculo personal del I Ching con estética Zen y Sumi-e. Reflexión profunda y sabiduría taoísta, completamente local y privado.",
-  "start_url": "./index.html?source=pwa",
-  "scope": "./",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
   "display_override": [
     "window-controls-overlay",
@@ -90,7 +90,7 @@
       "name": "Nueva Consulta",
       "short_name": "Consultar",
       "description": "Abre el oráculo directamente para una nueva consulta",
-      "url": "./index.html?shortcut=new",
+      "url": "/?shortcut=new",
       "icons": [
         {
           "src": "./assets/icons/icon-96.png",
@@ -102,7 +102,7 @@
       "name": "Mi Bitácora",
       "short_name": "Bitácora",
       "description": "Ver el historial de consultas guardadas",
-      "url": "./index.html?shortcut=history",
+      "url": "/?shortcut=history",
       "icons": [
         {
           "src": "./assets/icons/icon-96.png",
@@ -112,5 +112,11 @@
     }
   ],
   "prefer_related_applications": false,
-  "related_applications": []
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.iching.taoista",
+      "id": "com.iching.taoista"
+    }
+  ]
 }
