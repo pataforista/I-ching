@@ -112,8 +112,13 @@ var state = {
     });
   }
 
-  // Init Ink Galaxy Background
-  galaxy = new InkGalaxy({ count: 24 });
+  // Init Ink Galaxy Background — deferred to idle so it doesn't compete with boot
+  const initGalaxy = () => { galaxy = new InkGalaxy({ count: 24 }); };
+  if (window.requestIdleCallback) {
+    requestIdleCallback(initGalaxy, { timeout: 2000 });
+  } else {
+    setTimeout(initGalaxy, 400);
+  }
 
   // Init Art Background (ukiyo-e / sumi-e paintings)
   artBg = new ArtBackground();

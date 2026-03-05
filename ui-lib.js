@@ -664,12 +664,22 @@ export class DynamicAvatar {
         const avatar = this.container.querySelector('.sage-avatar');
         if (!avatar || prefersReducedMotion()) return;
 
+        // RAF throttle: only apply one style mutation per animation frame
+        let _rafPending = false;
+        let _pendingDx = 0, _pendingDy = 0;
+
         this._handleMouseMove = (e) => {
             if (this._destroyed) return;
             const rect = avatar.getBoundingClientRect();
-            const dx = (e.clientX - rect.left - rect.width / 2) / rect.width;
-            const dy = (e.clientY - rect.top - rect.height / 2) / rect.height;
-            avatar.style.transform = `perspective(600px) rotateY(${dx * 18}deg) rotateX(${-dy * 18}deg)`;
+            _pendingDx = (e.clientX - rect.left - rect.width / 2) / rect.width;
+            _pendingDy = (e.clientY - rect.top - rect.height / 2) / rect.height;
+            if (_rafPending) return;
+            _rafPending = true;
+            requestAnimationFrame(() => {
+                if (!this._destroyed)
+                    avatar.style.transform = `perspective(600px) rotateY(${_pendingDx * 18}deg) rotateX(${-_pendingDy * 18}deg)`;
+                _rafPending = false;
+            });
         };
         this._handleMouseLeave = () => {
             if (!this._destroyed) avatar.style.transform = '';
