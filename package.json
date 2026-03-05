@@ -22,5 +22,8 @@
     "d3-interpolate-path": "^2.3.0",
     "roughjs": "^4.6.6",
     "vivus": "^0.4.6"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
   }
 }

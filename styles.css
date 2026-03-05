@@ -1598,11 +1598,15 @@ dialog.modal .hexTitle {
   .bubble-menu-root,
   .ink-transition-overlay,
   canvas,
+  #install-banner,
+  #app-splash,
   .book-nav,
   #btnSave,
   #btnPDF,
   #btnClose,
-  .btn {
+  #btnSave2,
+  #btnClose2,
+  #btnShare {
     display: none !important;
   }
 
@@ -1629,5 +1633,222 @@ dialog.modal .hexTitle {
     box-shadow: none;
     border: 1px solid #ddd;
     backdrop-filter: none;
+  }
+
+  .reveal-section {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PREMIUM POLISH v3.0
+   ═══════════════════════════════════════════════════════════ */
+
+/* --- Cursor Blink (Typewriter component) --- */
+@keyframes cursor-blink {
+
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+/* --- Scroll Read Progress Indicator --- */
+#read-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), hsl(156, 40%, 60%));
+  z-index: 10001;
+  pointer-events: none;
+  transition: width 0.1s linear;
+  opacity: 0;
+  border-radius: 0 2px 2px 0;
+}
+
+#read-progress.visible {
+  opacity: 1;
+}
+
+/* --- Overscroll / Pull-to-refresh prevention --- */
+html {
+  overscroll-behavior-y: none;
+  /* Android: status bar theme color bleed fix */
+  background-color: var(--bg);
+}
+
+/* Smooth overscroll color for PWA on Android */
+@supports (overscroll-behavior: none) {
+  html {
+    overscroll-behavior: none;
+  }
+}
+
+/* --- Bubble Menu Premium Styling --- */
+.bubble-btn-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  border-radius: 50%;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.bubble-btn-label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+/* --- Focus visible styles (keyboard navigation) --- */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* --- Safe area insets for notched phones (TWA) --- */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .bubble-menu-root {
+    bottom: calc(clamp(16px, 4vw, 32px) + env(safe-area-inset-bottom, 0px));
+    right: calc(clamp(16px, 4vw, 32px) + env(safe-area-inset-right, 0px));
+  }
+
+  #install-banner {
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .toss-actions {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* --- Swipe gesture hint (reading screen back swipe) --- */
+.swipe-hint {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 48px;
+  background: var(--accent);
+  border-radius: 0 4px 4px 0;
+  opacity: 0;
+  z-index: 200;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.swipe-hint.active {
+  opacity: 0.5;
+}
+
+/* --- Premium scrollbar styling (Webkit) --- */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--panel-border);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--panel-border) transparent;
+}
+
+/* --- Text selection color --- */
+::selection {
+  background: hsla(156, 30%, 42%, 0.25);
+  color: var(--text);
+}
+
+/* --- HistoryView: wrap safe on mobile --- */
+@media (max-width: 480px) {
+  .history-card {
+    flex-wrap: wrap;
+  }
+
+  .history-card>div:last-child {
+    display: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PREFERS-REDUCED-MOTION
+   All animations and transitions gracefully disabled
+   ═══════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal-section {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .ink-transition-overlay {
+    display: none !important;
+  }
+
+  .home-brand-glyph {
+    animation: none !important;
+    opacity: 0.9;
+  }
+
+  .home-brand-title {
+    animation: none !important;
+    opacity: 0.5;
+  }
+
+  .home-form-card {
+    animation: none !important;
+    opacity: 1;
+  }
+
+  .enso-circle {
+    animation: none !important;
+    stroke-dashoffset: 40;
+    opacity: 0.85;
+  }
+
+  .fade-in {
+    animation: none !important;
+    opacity: 1;
+  }
+
+  #app-splash {
+    display: none !important;
   }
 }
