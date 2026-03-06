@@ -37,7 +37,7 @@ export function initFoxEvents(controller) {
             if (navigator.vibrate) navigator.vibrate(15);
 
             // Randomly choose a reaction state
-            const reactions = ['look_left', 'blink_soft', 'affirm_nod', 'ritual_trace'];
+            const reactions = ['look_left', 'look_right', 'blink_soft', 'affirm_nod', 'listen'];
             const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
             controller.setState(randomReaction);
 
