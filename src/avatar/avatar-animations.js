@@ -120,6 +120,50 @@ export class FoxAnimations {
         });
     }
 
+    async tiltHead(direction = 'left') {
+        if (!this.layers.head) return;
+        const angle = direction === 'left' ? -5 : 5;
+        const anim = this.layers.head.animate([
+            { transform: 'rotate(0deg)' },
+            { transform: `rotate(${angle}deg)` },
+            { transform: 'rotate(0deg)' }
+        ], {
+            duration: 800,
+            easing: 'ease-in-out'
+        });
+        return anim.finished;
+    }
+
+    flickerEar(side = 'left') {
+        const ear = side === 'left' ? this.layers.earLeft : this.layers.earRight;
+        if (!ear) return;
+        ear.animate([
+            { transform: 'rotate(0deg)' },
+            { transform: side === 'left' ? 'rotate(-12deg)' : 'rotate(12deg)' },
+            { transform: 'rotate(-4deg)' },
+            { transform: side === 'left' ? 'rotate(-8deg)' : 'rotate(8deg)' },
+            { transform: 'rotate(0deg)' }
+        ], {
+            duration: 250,
+            easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)'
+        });
+    }
+
+    async excitedTail() {
+        if (!this.layers.tail) return;
+        const anim = this.layers.tail.animate([
+            { transform: 'rotate(0deg)' },
+            { transform: 'rotate(15deg)' },
+            { transform: 'rotate(-5deg)' },
+            { transform: 'rotate(12deg)' },
+            { transform: 'rotate(0deg)' }
+        ], {
+            duration: 600,
+            easing: 'ease-in-out'
+        });
+        return anim.finished;
+    }
+
     guidePresent() {
         if (!this.layers.halo) return;
         return this.layers.halo.animate([

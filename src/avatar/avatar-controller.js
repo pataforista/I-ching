@@ -15,20 +15,25 @@ const FOX_SVG_INLINE = `<svg id="fox-root" xmlns="http://www.w3.org/2000/svg" vi
     </linearGradient>
     <linearGradient id="fox-body-grad" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="hsl(14, 75%, 48%)" />
-      <stop offset="100%" stop-color="hsl(14, 65%, 35%)" />
+      <stop offset="60%" stop-color="hsl(14, 70%, 42%)" />
+      <stop offset="100%" stop-color="hsl(14, 65%, 32%)" />
     </linearGradient>
     <radialGradient id="fox-head-grad" cx="40%" cy="28%" r="70%">
-      <stop offset="0%" stop-color="hsl(15, 78%, 56%)" />
-      <stop offset="62%" stop-color="hsl(14, 74%, 47%)" />
-      <stop offset="100%" stop-color="hsl(14, 66%, 36%)" />
+      <stop offset="0%" stop-color="hsl(16, 80%, 58%)" />
+      <stop offset="62%" stop-color="hsl(14, 75%, 48%)" />
+      <stop offset="100%" stop-color="hsl(14, 68%, 35%)" />
     </radialGradient>
+    <linearGradient id="fox-chest-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="hsl(30, 20%, 98%)" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="hsl(30, 20%, 90%)" stop-opacity="0.6" />
+    </linearGradient>
     <linearGradient id="fox-cheek-grad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="hsl(340, 95%, 86%)" stop-opacity="0.15"/>
-      <stop offset="50%" stop-color="hsl(340, 95%, 84%)" stop-opacity="0.42"/>
+      <stop offset="50%" stop-color="hsl(340, 95%, 84%)" stop-opacity="0.45"/>
       <stop offset="100%" stop-color="hsl(340, 95%, 86%)" stop-opacity="0.15"/>
     </linearGradient>
     <filter id="soft-shadow">
-      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="hsl(240, 6%, 12%)" flood-opacity="0.06"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="hsl(240, 6%, 12%)" flood-opacity="0.08"/>
     </filter>
   </defs>
 
@@ -55,11 +60,18 @@ const FOX_SVG_INLINE = `<svg id="fox-root" xmlns="http://www.w3.org/2000/svg" vi
     <!-- Body -->
     <g id="fox-body" style="transform-origin: 0px 40px;">
       <path d="M -50,80 C -60,0 -40,-60 0,-80 C 40,-60 60,0 50,80 Z" fill="url(#fox-body-grad)" filter="url(#soft-shadow)"/>
+      <path d="M -25,75 C -30,40 -20,0 0,-15 C 20,0 30,40 25,75 Z" fill="url(#fox-chest-grad)" opacity="0.85" />
     </g>
 
     <!-- Neck / Ruff -->
     <g id="fox-neck" transform="translate(0, -70)">
       <path d="M -35,10 C -45,30 45,30 35,10 C 20,20 -20,20 -35,10 Z" fill="hsl(30, 20%, 98%)" />
+    </g>
+
+    <!-- Zen Necklace Beads -->
+    <g id="fox-necklace" transform="translate(0, -66)" opacity="0.8">
+      <circle cx="0" cy="18" r="4.5" fill="hsl(38, 50%, 45%)" />
+      <path d="M -8,15 Q 0,22 8,15" fill="none" stroke="hsl(38, 30%, 30%)" stroke-width="0.8" />
     </g>
 
     <!-- Head Group -->
@@ -108,16 +120,18 @@ const FOX_SVG_INLINE = `<svg id="fox-root" xmlns="http://www.w3.org/2000/svg" vi
 
       <!-- Eyes (Left) -->
       <g id="fox-eye-left">
-        <path id="fox-eye-left-open" d="M -22,-2 Q -16,-8 -10,-2 Q -16,2 -22,-2 Z" fill="hsl(240, 6%, 20%)" />
-        <circle cx="-19" cy="-4" r="1.5" fill="white" opacity="0.8" />
+        <path id="fox-eye-left-open" d="M -22,-2 Q -16,-8 -10,-2 Q -16,2 -22,-2 Z" fill="hsl(240, 8%, 18%)" />
+        <circle id="fox-glint-left-1" cx="-19" cy="-4" r="1.6" fill="white" opacity="0.85" />
+        <circle id="fox-glint-left-2" cx="-14" cy="-3.5" r="0.8" fill="white" opacity="0.45" />
         <path id="fox-eye-left-half" d="M -22,-2 Q -16,-4 -10,-2 Q -16,-1 -22,-2 Z" fill="hsl(240, 6%, 20%)" style="display:none;" />
         <path id="fox-eye-left-closed" d="M -22,-2 Q -16,0 -10,-2" fill="none" stroke="hsl(240, 6%, 20%)" stroke-width="2.5" stroke-linecap="round" style="display:none;" />
       </g>
 
       <!-- Eyes (Right) -->
       <g id="fox-eye-right">
-        <path id="fox-eye-right-open" d="M 10,-2 Q 16,-8 22,-2 Q 16,2 10,-2 Z" fill="hsl(240, 6%, 20%)" />
-        <circle cx="13" cy="-4" r="1.5" fill="white" opacity="0.8" />
+        <path id="fox-eye-right-open" d="M 10,-2 Q 16,-8 22,-2 Q 16,2 10,-2 Z" fill="hsl(240, 8%, 18%)" />
+        <circle id="fox-glint-right-1" cx="13" cy="-4" r="1.6" fill="white" opacity="0.85" />
+        <circle id="fox-glint-right-2" cx="18" cy="-3.5" r="0.8" fill="white" opacity="0.45" />
         <path id="fox-eye-right-half" d="M 10,-2 Q 16,-4 22,-2 Q 16,-1 10,-2 Z" fill="hsl(240, 6%, 20%)" style="display:none;" />
         <path id="fox-eye-right-closed" d="M 10,-2 Q 16,0 22,-2" fill="none" stroke="hsl(240, 6%, 20%)" stroke-width="2.5" stroke-linecap="round" style="display:none;" />
       </g>
@@ -139,54 +153,54 @@ const FOX_SVG_INLINE = `<svg id="fox-root" xmlns="http://www.w3.org/2000/svg" vi
 </svg>`;
 
 export class FoxAvatarController {
-    constructor(container, options = {}) {
-        this.container = typeof container === 'string' ? document.querySelector(container) : container;
-        this.options = { ...options };
-        this.stateMachine = null;
-        this.isReady = false;
+  constructor(container, options = {}) {
+    this.container = typeof container === 'string' ? document.querySelector(container) : container;
+    this.options = { ...options };
+    this.stateMachine = null;
+    this.isReady = false;
 
-        this.init();
+    this.init();
+  }
+
+  async init() {
+    if (!this.container) return;
+
+    try {
+      // Use inline SVG directly — avoids fetch(), works offline and locally
+      this.container.innerHTML = FOX_SVG_INLINE;
+
+      this.stateMachine = new FoxStateMachine(this.container);
+      setupAvatarAccessibility(this.stateMachine);
+      initFoxEvents(this);
+
+      this.isReady = true;
+      this.setState('idle_calm');
+
+    } catch (e) {
+      console.error('Fox Avatar init error:', e);
+      // Minimal fallback: just show a glyph
+      if (this.container) {
+        this.container.innerHTML =
+          `<div style="font-size:clamp(80px,15vw,120px);opacity:0.6;text-align:center;line-height:1;font-family:serif;color:var(--accent);">狐</div>`;
+      }
     }
+  }
 
-    async init() {
-        if (!this.container) return;
+  setState(stateName) {
+    if (!this.isReady || !this.stateMachine) return;
+    this.stateMachine.transitionTo(stateName);
+  }
 
-        try {
-            // Use inline SVG directly — avoids fetch(), works offline and locally
-            this.container.innerHTML = FOX_SVG_INLINE;
+  dispatchEvent(eventName, payload) {
+    document.dispatchEvent(new CustomEvent('fox_event', { detail: { eventName, payload } }));
+  }
 
-            this.stateMachine = new FoxStateMachine(this.container);
-            setupAvatarAccessibility(this.stateMachine);
-            initFoxEvents(this);
+  pause() { if (this.stateMachine) this.stateMachine.pause(); }
+  resume() { if (this.stateMachine) this.stateMachine.resume(); }
 
-            this.isReady = true;
-            this.setState('idle_calm');
-
-        } catch (e) {
-            console.error('Fox Avatar init error:', e);
-            // Minimal fallback: just show a glyph
-            if (this.container) {
-                this.container.innerHTML =
-                    `<div style="font-size:clamp(80px,15vw,120px);opacity:0.6;text-align:center;line-height:1;font-family:serif;color:var(--accent);">狐</div>`;
-            }
-        }
-    }
-
-    setState(stateName) {
-        if (!this.isReady || !this.stateMachine) return;
-        this.stateMachine.transitionTo(stateName);
-    }
-
-    dispatchEvent(eventName, payload) {
-        document.dispatchEvent(new CustomEvent('fox_event', { detail: { eventName, payload } }));
-    }
-
-    pause() { if (this.stateMachine) this.stateMachine.pause(); }
-    resume() { if (this.stateMachine) this.stateMachine.resume(); }
-
-    destroy() {
-        if (this.stateMachine) this.stateMachine.destroy();
-        if (this.container) this.container.innerHTML = '';
-        this.isReady = false;
-    }
+  destroy() {
+    if (this.stateMachine) this.stateMachine.destroy();
+    if (this.container) this.container.innerHTML = '';
+    this.isReady = false;
+  }
 }

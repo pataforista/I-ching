@@ -245,6 +245,8 @@ export function getHexagramGlossary() {
         name_es: meta.name_es || meta.slug || `Hexagrama ${meta.id}`,
         pinyin: meta.pinyin || "",
         teaser_es: content.dynamic_core_es || content.general_reading_es || "Sin descripción disponible.",
+        upper_trigram: meta.upper_trigram,
+        lower_trigram: meta.lower_trigram,
       };
     })
     .sort((a, b) => a.id - b.id);

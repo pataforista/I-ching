@@ -45,12 +45,22 @@ export class FoxStateMachine {
     _loop(timestamp) {
         if (this.paused) return;
 
-        // Auto Blink Scheduler (only in states where eyes are open)
+        // Auto Blink & Micro-Idle Scheduler (only in states where eyes are open)
         if (this.currentState !== 'rest_eyes_closed' && this.currentState !== 'ritual_trace') {
+            // Blink logic
             if (timestamp - this.lastBlink > this.nextBlinkDelay) {
                 this.morphs.blink(this.blinkTiming);
                 this.lastBlink = timestamp;
                 this.nextBlinkDelay = this.getRandomBlinkDelay();
+
+                // 30% chance of a secondary micro-movement after a blink
+                if (Math.random() < 0.3) {
+                    setTimeout(() => {
+                        const dice = Math.random();
+                        if (dice < 0.5) this.animations.flickerEar(Math.random() > 0.5 ? 'left' : 'right');
+                        else if (dice < 0.8) this.animations.tiltHead(Math.random() > 0.5 ? 'left' : 'right');
+                    }, 400);
+                }
             }
         }
 
@@ -81,8 +91,8 @@ export class FoxStateMachine {
 
             case 'listen':
                 this.animations.startIdle();
-                this.animations.twitchEar('left');
-                setTimeout(() => this.animations.twitchEar('right'), 400);
+                this.animations.flickerEar('left');
+                setTimeout(() => this.animations.flickerEar('right'), 400);
                 setTimeout(() => this.transitionTo('idle_calm'), 2000);
                 break;
 
@@ -98,6 +108,8 @@ export class FoxStateMachine {
 
             case 'affirm_nod':
                 await this.morphs.setMouth('soft');
+                // Additional secondary motion for a "premium" feel
+                this.animations.excitedTail();
                 await this.animations.nod();
                 await this.morphs.setMouth('neutral');
                 this.transitionTo('idle_calm');

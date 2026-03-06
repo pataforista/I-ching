@@ -6,18 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pataforista/I-ching.git"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/pataforista/I-ching/issues"
-  },
-  "homepage": "https://github.com/pataforista/I-ching#readme",
   "dependencies": {
     "d3-interpolate-path": "^2.3.0",
     "roughjs": "^4.6.6",

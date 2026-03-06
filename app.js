@@ -56,7 +56,9 @@ var state = {
 
   // UI State
   _tossing: false,
+  history: [],
   glossaryFilter: "",
+  glossaryTrigramFilter: null,
 
   // Entitlements: app is fully paid — all features unlocked
   entitlements: {
@@ -185,8 +187,17 @@ function initBubbleMenu() {
         }
       },
       {
-        id: "privacy", icon: "⊙", label: "Privacidad", onClick: () => {
-          window.open('./privacy.html', '_blank', 'noopener');
+        id: "about", icon: "ℹ", label: "Acerca de", onClick: () => {
+          openModal("I Ching · Guía Taoísta", `
+            <div class="serif" style="text-align:center; padding:10px 0;">
+              <p><strong>Versión 1.0.0</strong></p>
+              <p style="font-size:0.9rem; opacity:0.8;">Una herramienta de reflexión profunda basada en el Libro de las Mutaciones.</p>
+              <hr style="opacity:0.1; margin:16px 0;">
+              <p style="font-size:0.85rem;"><strong>Contenido Tradicional:</strong> Basado en las obras de dominio público de Richard Wilhelm (1924) y James Legge (1882).</p>
+              <p style="font-size:0.85rem;"><strong>Soporte:</strong> <a href="mailto:miniappsminisoluciones@gmail.com">miniappsminisoluciones@gmail.com</a></p>
+              <p style="font-size:0.85rem; margin-top:16px;"><a href="./privacy.html" target="_blank">Política de Privacidad</a></p>
+            </div>
+          `);
         }
       },
     ]
@@ -628,9 +639,20 @@ function GlossaryView() {
 
   const filterRaw = (state.glossaryFilter || "").trim().toLowerCase();
   const filtered = glossary.filter((hex) => {
-    if (!filterRaw) return true;
-    const haystack = `${hex.id} ${hex.hanzi || ''} ${hex.name_es || ''} ${hex.pinyin || ''} ${hex.teaser_es || ''}`.toLowerCase();
-    return haystack.includes(filterRaw);
+    // Text search
+    let matchText = true;
+    if (filterRaw) {
+      const haystack = `${hex.id} ${hex.hanzi || ''} ${hex.name_es || ''} ${hex.pinyin || ''} ${hex.teaser_es || ''}`.toLowerCase();
+      matchText = haystack.includes(filterRaw);
+    }
+
+    // Trigram filter
+    let matchTrigram = true;
+    if (state.glossaryTrigramFilter) {
+      matchTrigram = (hex.upper_trigram === state.glossaryTrigramFilter || hex.lower_trigram === state.glossaryTrigramFilter);
+    }
+
+    return matchText && matchTrigram;
   });
 
   const cards = filtered.map((hex) => `
@@ -657,9 +679,41 @@ function GlossaryView() {
           <h2 class="hexTitle" style="margin:0;">Glosario de Hexagramas</h2>
           <button class="btn btn--ghost" id="btnBackHome3" style="padding:9px 14px;">Volver</button>
         </div>
-        <p class="muted serif" style="margin:0 0 14px;">Ventana completa para navegar los 64 hexagramas con búsqueda rápida.</p>
-        <input id="glossarySearch" class="input-field" placeholder="Buscar por número, hanzi o nombre..." value="${escapeHtml(state.glossaryFilter || '')}" />
-        <div class="history-grid" style="margin-top:14px; gap:10px;">
+        <p class="muted serif" style="margin:0 0 14px;">Explora los 64 hexagramas por nombre, número o trigramas.</p>
+        <div class="vstack" style="gap:12px; margin-bottom:16px;">
+          <input id="glossarySearch" class="input-field" placeholder="Buscar por número, hanzi o nombre..." value="${escapeHtml(state.glossaryFilter || '')}" />
+          
+          <div class="trigram-filter-bar" id="trigramFilters">
+            <button class="trigram-btn ${!state.glossaryTrigramFilter ? 'active' : ''}" data-trigram="null" title="Todos">
+              <span>All</span>
+            </button>
+            <button class="trigram-btn ${state.glossaryTrigramFilter === 'qian' ? 'active' : ''}" data-trigram="qian" title="Cielo / Qian">
+              <span>☰</span><small>Cielo</small>
+            </button>
+            <button class="trigram-btn ${state.glossaryTrigramFilter === 'kun' ? 'active' : ''}" data-trigram="kun" title="Tierra / Kun">
+              <span>☷</span><small>Tierra</small>
+            </button>
+            <button class="trigram-btn ${state.glossaryTrigramFilter === 'kan' ? 'active' : ''}" data-trigram="kan" title="Agua / Kan">
+              <span>☵</span><small>Agua</small>
+            </button>
+            <button class="trigram-btn ${state.glossaryTrigramFilter === 'li' ? 'active' : ''}" data-trigram="li" title="Fuego / Li">
+              <span>☲</span><small>Fuego</small>
+            </button>
+            <button class="trigram-btn ${state.glossaryTrigramFilter === 'zhen' ? 'active' : ''}" data-trigram="zhen" title="Trueno / Zhen">
+              <span>☳</span><small>Trueno</small>
+            </button>
+            <button class="trigram-btn ${state.glossaryTrigramFilter === 'xun' ? 'active' : ''}" data-trigram="xun" title="Viento / Xun">
+              <span>☴</span><small>Viento</small>
+            </button>
+            <button class="trigram-btn ${state.glossaryTrigramFilter === 'gen' ? 'active' : ''}" data-trigram="gen" title="Montaña / Gen">
+              <span>☶</span><small>Montaña</small>
+            </button>
+            <button class="trigram-btn ${state.glossaryTrigramFilter === 'dui' ? 'active' : ''}" data-trigram="dui" title="Lago / Dui">
+              <span>☱</span><small>Lago</small>
+            </button>
+          </div>
+        </div>
+        <div class="history-grid" style="gap:10px;">
           ${cards || `<p class="serif muted">No hay resultados para tu búsqueda.</p>`}
         </div>
       </div>
@@ -783,7 +837,16 @@ function TossView() {
     <div class="immersive-screen screen-toss">
       <div class="toss-ritual">
 
-        <div id="tossAvatarTarget" style="width: clamp(96px, 28vw, 156px); height: clamp(96px, 28vw, 156px); position: relative;"></div>
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div id="tossAvatarTarget" style="width: clamp(96px, 28vw, 156px); height: clamp(96px, 28vw, 156px); position: relative; z-index: 2;"></div>
+          
+          <div class="fox-speech-bubble">
+            <span class="muted-label">Voz del sabio</span>
+            <div class="toss-oracle-text">
+              <span id="zenText"></span>
+            </div>
+          </div>
+        </div>
 
         <!-- Mode toggle -->
         ${!isComplete ? `
@@ -797,12 +860,6 @@ function TossView() {
           <span class="muted serif" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.12em; opacity:0.5;">
             ${isComplete ? 'Hexagrama completo' : `Línea ${n + 1} de 6`}
           </span>
-          <span class="muted serif" style="font-size:0.68rem; text-transform:uppercase; letter-spacing:0.18em; opacity:0.55;">
-            Voz del zorro
-          </span>
-          <div class="toss-oracle-text">
-            <span id="zenText"></span>
-          </div>
 
         ${isManual && !isComplete ? `
         <!-- Manual coin selectors -->
@@ -1028,6 +1085,27 @@ function ReadingView() {
               <p class="serif" style="margin:0; font-size:0.88rem; opacity:0.8; line-height:1.6;">${escapeHtml((r.dynamic_core_es || '').substring(0, 150))}…</p>
             </div>
           </div>
+        </div>
+        ` : ''}
+
+        <!-- Perspectiva Tradicional (Wilhelm/Legge) -->
+        ${(p.wilhelm_essence_es && !p.wilhelm_essence_es.includes('pendiente')) || (p.legge_commentary_es && !p.legge_commentary_es.includes('proceso')) ? `
+        <div class="reveal-section traditional-section">
+          <span class="traditional-title">Pedigree Tradicional</span>
+          
+          ${p.wilhelm_essence_es && !p.wilhelm_essence_es.includes('pendiente') ? `
+          <div class="traditional-entry">
+            <span class="traditional-label">Richard Wilhelm</span>
+            <p class="traditional-text">${escapeHtml(p.wilhelm_essence_es)}</p>
+          </div>
+          ` : ''}
+
+          ${p.legge_commentary_es && !p.legge_commentary_es.includes('proceso') ? `
+          <div class="traditional-entry">
+            <span class="traditional-label">James Legge</span>
+            <p class="traditional-text">${escapeHtml(p.legge_commentary_es)}</p>
+          </div>
+          ` : ''}
         </div>
         ` : ''}
 
@@ -1579,6 +1657,22 @@ function bindPageEvents(root) {
   root.querySelector("#glossarySearch")?.addEventListener("input", (e) => {
     state.glossaryFilter = e.target.value;
     render();
+    // Maintain focus - wait for next cycle and set cursor
+    setTimeout(() => {
+      const input = document.getElementById("glossarySearch");
+      if (input) {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+      }
+    }, 0);
+  });
+
+  root.querySelector("#trigramFilters")?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".trigram-btn");
+    if (!btn) return;
+    const trigram = btn.dataset.trigram === "null" ? null : btn.dataset.trigram;
+    state.glossaryTrigramFilter = trigram;
+    render();
   });
   root.querySelectorAll("[data-open-hex]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -1591,6 +1685,26 @@ function bindPageEvents(root) {
           <p style="margin:0; font-size:1.2rem;">${escapeHtml(hex.hanzi || '')} · <strong>${escapeHtml(hex.name_es || '')}</strong></p>
           ${hex.pinyin ? `<p class="serif muted" style="margin:4px 0 0;">${escapeHtml(hex.pinyin)}</p>` : ''}
           <p class="serif" style="margin:12px 0 0; line-height:1.65;">${escapeHtml(hex.teaser_es || 'Sin descripción disponible.')}</p>
+          
+          ${(hex.wilhelm_essence_es && !hex.wilhelm_essence_es.includes('pendiente')) || (hex.legge_commentary_es && !hex.legge_commentary_es.includes('proceso')) ? `
+          <div class="modal-traditional">
+            <span style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); display:block; margin-bottom:10px;">Fuentes Tradicionales</span>
+            
+            ${hex.wilhelm_essence_es && !hex.wilhelm_essence_es.includes('pendiente') ? `
+            <div style="margin-bottom:12px;">
+              <span style="font-weight:600; font-size:0.75rem; opacity:0.6; display:block;">Richard Wilhelm</span>
+              <p class="serif" style="font-size:0.88rem; font-style:italic; opacity:0.8; margin:4px 0 0;">${escapeHtml(hex.wilhelm_essence_es)}</p>
+            </div>
+            ` : ''}
+
+            ${hex.legge_commentary_es && !hex.legge_commentary_es.includes('proceso') ? `
+            <div>
+              <span style="font-weight:600; font-size:0.75rem; opacity:0.6; display:block;">James Legge</span>
+              <p class="serif" style="font-size:0.88rem; font-style:italic; opacity:0.8; margin:4px 0 0;">${escapeHtml(hex.legge_commentary_es)}</p>
+            </div>
+            ` : ''}
+          </div>
+          ` : ''}
         </div>
       `);
     });

@@ -494,19 +494,54 @@ select.input-field {
   }
 }
 
-.sage-bubble {
+.fox-speech-bubble {
+  position: relative;
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
   padding: clamp(16px, 3.5vw, 24px);
-  border-radius: var(--radius-sm);
+  border-radius: 16px;
   max-width: 480px;
+  width: 100%;
   text-align: center;
   font-size: clamp(0.9rem, 2.2vw, 1.05rem);
-  font-family: var(--font-sans);
+  font-family: var(--font-serif);
   line-height: 1.6;
-  position: relative;
   z-index: 5;
-  box-shadow: var(--panel-shadow);
+  box-shadow: 0 10px 30px hsla(240, 6%, 12%, 0.08), 0 4px 12px hsla(240, 6%, 12%, 0.04);
+  margin-top: 12px;
+}
+
+.fox-speech-bubble::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 16px;
+  height: 16px;
+  background: var(--panel-bg);
+  border-left: 1px solid var(--panel-border);
+  border-top: 1px solid var(--panel-border);
+  border-radius: 3px 0 0 0;
+  z-index: -1;
+}
+
+.fox-speech-bubble .muted-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  opacity: 0.55;
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-sans);
+}
+
+.toss-oracle-text {
+  min-height: 3.2em;
+  /* Prevents layout jumps when text types out */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* --- Coin Stage --- */
@@ -1814,6 +1849,67 @@ a:focus:not(:focus-visible) {
   }
 }
 
+/* --- Glossary Trigram Filters --- */
+.trigram-filter-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  mask-image: linear-gradient(to right, black 85%, transparent);
+}
+
+.trigram-filter-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.trigram-btn {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 62px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 8px;
+}
+
+.trigram-btn span {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.trigram-btn small {
+  font-size: 0.62rem;
+  font-family: var(--font-serif);
+  opacity: 0.6;
+  margin-top: 2px;
+}
+
+.trigram-btn:hover {
+  border-color: var(--accent);
+  background: var(--bg);
+}
+
+.trigram-btn.active {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px hsla(156, 30%, 42%, 0.25);
+}
+
+.trigram-btn.active small {
+  color: inherit;
+  opacity: 0.9;
+}
+
 /* ═══════════════════════════════════════════════════════════
    PREFERS-REDUCED-MOTION
    All animations and transitions gracefully disabled
@@ -1867,4 +1963,80 @@ a:focus:not(:focus-visible) {
   #app-splash {
     display: none !important;
   }
+}
+
+/* --- Traditional Perspectives Section --- */
+.traditional-section {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: clamp(20px, 4vw, 36px);
+  margin-top: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--panel-shadow);
+}
+
+.traditional-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--gold);
+  opacity: 0.6;
+}
+
+.traditional-title {
+  font-family: var(--font-serif);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  margin-bottom: 20px;
+  display: block;
+}
+
+.traditional-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.traditional-entry:last-child {
+  margin-bottom: 0;
+}
+
+.traditional-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.traditional-label::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--panel-border);
+  opacity: 0.5;
+}
+
+.traditional-text {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  opacity: 0.9;
+  font-style: italic;
+}
+
+/* Modal specific traditional styles */
+.modal-traditional {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--panel-border);
 }
