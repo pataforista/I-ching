@@ -232,6 +232,24 @@ export function isContentLoaded() {
   return !!store.content;
 }
 
+export function getHexagramGlossary() {
+  const metaList = store.meta?.hexagrams || [];
+  const contentMap = store.content?.hexagrams || {};
+
+  return metaList
+    .map((meta) => {
+      const content = contentMap[String(meta.id)] || {};
+      return {
+        id: meta.id,
+        hanzi: meta.hanzi || "",
+        name_es: meta.name_es || meta.slug || `Hexagrama ${meta.id}`,
+        pinyin: meta.pinyin || "",
+        teaser_es: content.dynamic_core_es || content.general_reading_es || "Sin descripción disponible.",
+      };
+    })
+    .sort((a, b) => a.id - b.id);
+}
+
 // --- Toss Logic ---
 
 export function tossLine() {

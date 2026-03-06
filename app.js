@@ -6,7 +6,8 @@ import {
   trackEvent,
   tossLine,
   buildReading,
-  t
+  t,
+  getHexagramGlossary
 } from "./engine.js";
 
 // Constants
@@ -558,6 +559,33 @@ function initReadingVisuals() {
 
 // No book shell — views render directly into immersive-shell
 
+function buildGlossaryModalHTML() {
+  const glossary = getHexagramGlossary();
+  if (!glossary.length) {
+    return `<p class="serif">No se pudo cargar el glosario por ahora.</p>`;
+  }
+
+  const items = glossary.map((hex) => `
+    <article style="padding:10px 0; border-bottom:1px solid hsla(240,6%,12%,0.08);">
+      <div style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
+        <span style="font-weight:700; font-size:0.95rem;">#${hex.id}</span>
+        <span style="font-size:1.2rem; line-height:1;">${escapeHtml(hex.hanzi || '')}</span>
+        <span class="serif" style="font-weight:600;">${escapeHtml(hex.name_es || '')}</span>
+        ${hex.pinyin ? `<span class="muted serif" style="font-size:0.78rem;">(${escapeHtml(hex.pinyin)})</span>` : ''}
+      </div>
+      <p class="serif" style="margin:8px 0 0; font-size:0.85rem; opacity:0.85; line-height:1.55;">${escapeHtml((hex.teaser_es || '').slice(0, 190))}${hex.teaser_es && hex.teaser_es.length > 190 ? '...' : ''}</p>
+    </article>
+  `).join('');
+
+  return `
+    <div style="max-height:min(70vh,640px); overflow:auto; padding-right:4px;">
+      <p class="serif muted" style="font-size:0.82rem; margin:0 0 10px;">Glosario resumido de los 64 hexagramas.</p>
+      ${items}
+      <p class="serif" style="margin:14px 0 0; font-size:0.8rem; opacity:0.7;">Contacto: <a href="mailto:miniappsminisoluciones@gmail.com">miniappsminisoluciones@gmail.com</a></p>
+    </div>
+  `;
+}
+
 function HomeFormView() {
   const qText = state.draft.question.text_es || "";
   const placeholder = t("home.placeholder_question") || "¿Qué actitud conviene sostener ante esta situación?";
@@ -595,6 +623,10 @@ function HomeFormView() {
             <button class="btn btn--primary" id="btnBegin" style="width:100%; padding:18px; font-size:1.05rem; margin-top:4px;">
               ${t("home.btn_toss") || "Consultar el Oráculo"}
             </button>
+            <button class="btn btn--ghost" id="btnGlossary" style="width:100%; padding:12px 18px; font-size:0.9rem;">
+              Glosario de Hexagramas
+            </button>
+            <p class="muted serif" style="margin:0; font-size:0.75rem; text-align:center;">Contacto: <a href="mailto:miniappsminisoluciones@gmail.com">miniappsminisoluciones@gmail.com</a></p>
           </div>
         </div>
 
@@ -1419,6 +1451,9 @@ function bindPageEvents(root) {
     state.draft.question.mode = e.target.value;
   });
   root.querySelector("#btnHistoryShortcut")?.addEventListener("click", openHistory);
+  root.querySelector("#btnGlossary")?.addEventListener("click", () => {
+    openModal("Glosario de Hexagramas", buildGlossaryModalHTML());
+  });
 
   // Toss — digital
   root.querySelector("#btnToss")?.addEventListener("click", onTossNextLine);
