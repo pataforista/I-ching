@@ -14,6 +14,7 @@ export class FoxStateMachine {
         this.blinkTiming = FoxTheme.timing.blinkBase;
         this.lastBlink = performance.now();
         this.nextBlinkDelay = this.getRandomBlinkDelay();
+        this.pendingTimeouts = new Set();
 
         this._loop = this._loop.bind(this);
         this.rafId = requestAnimationFrame(this._loop);
@@ -22,11 +23,13 @@ export class FoxStateMachine {
     destroy() {
         this.paused = true;
         cancelAnimationFrame(this.rafId);
+        this.clearPendingTimeouts();
         this.animations.stopIdle();
     }
 
     pause() {
         this.paused = true;
+        this.clearPendingTimeouts();
         this.animations.stopIdle();
     }
 
@@ -42,6 +45,21 @@ export class FoxStateMachine {
         return 5000 + Math.random() * 6000;
     }
 
+    queueTimeout(fn, delay) {
+        const timeoutId = setTimeout(() => {
+            this.pendingTimeouts.delete(timeoutId);
+            if (this.paused) return;
+            fn();
+        }, delay);
+        this.pendingTimeouts.add(timeoutId);
+        return timeoutId;
+    }
+
+    clearPendingTimeouts() {
+        this.pendingTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+        this.pendingTimeouts.clear();
+    }
+
     _loop(timestamp) {
         if (this.paused) return;
 
@@ -53,9 +71,15 @@ export class FoxStateMachine {
                 this.lastBlink = timestamp;
                 this.nextBlinkDelay = this.getRandomBlinkDelay();
 
+                // Natural clustered blink: sometimes a quick follow-up blink.
+                if (Math.random() < 0.22) {
+                    const quickDelay = 120 + Math.random() * 120;
+                    this.queueTimeout(() => this.morphs.blink(this.blinkTiming * 0.75), quickDelay);
+                }
+
                 // 30% chance of a secondary micro-movement after a blink
                 if (Math.random() < 0.3) {
-                    setTimeout(() => {
+                    this.queueTimeout(() => {
                         const dice = Math.random();
                         if (dice < 0.5) this.animations.flickerEar(Math.random() > 0.5 ? 'left' : 'right');
                         else if (dice < 0.8) this.animations.tiltHead(Math.random() > 0.5 ? 'left' : 'right');
@@ -92,8 +116,8 @@ export class FoxStateMachine {
             case 'listen':
                 this.animations.startIdle();
                 this.animations.flickerEar('left');
-                setTimeout(() => this.animations.flickerEar('right'), 400);
-                setTimeout(() => this.transitionTo('idle_calm'), 2000);
+                this.queueTimeout(() => this.animations.flickerEar('right'), 400);
+                this.queueTimeout(() => this.transitionTo('idle_calm'), 2000);
                 break;
 
             case 'look_left':
@@ -143,7 +167,7 @@ export class FoxStateMachine {
                         easing: 'ease-in-out'
                     });
                 }
-                setTimeout(() => this.transitionTo('rest_eyes_closed'), FoxTheme.timing.ritualTrace);
+                this.queueTimeout(() => this.transitionTo('rest_eyes_closed'), FoxTheme.timing.ritualTrace);
                 break;
 
             default:
