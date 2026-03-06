@@ -37,7 +37,7 @@ var state = {
   // Boot status
   boot: { ok: true, missing: [], error: null },
 
-  // Navigation: 'home' | 'toss' | 'reading' | 'history'
+  // Navigation: 'home' | 'toss' | 'reading' | 'history' | 'glossary' | 'daily'
   nav: "home",
 
   // Data
@@ -56,6 +56,7 @@ var state = {
 
   // UI State
   _tossing: false,
+  glossaryFilter: "",
 
   // Entitlements: app is fully paid — all features unlocked
   entitlements: {
@@ -345,7 +346,7 @@ function initSwipeGestures() {
     touchStartTime = Date.now();
 
     // Show hint on left edge
-    if (touchStartX < EDGE_ZONE && (state.nav === 'reading' || state.nav === 'history')) {
+    if (touchStartX < EDGE_ZONE && (state.nav === 'reading' || state.nav === 'history' || state.nav === 'glossary' || state.nav === 'daily')) {
       hint.classList.add('active');
     }
   };
@@ -367,6 +368,8 @@ function initSwipeGestures() {
       haptic('light');
       if (state.nav === 'reading') startNew();
       else if (state.nav === 'history') startNew();
+      else if (state.nav === 'glossary') startNew();
+      else if (state.nav === 'daily') startNew();
       else if (state.nav === 'toss') startNew();
     }
 
@@ -402,6 +405,8 @@ async function nav(to) {
   else if (to === "toss") dispatchFox('SHOW_ORACLE');
   else if (to === "reading") dispatchFox('SHOW_READING');
   else if (to === "history") dispatchFox('SLEEP_MODE');
+  else if (to === "glossary") dispatchFox('SHOW_READING');
+  else if (to === "daily") dispatchFox('SHOW_READING');
 
   // Premium: progress bar + swipe gestures on each screen
   initReadProgress();
@@ -447,6 +452,14 @@ function openHistory() {
   nav("history");
 }
 
+function openGlossary() {
+  nav("glossary");
+}
+
+function openDailyHexagram() {
+  nav("daily");
+}
+
 function deleteHistory() {
   state.history = [];
   saveLocal();
@@ -474,6 +487,8 @@ function render() {
     case "toss": contentHTML = TossView(); break;
     case "reading": contentHTML = ReadingView(); break;
     case "history": contentHTML = HistoryView(); break;
+    case "glossary": contentHTML = GlossaryView(); break;
+    case "daily": contentHTML = DailyHexagramView(); break;
     default: contentHTML = HomeFormView();
   }
 
@@ -586,6 +601,108 @@ function buildGlossaryModalHTML() {
   `;
 }
 
+function getHexagramOfDay() {
+  const glossary = getHexagramGlossary();
+  if (!glossary.length) return null;
+
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((now - startOfYear) / 86400000) + 1;
+  const idx = dayOfYear % glossary.length;
+  return glossary[idx];
+}
+
+function GlossaryView() {
+  const glossary = getHexagramGlossary();
+  if (!glossary.length) {
+    return `
+      <section class="immersive-screen" style="padding-top:42px;">
+        <div class="history-wrapper" style="max-width:920px; width:min(100%, 920px);">
+          <h2 class="hexTitle" style="margin:0 0 12px;">Glosario de Hexagramas</h2>
+          <p class="serif">No se pudo cargar el glosario por ahora.</p>
+          <button class="btn btn--ghost" id="btnBackHome3">Volver</button>
+        </div>
+      </section>
+    `;
+  }
+
+  const filterRaw = (state.glossaryFilter || "").trim().toLowerCase();
+  const filtered = glossary.filter((hex) => {
+    if (!filterRaw) return true;
+    const haystack = `${hex.id} ${hex.hanzi || ''} ${hex.name_es || ''} ${hex.pinyin || ''} ${hex.teaser_es || ''}`.toLowerCase();
+    return haystack.includes(filterRaw);
+  });
+
+  const cards = filtered.map((hex) => `
+    <article class="history-card" style="padding:14px 16px;">
+      <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
+        <div>
+          <div style="display:flex; gap:8px; align-items:baseline; flex-wrap:wrap;">
+            <span style="font-weight:700;">#${hex.id}</span>
+            <span style="font-size:1.3rem; line-height:1;">${escapeHtml(hex.hanzi || '')}</span>
+            <span class="serif" style="font-weight:600;">${escapeHtml(hex.name_es || '')}</span>
+          </div>
+          ${hex.pinyin ? `<p class="muted serif" style="margin:4px 0 0; font-size:0.78rem;">${escapeHtml(hex.pinyin)}</p>` : ''}
+        </div>
+        <button class="btn btn--ghost" data-open-hex="${hex.id}" style="padding:8px 12px; font-size:0.78rem;">Ver</button>
+      </div>
+      <p class="serif" style="margin:10px 0 0; font-size:0.84rem; line-height:1.6;">${escapeHtml((hex.teaser_es || '').slice(0, 210))}${hex.teaser_es && hex.teaser_es.length > 210 ? '...' : ''}</p>
+    </article>
+  `).join('');
+
+  return `
+    <section class="immersive-screen" style="padding-top:42px;">
+      <div class="history-wrapper" style="max-width:920px; width:min(100%, 920px);">
+        <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
+          <h2 class="hexTitle" style="margin:0;">Glosario de Hexagramas</h2>
+          <button class="btn btn--ghost" id="btnBackHome3" style="padding:9px 14px;">Volver</button>
+        </div>
+        <p class="muted serif" style="margin:0 0 14px;">Ventana completa para navegar los 64 hexagramas con búsqueda rápida.</p>
+        <input id="glossarySearch" class="input-field" placeholder="Buscar por número, hanzi o nombre..." value="${escapeHtml(state.glossaryFilter || '')}" />
+        <div class="history-grid" style="margin-top:14px; gap:10px;">
+          ${cards || `<p class="serif muted">No hay resultados para tu búsqueda.</p>`}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function DailyHexagramView() {
+  const hex = getHexagramOfDay();
+  if (!hex) {
+    return `
+      <section class="immersive-screen" style="padding-top:42px;">
+        <div class="history-wrapper" style="max-width:760px; width:min(100%, 760px);">
+          <h2 class="hexTitle" style="margin:0 0 12px;">Hexagrama del día</h2>
+          <p class="serif">No se pudo cargar el hexagrama del día.</p>
+          <button class="btn btn--ghost" id="btnBackHome4">Volver</button>
+        </div>
+      </section>
+    `;
+  }
+
+  return `
+    <section class="immersive-screen" style="padding-top:42px;">
+      <div class="history-wrapper" style="max-width:760px; width:min(100%, 760px);">
+        <div class="history-card" style="padding:18px;">
+          <p class="muted serif" style="margin:0; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em;">Hexagrama del día</p>
+          <div style="display:flex; align-items:baseline; gap:10px; margin-top:8px; flex-wrap:wrap;">
+            <span style="font-weight:700; font-size:1.06rem;">#${hex.id}</span>
+            <span style="font-size:2.1rem; line-height:1;">${escapeHtml(hex.hanzi || '')}</span>
+            <h2 class="hexTitle" style="margin:0; font-size:1.28rem;">${escapeHtml(hex.name_es || '')}</h2>
+          </div>
+          ${hex.pinyin ? `<p class="muted serif" style="margin:6px 0 0;">${escapeHtml(hex.pinyin)}</p>` : ''}
+          <p class="serif" style="margin:14px 0 0; line-height:1.7;">${escapeHtml(hex.teaser_es || 'Sin descripción disponible.')}</p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+            <button class="btn btn--primary" id="btnDailyOpenGlossary">Explorar glosario</button>
+            <button class="btn btn--ghost" id="btnBackHome4">Volver al inicio</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
 function HomeFormView() {
   const qText = state.draft.question.text_es || "";
   const placeholder = t("home.placeholder_question") || "¿Qué actitud conviene sostener ante esta situación?";
@@ -625,6 +742,9 @@ function HomeFormView() {
             </button>
             <button class="btn btn--ghost" id="btnGlossary" style="width:100%; padding:12px 18px; font-size:0.9rem;">
               Glosario de Hexagramas
+            </button>
+            <button class="btn btn--ghost" id="btnDailyHex" style="width:100%; padding:12px 18px; font-size:0.9rem;">
+              Hexagrama del día
             </button>
             <p class="muted serif" style="margin:0; font-size:0.75rem; text-align:center;">Contacto: <a href="mailto:miniappsminisoluciones@gmail.com">miniappsminisoluciones@gmail.com</a></p>
           </div>
@@ -1451,9 +1571,34 @@ function bindPageEvents(root) {
     state.draft.question.mode = e.target.value;
   });
   root.querySelector("#btnHistoryShortcut")?.addEventListener("click", openHistory);
-  root.querySelector("#btnGlossary")?.addEventListener("click", () => {
-    openModal("Glosario de Hexagramas", buildGlossaryModalHTML());
+  root.querySelector("#btnGlossary")?.addEventListener("click", openGlossary);
+  root.querySelector("#btnDailyHex")?.addEventListener("click", openDailyHexagram);
+
+  // Glossary page
+  root.querySelector("#btnBackHome3")?.addEventListener("click", startNew);
+  root.querySelector("#glossarySearch")?.addEventListener("input", (e) => {
+    state.glossaryFilter = e.target.value;
+    render();
   });
+  root.querySelectorAll("[data-open-hex]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-open-hex");
+      const glossary = getHexagramGlossary();
+      const hex = glossary.find(item => String(item.id) === String(id));
+      if (!hex) return;
+      openModal(`Hexagrama #${hex.id}`, `
+        <div>
+          <p style="margin:0; font-size:1.2rem;">${escapeHtml(hex.hanzi || '')} · <strong>${escapeHtml(hex.name_es || '')}</strong></p>
+          ${hex.pinyin ? `<p class="serif muted" style="margin:4px 0 0;">${escapeHtml(hex.pinyin)}</p>` : ''}
+          <p class="serif" style="margin:12px 0 0; line-height:1.65;">${escapeHtml(hex.teaser_es || 'Sin descripción disponible.')}</p>
+        </div>
+      `);
+    });
+  });
+
+  // Daily hexagram page
+  root.querySelector("#btnBackHome4")?.addEventListener("click", startNew);
+  root.querySelector("#btnDailyOpenGlossary")?.addEventListener("click", openGlossary);
 
   // Toss — digital
   root.querySelector("#btnToss")?.addEventListener("click", onTossNextLine);
