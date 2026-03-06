@@ -10,6 +10,22 @@
 // Verified: isPublicDomain === true via MET Open Access API
 
 const MET_BASE = "https://images.metmuseum.org/CRDImages/as/web-large/";
+// Smaller images for mobile/slow connections (saves bandwidth, loads faster)
+const MET_BASE_SMALL = "https://images.metmuseum.org/CRDImages/as/original/";
+
+/** Returns true if device is likely mobile or on a slow connection */
+function _isMobileOrSlow() {
+    // Screen width heuristic
+    if (window.innerWidth <= 768) return true;
+    // Network Information API (Chrome/Android)
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conn) {
+        // effectiveType: 'slow-2g', '2g', '3g', '4g'
+        if (conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g') return true;
+        if (conn.saveData === true) return true;
+    }
+    return false;
+}
 
 const MET_ARTWORKS = [
     // Hiroshige — Six Jewel Rivers from Various Provinces (1857, woodblock prints)
@@ -99,7 +115,8 @@ const FALLBACK_SVGS = [
     "./assets/fallback/sumi-reeds.svg"
 ];
 
-const LOAD_TIMEOUT_MS = 7000; // 7s before falling back
+const LOAD_TIMEOUT_MS = 7000;       // 7s on desktop
+const LOAD_TIMEOUT_MOBILE_MS = 5000; // 5s on mobile/slow connections
 
 // ─── ArtBackground Class ──────────────────────────────────────────────────────
 export class ArtBackground {
@@ -192,9 +209,11 @@ export class ArtBackground {
     async _loadNext() {
         this._isTransitioning = true;
         const artwork = this._pickArtwork();
+        const mobile = _isMobileOrSlow();
+        const timeout = mobile ? LOAD_TIMEOUT_MOBILE_MS : LOAD_TIMEOUT_MS;
 
         try {
-            const src = await this._loadWithTimeout(artwork.url, LOAD_TIMEOUT_MS);
+            const src = await this._loadWithTimeout(artwork.url, timeout);
             this._crossfade(src);
             this._setAttribution(artwork);
         } catch {

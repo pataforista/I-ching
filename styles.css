@@ -76,44 +76,55 @@
 }
 
 /* --- Layout --- */
-html,
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  /* Background on html ensures art-bg-layer (z-index:-2) is visible on iOS Safari */
+  background: var(--bg);
+  transition: background 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
 body {
   margin: 0;
   padding: 0;
   width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
-}
-
-body {
-  background: var(--bg);
+  /* transparent so #art-bg-layer with z-index:-2 shows through on all browsers */
+  background: transparent;
   color: var(--text);
   font-family: var(--font-sans);
   line-height: 1.7;
-  transition: background 0.8s cubic-bezier(0.25, 1, 0.5, 1),
-    color 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: color 0.8s cubic-bezier(0.25, 1, 0.5, 1);
   font-size: clamp(16px, 1.05vw + 12px, 18px);
   -webkit-tap-highlight-color: transparent;
   /* better mobile feel */
-
-  /* Extremely subtle paper noise - 2% opacity */
-  background-image:
-    radial-gradient(circle at 15% 15%, hsla(215, 30%, 35%, 0.02) 0%, transparent 40%),
-    radial-gradient(circle at 85% 85%, hsla(156, 30%, 42%, 0.02) 0%, transparent 40%),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
 }
 
 /* --- Art Background Layer (ukiyo-e / sumi-e paintings) --- */
+/* Use top/right/bottom/left instead of `inset` for broader mobile browser compatibility */
 #art-bg-layer {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: -2;
   overflow: hidden;
+  /* Prevent iOS Safari rubber-band effect from leaving gaps */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 #art-bg-layer img {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -126,12 +137,17 @@ body {
 /* Paper/ink overlay — keeps text readable over the painting */
 #art-bg-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: -1;
   pointer-events: none;
   /* Light mode: warm ivory veil, 82% opacity */
   background: hsla(42, 25%, 96%, 0.83);
   transition: background 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 [data-theme="ink"] #art-bg-overlay {

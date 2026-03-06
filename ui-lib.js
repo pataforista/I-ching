@@ -78,6 +78,91 @@ export class Typewriter {
     delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 }
 
+// ─── BlurText (React Bits inspired) ───────────────────────────
+export class BlurText {
+    constructor(element, options = {}) {
+        this.element = typeof element === 'string' ? document.querySelector(element) : element;
+        this.options = {
+            delay: 45,            // stagger delay across words
+            animationDuration: 0.8, // in seconds
+            initialDelay: 0,
+            onComplete: null,
+            ...options
+        };
+        this._cancelled = false;
+        this.init();
+    }
+
+    init() {
+        if (!this.element) return;
+        this.element.innerHTML = '';
+        this.element.style.display = 'inline-flex';
+        this.element.style.flexWrap = 'wrap';
+        this.element.style.justifyContent = 'center';
+        this.element.style.gap = '0.25em'; // space between words
+    }
+
+    async type(text) {
+        if (!this.element) return;
+        this._cancelled = false;
+        this.element.innerHTML = '';
+
+        if (this.options.initialDelay) await new Promise(r => setTimeout(r, this.options.initialDelay));
+
+        if (prefersReducedMotion()) {
+            this.element.textContent = text;
+            if (!this._cancelled && this.options.onComplete) this.options.onComplete();
+            return;
+        }
+
+        // Split text into words for React Bits style block animation
+        const words = text.split(' ');
+        const spans = [];
+
+        words.forEach((word) => {
+            const span = document.createElement('span');
+            span.textContent = word;
+            // React Bits initial style: blur out, scaled up, faded out, moved down
+            span.style.cssText = `
+                display: inline-block;
+                opacity: 0;
+                transform: translate3d(0, 8px, 0) scale(1.05);
+                filter: blur(6px);
+                will-change: transform, opacity, filter;
+                transition: opacity ${this.options.animationDuration}s cubic-bezier(0.16, 1, 0.3, 1),
+                            transform ${this.options.animationDuration}s cubic-bezier(0.16, 1, 0.3, 1),
+                            filter ${this.options.animationDuration}s cubic-bezier(0.16, 1, 0.3, 1);
+            `;
+            this.element.appendChild(span);
+            // Non-breaking space is handled by gap property in parent
+            spans.push(span);
+        });
+
+        // Trigger animations with stagger
+        for (let i = 0; i < spans.length; i++) {
+            if (this._cancelled) break;
+
+            // Allow browser paint
+            await new Promise(r => setTimeout(r, this.options.delay));
+
+            if (!this._cancelled) {
+                // Remove blur, scale, and transform
+                spans[i].style.opacity = '1';
+                spans[i].style.transform = 'translate3d(0, 0, 0) scale(1)';
+                spans[i].style.filter = 'blur(0px)';
+            }
+        }
+
+        if (!this._cancelled && this.options.onComplete) {
+            // Wait for last animation to finish
+            setTimeout(this.options.onComplete, this.options.animationDuration * 1000);
+        }
+    }
+
+    cancel() { this._cancelled = true; }
+}
+
+
 // ─── BubbleMenu ───────────────────────────────────────────────
 export class BubbleMenu {
     constructor(itemsOrConfig = [], options = {}) {

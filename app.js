@@ -1,4 +1,4 @@
-import { BubbleMenu, Typewriter, InkGalaxy, TiltCard, EnsoLoader, DynamicHexagram, drawHanzi, DynamicAvatar } from "./ui-lib.js";
+import { Typewriter, BlurText, BubbleMenu, InkGalaxy, TiltCard, EnsoLoader, DynamicHexagram, drawHanzi, DynamicAvatar } from "./ui-lib.js";
 import { FoxAvatarController } from "./src/avatar/avatar-controller.js";
 import { ArtBackground } from "./src/art-background.js";
 import {
@@ -317,7 +317,7 @@ function initReadProgress() {
 // ---------- Swipe Gesture Navigation ----------
 function initSwipeGestures() {
   const SWIPE_THRESHOLD = 60;
-  const EDGE_ZONE = 40; // pixels from left/right edge
+  const EDGE_ZONE = 25; // pixels from left/right edge
   let touchStartX = 0;
   let touchStartY = 0;
   let touchStartTime = 0;
@@ -347,12 +347,15 @@ function initSwipeGestures() {
 
   document.body._swipeEnd = (e) => {
     hint.classList.remove('active');
+    // Si es un simple "tap" no interumpir
+    if (e.changedTouches.length === 0) return;
+
     const dx = e.changedTouches[0].clientX - touchStartX;
     const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
     const elapsed = Date.now() - touchStartTime;
 
-    // Must be a fast, mostly horizontal gesture
-    if (elapsed > 500 || dy > 60) return;
+    // Must be a fast, mostly horizontal gesture. Si tardó mucho o es vertical, o si se movió muy poco, considerarlo tap.
+    if (elapsed > 500 || dy > 60 || Math.abs(dx) < SWIPE_THRESHOLD) return;
 
     // Right swipe from left edge → go back
     if (dx > SWIPE_THRESHOLD && touchStartX < EDGE_ZONE) {
@@ -639,11 +642,8 @@ function TossView() {
             ${isComplete ? 'Hexagrama completo' : `Línea ${n + 1} de 6`}
           </span>
           <div class="toss-oracle-text">
-            ${isManual && !isComplete
-      ? '<em style="opacity:0.55">Lanza las monedas físicamente, luego registra: ☰ Yang (cara) · ☷ Yin (cruz)</em>'
-      : '<span id="zenText"></span>'}
+            <span id="zenText"></span>
           </div>
-        </div>
 
         ${isManual && !isComplete ? `
         <!-- Manual coin selectors -->
@@ -1177,18 +1177,71 @@ function bindShellEvents() {
     state._bookOpen = true;
     render();
   });
+
+  // Reacciones al tocar al zorro
+  document.addEventListener("fox_poke", () => {
+    const zenEl = document.getElementById("zenText");
+    if (zenEl && state.nav === "toss" && !state._tossing) {
+      const pokes = [
+        "El silencio también es una respuesta.",
+        "Observo el cambio en todas las cosas.",
+        "¿Buscas la verdad o solo confirmación?",
+        "Todo fluye, nada permanece.",
+        "El sabio señala la luna, no mires el dedo.",
+        "Respira, la respuesta ya está en ti."
+      ];
+      if (sageTyper) sageTyper.cancel();
+      sageTyper = new BlurText(zenEl, { delay: 30, animationDuration: 0.6 });
+      sageTyper.type(pokes[Math.floor(Math.random() * pokes.length)]);
+    }
+  });
 }
 
 function initPageEffects() {
   const zenEl = document.getElementById("zenText");
   if (zenEl) {
     if (sageTyper) sageTyper.cancel();
-    sageTyper = new Typewriter(zenEl, { typingSpeed: 35 });
+    // Usa el nuevo BlurText estilo React Bits
+    sageTyper = new BlurText(zenEl, { delay: 40, animationDuration: 0.8 });
+
     const n = state.draft.tosses.length;
+    const isManual = state.draft.tossMode === 'manual';
     let msg = "";
-    if (n === 0) msg = "Concentra tu mente en la pregunta... Lanza las monedas cuando sientas calma interior.";
-    else if (n < 6) msg = `El oráculo escucha... Línea ${n + 1} de 6. Sostén la pregunta en tu mente.`;
-    else msg = "El hexagrama está completo. La respuesta del Libro aguarda.";
+
+    // Frases variadas según la fase de la tirada
+    if (n === 0) {
+      if (isManual) {
+        msg = "Lanza tus propias monedas. Siente su peso, registra el resultado.";
+      } else {
+        const phrases = [
+          "Concentra tu mente en la pregunta... Lanza las monedas cuando sientas calma interior.",
+          "El oráculo aguarda tu consulta inicial. Tira las monedas.",
+          "Respira profundo. Cuando el silencio se asiente, lanza las monedas.",
+          "Una mente serena atrae respuestas claras. Adelante."
+        ];
+        msg = phrases[Math.floor(Math.random() * phrases.length)];
+      }
+    } else if (n < 6) {
+      if (isManual) {
+        msg = `El eco de tu lanzamiento toma forma. Registra la línea ${n + 1}.`;
+      } else {
+        const phrases = [
+          `El oráculo escucha... Línea ${n + 1} de 6. Sostén la pregunta en tu mente.`,
+          `La mutación toma forma. Continúa con la línea ${n + 1}.`,
+          `Mantén el foco en tu intención. Tira de nuevo para la línea ${n + 1}.`,
+          `El tejido del tiempo se despliega. Avanza a la línea ${n + 1}.`
+        ];
+        msg = phrases[Math.floor(Math.random() * phrases.length)];
+      }
+    } else {
+      const phrases = [
+        "El hexagrama está completo. La respuesta del Libro aguarda.",
+        "La forma final ha emergido. Adelante.",
+        "El ciclo se ha cerrado. Descubramos la lectura."
+      ];
+      msg = phrases[Math.floor(Math.random() * phrases.length)];
+    }
+
     sageTyper.type(msg);
   }
 
@@ -1212,6 +1265,21 @@ function onTossNextLine() {
 
   const ensoEl = document.getElementById("ensoTarget");
   if (ensoEl) new EnsoLoader(ensoEl).show(2000);
+
+  // Fox transitional speech during toss
+  const zenEl = document.getElementById("zenText");
+  if (zenEl && sageTyper) {
+    const tossPhrases = [
+      "Las monedas caen en el vacío...",
+      "Observando el fluir del Yin y el Yang...",
+      "El azar dialoga con el universo...",
+      "El cambio se manifiesta..."
+    ];
+    // Cancel prior text and blur in new text fast
+    sageTyper.cancel();
+    sageTyper = new BlurText(zenEl, { delay: 25, animationDuration: 0.6 });
+    sageTyper.type(tossPhrases[Math.floor(Math.random() * tossPhrases.length)]);
+  }
 
   // Small delay so the DOM is painted before we animate
   setTimeout(() => {
