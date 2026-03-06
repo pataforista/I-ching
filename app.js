@@ -28,6 +28,10 @@ let homeAvatar = null;
 let tossAvatar = null;
 let artBg = null;
 
+function foxLine(text) {
+  return `🦊 ${text}`;
+}
+
 var state = {
   // Boot status
   boot: { ok: true, missing: [], error: null },
@@ -641,6 +645,9 @@ function TossView() {
           <span class="muted serif" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.12em; opacity:0.5;">
             ${isComplete ? 'Hexagrama completo' : `Línea ${n + 1} de 6`}
           </span>
+          <span class="muted serif" style="font-size:0.68rem; text-transform:uppercase; letter-spacing:0.18em; opacity:0.55;">
+            Voz del zorro
+          </span>
           <div class="toss-oracle-text">
             <span id="zenText"></span>
           </div>
@@ -1192,7 +1199,7 @@ function bindShellEvents() {
       ];
       if (sageTyper) sageTyper.cancel();
       sageTyper = new BlurText(zenEl, { delay: 30, animationDuration: 0.6 });
-      sageTyper.type(pokes[Math.floor(Math.random() * pokes.length)]);
+      sageTyper.type(foxLine(pokes[Math.floor(Math.random() * pokes.length)]));
     }
   });
 }
@@ -1242,7 +1249,7 @@ function initPageEffects() {
       msg = phrases[Math.floor(Math.random() * phrases.length)];
     }
 
-    sageTyper.type(msg);
+    sageTyper.type(foxLine(msg));
   }
 
   // Tilt effect on cards
@@ -1278,7 +1285,7 @@ function onTossNextLine() {
     // Cancel prior text and blur in new text fast
     sageTyper.cancel();
     sageTyper = new BlurText(zenEl, { delay: 25, animationDuration: 0.6 });
-    sageTyper.type(tossPhrases[Math.floor(Math.random() * tossPhrases.length)]);
+    sageTyper.type(foxLine(tossPhrases[Math.floor(Math.random() * tossPhrases.length)]));
   }
 
   // Small delay so the DOM is painted before we animate
