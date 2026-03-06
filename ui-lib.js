@@ -187,7 +187,7 @@ export class BubbleMenu {
         this.root.setAttribute('aria-label', 'Menú de navegación');
         this.root.style.cssText =
             'position:fixed; bottom:clamp(16px,4vw,32px); right:clamp(16px,4vw,32px); z-index:1000; ' +
-            'display:flex; flex-direction:column-reverse; align-items:flex-end; gap:12px;';
+            'display:flex; flex-direction:column-reverse; align-items:flex-end; gap:12px; pointer-events:none;';
 
         // Toggle button
         this.toggleBtn = document.createElement('button');
@@ -196,7 +196,7 @@ export class BubbleMenu {
         this.toggleBtn.setAttribute('aria-label', 'Abrir menú');
         this.toggleBtn.innerHTML = `<span class="bubble-icon-inner">${this.options.mainIcon}</span>`;
         this.toggleBtn.style.cssText =
-            'width:56px; height:56px; border-radius:50%; background:var(--text); color:var(--bg); ' +
+            'width:56px; height:56px; border-radius:50%; background:var(--text); color:var(--bg); pointer-events:auto; ' +
             'box-shadow:0 8px 24px hsla(0,0%,0%,0.18); display:grid; place-items:center; cursor:pointer; ' +
             'font-size:22px; border:none; transition:all 0.35s cubic-bezier(0.16, 1, 0.3, 1); user-select:none; ' +
             'will-change:transform;';
@@ -221,7 +221,7 @@ export class BubbleMenu {
                 `<span class="bubble-btn-label">${item.label}</span>` +
                 `<span class="bubble-btn-icon">${item.icon || ''}</span>`;
             btn.style.cssText =
-                'display:flex; align-items:center; gap:10px; padding:10px 18px 10px 16px; ' +
+                'display:flex; align-items:center; gap:10px; padding:10px 18px 10px 16px; pointer-events:auto; ' +
                 'background:var(--panel-bg); color:var(--text); border:1px solid var(--panel-border); ' +
                 'border-radius:100px; cursor:pointer; font-family:var(--font-sans); font-weight:500; ' +
                 'font-size:0.85rem; opacity:0; transform:translateX(12px) scale(0.95); ' +
