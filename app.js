@@ -300,8 +300,11 @@ function staggerCards(selector = '.history-card', baseDelay = 0.05) {
 async function registerSW() {
   if (!('serviceWorker' in navigator)) return;
   try {
-    await navigator.serviceWorker.register('./sw.js');
-  } catch { /* silent */ }
+    const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+    console.log('[PWA] Service Worker registered:', reg.scope);
+  } catch (err) {
+    console.error('[PWA] Service Worker registration failed:', err);
+  }
 }
 
 // ---------- Haptic ----------
