@@ -73,21 +73,21 @@
   "screenshots": [
     {
       "src": "/assets/screenshots/screen-home.png",
-      "sizes": "1080x1920",
+      "sizes": "1334x1105",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Pantalla principal — Nueva consulta"
     },
     {
       "src": "/assets/screenshots/screen-reading.png",
-      "sizes": "1080x1920",
+      "sizes": "1334x1105",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Lectura del hexagrama"
     },
     {
       "src": "/assets/screenshots/screen-wide.png",
-      "sizes": "1920x1080",
+      "sizes": "1911x1356",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Escritorio — Interfaz completa"
@@ -172,6 +172,5 @@
     {
       "origin": "https://ichingreflexion.vercel.app"
     }
-  ],
-  "iarc_rating_id": "e0000000-0000-0000-0000-000000000000"
+  ]
 }
