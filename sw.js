@@ -4,7 +4,7 @@
 //  Play Store / TWA ready
 // ============================================================
 
-const CACHE_VERSION = "v1.0.0";
+const CACHE_VERSION = "v1.0.1";
 const CACHE_NAME = `iching-shell-${CACHE_VERSION}`;
 const DATA_CACHE = `iching-data-${CACHE_VERSION}`;
 
@@ -33,8 +33,8 @@ const SHELL = [
   // Core images
   "./assets/sage.png",
   "./assets/sage_cover.png",
-  "./assets/coin_yang.png",
-  "./assets/coin_yin.png",
+  "./assets/coin_yang_final.png",
+  "./assets/coin_yin_final.png",
 
   // Sumi-e offline art backgrounds
   "./assets/fallback/sumi-mountains.svg",

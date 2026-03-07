@@ -12,10 +12,12 @@
   "type": "commonjs",
   "dependencies": {
     "d3-interpolate-path": "^2.3.0",
+    "pureimage": "^0.4.18",
     "roughjs": "^4.6.6",
     "vivus": "^0.4.6"
   },
   "devDependencies": {
+    "jimp": "^0.22.10",
     "sharp": "^0.34.5"
   }
 }

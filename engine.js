@@ -276,7 +276,9 @@ export function tossYarrowLine() {
   // 7 (Joven Yang): 5/16 (31.25%)
   // 8 (Joven Yin): 7/16  (43.75%)
   // 9 (Viejo Yang): 3/16 (18.75%)
-  const r = Math.random();
+  const array = new Uint32Array(1);
+  window.crypto.getRandomValues(array);
+  const r = array[0] / (0xFFFFFFFF + 1);
   let value;
 
   if (r < 1 / 16) value = 6;
@@ -301,7 +303,9 @@ export function setMethod(method) {
 }
 
 function randCoin() {
-  return Math.random() < 0.5 ? "heads" : "tails";
+  const array = new Uint32Array(1);
+  window.crypto.getRandomValues(array);
+  return array[0] % 2 === 0 ? "heads" : "tails";
 }
 
 // --- Reading Assembly ---

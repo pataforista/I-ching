@@ -11,8 +11,9 @@ import {
 } from "./engine.js";
 
 // Constants
-const LS_KEY = "iching_local_v1";
+const LS_KEY = "iching_local_v2";
 const LS_THEME = "iching_theme_v1";
+const LS_AUDIO = "iching_audio_v1";
 
 function dispatchFox(eventName, payload) {
   document.dispatchEvent(new CustomEvent('fox_event', { detail: { eventName, payload } }));
@@ -68,6 +69,9 @@ var state = {
     full_access: true,
     journal_mode: true,
     export_tools: true
+  },
+  settings: {
+    audio_enabled: true
   }
 };
 
@@ -75,6 +79,12 @@ var state = {
 (async function init() {
   loadLocal();
   if (!state.history) state.history = [];
+
+  // Sync audio setting from LS
+  const savedAudio = localStorage.getItem(LS_AUDIO);
+  if (savedAudio !== null) {
+    state.settings.audio_enabled = savedAudio === "true";
+  }
 
   // Handle PWA shortcut deep links
   const bootNav = sessionStorage.getItem('iching_boot_nav');
@@ -156,6 +166,7 @@ function initBubbleMenu() {
     items: [
       { id: "home", icon: "✦", label: "Nueva consulta", onClick: () => startNew() },
       { id: "history", icon: "◎", label: "Mi bitácora", onClick: () => openHistory() },
+      { id: "audio", icon: state.settings.audio_enabled ? "🔊" : "🔇", label: state.settings.audio_enabled ? "Silenciar sonidos" : "Activar sonidos", onClick: () => onToggleAudio() },
       { id: "theme", icon: "◑", label: "Cambiar tema", onClick: () => onToggleTheme() },
       {
         id: "notify", icon: hasSub ? "◉" : "○", label: hasSub ? "Silenciar recordatorio" : "Activar recordatorio", onClick: async () => {
@@ -392,9 +403,71 @@ function initSwipeGestures() {
       else if (tossBtn && !state._tossing) { haptic('light'); onTossNextLine(); }
     }
   };
-
   document.body.addEventListener('touchstart', document.body._swipeStart, { passive: true });
   document.body.addEventListener('touchend', document.body._swipeEnd, { passive: true });
+}
+
+// ---------- Sensory Feedback ----------
+let audioCtx;
+
+function onToggleAudio() {
+  state.settings.audio_enabled = !state.settings.audio_enabled;
+  localStorage.setItem(LS_AUDIO, state.settings.audio_enabled);
+
+  // Update bubble menu if open
+  if (bubbleMenu && bubbleMenu.items) {
+    const audioItem = bubbleMenu.items.find(i => i.id === "audio");
+    if (audioItem) {
+      audioItem.icon = state.settings.audio_enabled ? "🔊" : "🔇";
+      audioItem.label = state.settings.audio_enabled ? "Silenciar sonidos" : "Activar sonidos";
+      bubbleMenu.render();
+    }
+  }
+
+  render();
+}
+
+function playTossFeedback() {
+  if (!state.settings.audio_enabled) return;
+
+  // Haptic vibration: a fluttery pattern mimicking shaking and landing coins
+  if (navigator.vibrate) {
+    navigator.vibrate([15, 40, 25, 60, 15, 80, 40]);
+  }
+
+  // Synthesize a kinder, softer "Singing Bowl" tone using Web Audio API
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    const t = audioCtx.currentTime;
+
+    const playZenBowl = (time, freq, volume, duration) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, time);
+
+      // Ultra-soft attack and very long, peaceful decay
+      gain.gain.setValueAtTime(0, time);
+      gain.gain.linearRampToValueAtTime(volume, time + 0.1); // slow fade in
+      gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+
+      osc.start(time);
+      osc.stop(time + duration + 0.1);
+    };
+
+    // A harmonious, gentle chord (Low, Med, High resonant tones)
+    playZenBowl(t, 440, 0.15, 2.5);  // Root
+    playZenBowl(t + 0.1, 660, 0.08, 2.0); // Fifth
+    playZenBowl(t + 0.2, 880, 0.05, 1.5); // Octave
+  } catch (e) {
+    console.warn("Audio feedback unavailable", e);
+  }
 }
 
 // ---------- Navigation ----------
@@ -763,6 +836,11 @@ function HomeFormView() {
 
   return `
     <div class="immersive-screen screen-home">
+      <!-- Discreet Audio Toggle -->
+      <button class="btn btn--ghost" id="btnAudioToggle" style="position:absolute; top:24px; right:24px; z-index:100; padding:10px; border-radius:50%; width:44px; height:44px; opacity:0.5;">
+        ${state.settings.audio_enabled ? "🔊" : "🔇"}
+      </button>
+
       <div class="home-hero">
 
         <div id="homeAvatarTarget" style="width: clamp(160px, 20vw, 220px); height: clamp(160px, 20vw, 220px); position: relative; z-index: 10;"></div>
@@ -856,7 +934,7 @@ function TossView() {
         </div>
         ` : ''}
 
-        <div style="text-align:center; display:flex; flex-direction:column; gap:4px;">
+        <div style="text-align:center; display:flex; flex-direction:column; align-items:center; gap:4px;">
           <span class="muted serif" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.12em; opacity:0.5;">
             ${isComplete ? 'Hexagrama completo' : `Línea ${n + 1} de 6`}
           </span>
@@ -1219,187 +1297,18 @@ function opt(val, label) {
 }
 
 function renderStageCoins() {
-  // SVG for Yang face (Heads) — solid Yang line, golden bronze coin
-  const yangFaceSVG = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
-      <defs>
-        <!-- Warm bronze body gradient -->
-        <radialGradient id="coinGrad-yang" cx="38%" cy="35%" r="65%">
-          <stop offset="0%"   stop-color="hsl(42, 80%, 75%)"/>
-          <stop offset="40%"  stop-color="hsl(38, 70%, 58%)"/>
-          <stop offset="75%"  stop-color="hsl(34, 65%, 40%)"/>
-          <stop offset="100%" stop-color="hsl(30, 55%, 28%)"/>
-        </radialGradient>
-        <!-- Specular highlight -->
-        <radialGradient id="specular-yang" cx="30%" cy="28%" r="40%">
-          <stop offset="0%"   stop-color="hsl(48, 90%, 85%)" stop-opacity="0.6"/>
-          <stop offset="100%" stop-color="hsl(42, 70%, 60%)" stop-opacity="0"/>
-        </radialGradient>
-        <!-- Rim inner shadow -->
-        <radialGradient id="rimShadow-yang" cx="50%" cy="50%" r="50%">
-          <stop offset="82%"  stop-color="transparent"/>
-          <stop offset="100%" stop-color="hsl(30, 50%, 18%)" stop-opacity="0.55"/>
-        </radialGradient>
-        <!-- Square hole gradient -->
-        <linearGradient id="holeGrad-yang" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%"   stop-color="hsl(240, 10%, 8%)"/>
-          <stop offset="100%" stop-color="hsl(240, 8%, 14%)"/>
-        </linearGradient>
-        <!-- Noise texture filter -->
-        <filter id="texture-yang" x="0" y="0" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" result="noise" stitchTiles="stitch"/>
-          <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise"/>
-          <feBlend in="SourceGraphic" in2="grayNoise" mode="overlay" result="blended"/>
-          <feComposite in="blended" in2="SourceGraphic" operator="in"/>
-        </filter>
-        <!-- Engraving emboss filter -->
-        <filter id="emboss-yang">
-          <feGaussianBlur stdDeviation="0.6" result="blur"/>
-          <feSpecularLighting in="blur" surfaceScale="3" specularConstant="0.8" specularExponent="15" result="spec" lighting-color="hsl(48,80%,82%)">
-            <fePointLight x="60" y="55" z="90"/>
-          </feSpecularLighting>
-          <feComposite in="spec" in2="SourceAlpha" operator="in" result="specMasked"/>
-          <feBlend in="SourceGraphic" in2="specMasked" mode="screen"/>
-        </filter>
-      </defs>
-
-      <!-- Main coin body -->
-      <circle cx="100" cy="100" r="96" fill="url(#coinGrad-yang)" filter="url(#texture-yang)"/>
-
-      <!-- Raised outer rim -->
-      <circle cx="100" cy="100" r="96" fill="none" stroke="hsl(38, 60%, 48%)" stroke-width="6" opacity="0.6"/>
-      <circle cx="100" cy="100" r="91" fill="none" stroke="hsl(42, 75%, 70%)" stroke-width="2" opacity="0.5"/>
-      <circle cx="100" cy="100" r="88" fill="none" stroke="hsl(30, 50%, 28%)" stroke-width="1.5" opacity="0.4"/>
-
-      <!-- Inner decorative ring -->
-      <circle cx="100" cy="100" r="68" fill="none" stroke="hsl(38, 55%, 42%)" stroke-width="1.5" opacity="0.5" stroke-dasharray="5 3"/>
-
-      <!-- Square center hole -->
-      <rect x="79" y="79" width="42" height="42" rx="3" ry="3" fill="url(#holeGrad-yang)"/>
-      <!-- Square hole inner bevel highlight -->
-      <rect x="79" y="79" width="42" height="42" rx="3" ry="3" fill="none" stroke="hsl(38,65%,55%)" stroke-width="1.5" opacity="0.4"/>
-      <rect x="81" y="81" width="38" height="38" rx="2" ry="2" fill="none" stroke="hsl(240,10%,5%)" stroke-width="1" opacity="0.6"/>
-
-      <!-- Yang symbol: solid horizontal bar (☰ representation — solid yang line) -->
-      <g filter="url(#emboss-yang)" opacity="0.95">
-        <!-- Upper trigram bar (yang — solid) -->
-        <rect x="42" y="55" width="116" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <!-- Middle bar -->
-        <rect x="42" y="71" width="116" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <!-- Lower bar -->
-        <rect x="42" y="87" width="33" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <rect x="125" y="87" width="33" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-
-        <!-- Bottom trigram bars -->
-        <rect x="42" y="113" width="116" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <rect x="42" y="129" width="116" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <rect x="42" y="145" width="116" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-      </g>
-
-      <!-- Specular sheen layered on top -->
-      <circle cx="100" cy="100" r="96" fill="url(#specular-yang)" style="mix-blend-mode:screen;"/>
-
-      <!-- Rim shadow vignette -->
-      <circle cx="100" cy="100" r="96" fill="url(#rimShadow-yang)"/>
-    </svg>`;
-
-  // SVG for Yin face (Tails) — broken Yin line, darker aged patina
-  const yinFaceSVG = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
-      <defs>
-        <!-- Darker, more aged bronze for yin -->
-        <radialGradient id="coinGrad-yin" cx="38%" cy="35%" r="65%">
-          <stop offset="0%"   stop-color="hsl(36, 60%, 62%)"/>
-          <stop offset="40%"  stop-color="hsl(32, 52%, 45%)"/>
-          <stop offset="75%"  stop-color="hsl(28, 48%, 30%)"/>
-          <stop offset="100%" stop-color="hsl(22, 42%, 18%)"/>
-        </radialGradient>
-        <radialGradient id="specular-yin" cx="30%" cy="28%" r="40%">
-          <stop offset="0%"   stop-color="hsl(44, 80%, 78%)" stop-opacity="0.45"/>
-          <stop offset="100%" stop-color="hsl(36, 60%, 50%)" stop-opacity="0"/>
-        </radialGradient>
-        <radialGradient id="rimShadow-yin" cx="50%" cy="50%" r="50%">
-          <stop offset="82%"  stop-color="transparent"/>
-          <stop offset="100%" stop-color="hsl(22, 40%, 10%)" stop-opacity="0.65"/>
-        </radialGradient>
-        <linearGradient id="holeGrad-yin" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%"   stop-color="hsl(240, 10%, 6%)"/>
-          <stop offset="100%" stop-color="hsl(240, 8%, 12%)"/>
-        </linearGradient>
-        <filter id="texture-yin" x="0" y="0" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" result="noise" stitchTiles="stitch"/>
-          <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise"/>
-          <feBlend in="SourceGraphic" in2="grayNoise" mode="overlay" result="blended"/>
-          <feComposite in="blended" in2="SourceGraphic" operator="in"/>
-        </filter>
-        <filter id="emboss-yin">
-          <feGaussianBlur stdDeviation="0.6" result="blur"/>
-          <feSpecularLighting in="blur" surfaceScale="3" specularConstant="0.7" specularExponent="12" result="spec" lighting-color="hsl(44,70%,75%)">
-            <fePointLight x="60" y="55" z="90"/>
-          </feSpecularLighting>
-          <feComposite in="spec" in2="SourceAlpha" operator="in" result="specMasked"/>
-          <feBlend in="SourceGraphic" in2="specMasked" mode="screen"/>
-        </filter>
-        <!-- Green patina splatters on yin side -->
-        <filter id="patina-yin">
-          <feTurbulence type="fractalNoise" baseFrequency="0.2" numOctaves="2" result="noise2"/>
-          <feColorMatrix type="matrix" values="0 0 0 0 0.2  0 0 0 0 0.55  0 0 0 0 0.3  0 0 0 0.25 0" in="noise2" result="greenNoise"/>
-          <feComposite in="greenNoise" in2="SourceAlpha" operator="in"/>
-        </filter>
-      </defs>
-
-      <!-- Main coin body -->
-      <circle cx="100" cy="100" r="96" fill="url(#coinGrad-yin)" filter="url(#texture-yin)"/>
-
-      <!-- Green patina layer (aged look) -->
-      <circle cx="100" cy="100" r="96" fill="hsl(155, 40%, 35%)" style="mix-blend-mode:overlay" opacity="0.12" filter="url(#patina-yin)"/>
-
-      <!-- Raised outer rim -->
-      <circle cx="100" cy="100" r="96" fill="none" stroke="hsl(32, 55%, 38%)" stroke-width="6" opacity="0.6"/>
-      <circle cx="100" cy="100" r="91" fill="none" stroke="hsl(36, 65%, 58%)" stroke-width="2" opacity="0.4"/>
-      <circle cx="100" cy="100" r="88" fill="none" stroke="hsl(22, 45%, 20%)" stroke-width="1.5" opacity="0.4"/>
-
-      <!-- Inner ring -->
-      <circle cx="100" cy="100" r="68" fill="none" stroke="hsl(32, 48%, 35%)" stroke-width="1.5" opacity="0.5" stroke-dasharray="5 3"/>
-
-      <!-- Square center hole -->
-      <rect x="79" y="79" width="42" height="42" rx="3" ry="3" fill="url(#holeGrad-yin)"/>
-      <rect x="79" y="79" width="42" height="42" rx="3" ry="3" fill="none" stroke="hsl(34,55%,45%)" stroke-width="1.5" opacity="0.35"/>
-      <rect x="81" y="81" width="38" height="38" rx="2" ry="2" fill="none" stroke="hsl(240,10%,4%)" stroke-width="1" opacity="0.6"/>
-
-      <!-- Yin symbol: broken lines on both upper and lower trigrams -->
-      <g filter="url(#emboss-yin)" opacity="0.9">
-        <!-- Upper trigram (broken Yin lines) -->
-        <rect x="42" y="55" width="47" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <rect x="111" y="55" width="47" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <rect x="42" y="71" width="47" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <rect x="111" y="71" width="47" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <rect x="42" y="87" width="47" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <rect x="111" y="87" width="47" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <!-- Lower trigram (broken Yin lines) -->
-        <rect x="42" y="113" width="47" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <rect x="111" y="113" width="47" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <rect x="42" y="129" width="47" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <rect x="111" y="129" width="47" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <rect x="42" y="145" width="47" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-        <rect x="111" y="145" width="47" height="11" rx="3" fill="hsl(240, 8%, 15%)"/>
-      </g>
-
-      <!-- Specular sheen -->
-      <circle cx="100" cy="100" r="96" fill="url(#specular-yin)" style="mix-blend-mode:screen;"/>
-
-      <!-- Rim vignette -->
-      <circle cx="100" cy="100" r="96" fill="url(#rimShadow-yin)"/>
-    </svg>`;
+  // Use new realistic image assets for Cara (Yang) and Cruz (Yin)
+  const yangFace = `<img src="./assets/coin_yang_final.png" alt="Cara (Yang)" />`;
+  const yinFace = `<img src="./assets/coin_yin_final.png" alt="Cruz (Yin)" />`;
 
   return [1, 2, 3].map((_, i) => `
     <div class="coin-3d" style="--toss-dur:${880 + i * 60}ms;">
       <div class="coin-spin-inner" style="position:relative; width:100%; height:100%; transform-style:preserve-3d;">
         <div class="coin-face coin-front">
-          ${yangFaceSVG}
+          ${yangFace}
         </div>
         <div class="coin-face coin-back">
-          ${yinFaceSVG}
+          ${yinFace}
         </div>
       </div>
     </div>
@@ -1499,6 +1408,9 @@ function onTossNextLine() {
 
   state._tossing = true;
   render();
+
+  // Trigger sensory feedback (sound and vibration)
+  playTossFeedback();
 
   const ensoEl = document.getElementById("ensoTarget");
   if (ensoEl) new EnsoLoader(ensoEl).show(2000);
@@ -1647,6 +1559,10 @@ function bindPageEvents(root) {
   });
   root.querySelector("#qMode")?.addEventListener("change", e => {
     state.draft.question.mode = e.target.value;
+  });
+
+  root.querySelector("#btnAudioToggle")?.addEventListener("click", () => {
+    onToggleAudio();
   });
   root.querySelector("#btnHistoryShortcut")?.addEventListener("click", openHistory);
   root.querySelector("#btnGlossary")?.addEventListener("click", openGlossary);
