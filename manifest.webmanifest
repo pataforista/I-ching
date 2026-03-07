@@ -150,9 +150,6 @@
   "note_taking": {
     "new_note_url": "/?action=new-note"
   },
-  "scope_extensions": [
-    {
-      "origin": "https://ichingreflexion.vercel.app"
-    }
-  ]
+  "scope_extensions": [],
+  "iarc_rating_id": "00000000-0000-0000-0000-000000000000"
 }
