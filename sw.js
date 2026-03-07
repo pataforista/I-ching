@@ -4,7 +4,7 @@
 //  Play Store / TWA ready
 // ============================================================
 
-const CACHE_VERSION = "v1.0.1";
+const CACHE_VERSION = "v1.0.2";
 const CACHE_NAME = `iching-shell-${CACHE_VERSION}`;
 const DATA_CACHE = `iching-data-${CACHE_VERSION}`;
 
