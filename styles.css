@@ -308,6 +308,8 @@ h4,
   letter-spacing: 0.02em;
   text-decoration: none;
   white-space: nowrap;
+  min-height: 44px;
+  /* PWABuilder Touch Target Requirement */
 }
 
 .btn:hover:not(:disabled) {
