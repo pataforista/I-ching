@@ -1,7 +1,7 @@
 {
   "name": "I Ching · Guía Taoísta",
   "short_name": "IChing Tao",
-  "id": "com.iching.tao",
+  "id": "com.iching.taoista",
   "description": "Tu oráculo personal del I Ching con estética Zen y Sumi-e. Reflexión profunda y sabiduría taoísta, completamente local y privado.",
   "start_url": "/",
   "scope": "/",
