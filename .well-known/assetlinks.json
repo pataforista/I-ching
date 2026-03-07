@@ -7,7 +7,7 @@
             "namespace": "android_app",
             "package_name": "app.vercel.ichingreflexion.twa",
             "sha256_cert_fingerprints": [
-                "REEMPLAZA_CON_SHA256_FINGERPRINT_DE_TU_KEYSTORE"
+                "04:4C:49:73:8E:84:4C:EF:01:8D:73:30:09:DB:C6:4A:CB:5C:A8:EA:ED:C6:CB:03:9C:13:32:E2:1D:D7:55:F4"
             ]
         }
     }
