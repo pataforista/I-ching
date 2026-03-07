@@ -119,6 +119,15 @@
   "launch_handler": {
     "client_mode": "focus-existing"
   },
+  "share_target": {
+    "action": "/?share=true",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "file_handlers": [
     {
       "action": "/?action=open-reading",

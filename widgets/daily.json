@@ -1,0 +1,43 @@
+{
+    "type": "AdaptiveCard",
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.5",
+    "body": [
+        {
+            "type": "Container",
+            "style": "default",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "text": "${title}",
+                    "weight": "Bolder",
+                    "size": "Medium",
+                    "wrap": true,
+                    "color": "Dark"
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "${hexagramName}",
+                    "size": "ExtraLarge",
+                    "weight": "Bolder",
+                    "color": "Good",
+                    "spacing": "Medium",
+                    "wrap": true
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "${judgment}",
+                    "wrap": true,
+                    "spacing": "Small"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "type": "Action.OpenUrl",
+            "title": "Consultar Oráculo",
+            "url": "https://ichingreflexion.vercel.app/"
+        }
+    ]
+}
