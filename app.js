@@ -153,7 +153,6 @@ var state = {
     }
   }
 
-  registerSW();
   render();
 
   // Signal splash screen to hide
@@ -297,15 +296,7 @@ function staggerCards(selector = '.history-card', baseDelay = 0.05) {
 }
 
 // ---------- SW ----------
-async function registerSW() {
-  if (!('serviceWorker' in navigator)) return;
-  try {
-    const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-    console.log('[PWA] Service Worker registered:', reg.scope);
-  } catch (err) {
-    console.error('[PWA] Service Worker registration failed:', err);
-  }
-}
+// Service Worker registration moved to index.html for PWABuilder static detection
 
 // ---------- Haptic ----------
 function haptic(type = 'light') {
